@@ -8,7 +8,7 @@ export default function Sidebar({ children }) {
 
   return (
     <aside className="h-screen">
-      <nav className="h-full inline-flex flex-col bg-white border-r shadow-sm">
+      <nav className="h-full inline-flex flex-col bg-background border-r shadow-sm">
         <div className="p-4 pb-2 flex justify-between items-center">
           <img
             src="https://img.logoipsum.com/243.svg"
@@ -19,7 +19,7 @@ export default function Sidebar({ children }) {
           />
           <button
             onClick={() => setExpanded((curr) => !curr)}
-            className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100"
+            className="p-1.5 rounded-lg bg-side-active/50 hover:bg-side-active/30"
           >
             {expanded ? <ChevronFirst /> : <ChevronLast />}
           </button>
@@ -64,8 +64,8 @@ export function SidebarItem({ icon, text, active, alert }) {
         transition-colors group
         ${
           active
-            ? "bg-gradient-to-tr from-indigo-200 to-indigo-100 text-indigo-800"
-            : "hover:bg-indigo-50 text-gray-600"
+            ? "bg-side-active text-sidetext-active"
+            : "hover:bg-side-active/30 text-text-primary"
         }
     `}
     >
