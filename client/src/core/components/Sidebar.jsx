@@ -1,14 +1,51 @@
 import { MoreVertical, ChevronLast, ChevronFirst } from "lucide-react";
-import { useContext, createContext, useState } from "react";
+import { useContext, createContext, useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../services/slices/userSlice";
 
 const SidebarContext = createContext();
 
 export default function Sidebar({ children }) {
-  const [expanded, setExpanded] = useState(true);
+  const dispatch = useDispatch();
 
+  const [expanded, setExpanded] = useState(true);
+  const userInfo = useSelector((state) => state.user.userInfo);
+
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null); // Ref for the dropdown
+  const moreVerticalRef = useRef(null); // Ref for the MoreVertical button
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+  };
+
+  const handleDropdownToggle = () => {
+    setShowDropdown((prev) => !prev); // Toggle the dropdown visibility
+  };
+  // Close the dropdown when clicking outside of it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        moreVerticalRef.current &&
+        !moreVerticalRef.current.contains(event.target)
+      ) {
+        setShowDropdown(false); // Close dropdown if click is outside
+      }
+    };
+
+    // Add event listener for clicks outside
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   return (
     <aside className="h-screen">
-      <nav className="h-full inline-flex flex-col bg-background border-r shadow-sm">
+      <nav className="h-full inline-flex flex-col bg-background border-r shadow-sm relative">
         <div className="p-4 pb-2 flex justify-between items-center">
           <img
             src="https://img.logoipsum.com/243.svg"
@@ -30,11 +67,7 @@ export default function Sidebar({ children }) {
         </SidebarContext.Provider>
 
         <div className="border-t flex p-3">
-          <img
-            src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
-            alt=""
-            className="w-10 h-10 rounded-md"
-          />
+          <img src={userInfo.picture} alt="" className="w-10 h-10 rounded-md" />
           <div
             className={`
               flex justify-between items-center
@@ -42,14 +75,38 @@ export default function Sidebar({ children }) {
           `}
           >
             <div className="leading-4">
-              <h4 className="font-semibold">John Doe</h4>
+              <h4 className="font-semibold">{userInfo.name}</h4>
               <span className="text-xs text-text-primary">
-                johndoe@gmail.com
+                {userInfo.email}
               </span>
             </div>
-            <MoreVertical size={20} />
+            <button
+              onClick={handleDropdownToggle}
+              ref={moreVerticalRef}
+              className="p-2 rounded-md hover:bg-side-active/30"
+            >
+              <MoreVertical size={20} />
+            </button>
           </div>
         </div>
+
+        {/* Dropdown Menu for Profile and Logout */}
+        {showDropdown && (
+          <div
+            ref={dropdownRef}
+            className="absolute right-0 bottom-[60px] w-40 bg-background shadow-lg rounded-lg mt-2 p-2 border border-color"
+          >
+            <button className="w-full text-left px-4 py-2 text-sm hover:bg-side-active/30 rounded-md">
+              Profile
+            </button>
+            <button
+              onClick={handleLogout}
+              className="w-full text-left px-4 py-2 text-sm hover:bg-side-active/30 rounded-md"
+            >
+              Logout
+            </button>
+          </div>
+        )}
       </nav>
     </aside>
   );
