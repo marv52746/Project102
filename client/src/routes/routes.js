@@ -1,55 +1,132 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { authRoute, publicRoutes } from "./router.link";
 import { useSelector } from "react-redux";
 import {
-  LifeBuoy,
   Receipt,
-  Boxes,
-  Package,
   UserCircle,
-  BarChart3,
   LayoutDashboard,
-  Settings,
+  Bed,
+  NotebookPen,
+  Accessibility,
 } from "lucide-react";
 import Sidebar, { SidebarItem } from "../core/components/Sidebar";
-
-// ProtectedRoute to handle internal users
-//   const ProtectedRoute = ({ element }) => {
-//     const authState = useSelector((state) => state.user.authState);
-//     return authState ? element : <Navigate to="/signin" />;
-//   };
+import Header from "../core/components/Header";
+import { all_routes } from "./all_routes";
 
 const theme = "light";
 
-// Layout for internal users (employee users)
+// Updated iconMapping as an array of objects
+const iconMapping = [
+  {
+    text: "Dashboard",
+    icon: <LayoutDashboard size={20} />,
+    alert: false,
+    active: false,
+    iconText: "Dashboard",
+    to: all_routes.dashboard,
+    table: "dashboard",
+  },
+  {
+    text: "Patients",
+    icon: <Accessibility size={20} />,
+    alert: false,
+    active: false,
+    iconText: "Patients",
+    to: all_routes.patients,
+    table: "patients",
+  },
+  {
+    text: "Doctors",
+    icon: <UserCircle size={20} />,
+    alert: false,
+    active: false,
+    iconText: "Doctors",
+    to: all_routes.doctors,
+    table: "doctors",
+  },
+  {
+    text: "Appointments",
+    icon: <NotebookPen size={20} />,
+    alert: false,
+    active: false,
+    iconText: "Appointments",
+    to: all_routes.appointments,
+    table: "appointments",
+  },
+  {
+    text: "Payments",
+    icon: <Receipt size={20} />,
+    alert: true,
+    active: false,
+    iconText: "Payments",
+    table: "payments",
+  },
+  {
+    text: "Room Allotments",
+    icon: <Bed size={20} />,
+    alert: true,
+    active: false,
+    iconText: "Room Allotments",
+    table: "room-allotments",
+  },
+];
+
 const InternalLayout = () => {
+  const location = useLocation(); // Get the current location (URL)
+
+  // Function to extract tablename based on the current URL
+  const getTablenameFromPath = () => {
+    const path = location.pathname.split("/"); // Split path into segments
+
+    if (path[1] === "") {
+      // Root path ("/")
+      return "dashboard"; // Default to "dashboard" for the root path
+    }
+
+    if (path[1] === "list" && path[2]) {
+      // List path ("/list/:tablename")
+      return path[2]; // Extract tablename from the URL
+    }
+
+    if (path[1] === "form" && path[2]) {
+      // Form path ("/form/:tablename/:id")
+      return path[2]; // Extract tablename from the URL (ignore the id)
+    }
+
+    return ""; // Return empty string if no match
+  };
+
+  // Function to determine the active item based on the current route
+  const getActiveSidebarItem = (route) => {
+    return route === getTablenameFromPath() ? "active" : "";
+  };
+
   return (
-    <div className={`flex ${theme}`}>
+    <div className={`flex h-screen ${theme}`}>
       {/* Sidebar for internal users */}
-      <Sidebar className="w-10">
-        <SidebarItem
-          icon={<LayoutDashboard size={20} />}
-          text="Dashboard"
-          alert
-        />
-        <SidebarItem icon={<BarChart3 size={20} />} text="Statistics" active />
-        <SidebarItem icon={<UserCircle size={20} />} text="Users" />
-        <SidebarItem icon={<Boxes size={20} />} text="Inventory" />
-        <SidebarItem icon={<Package size={20} />} text="Orders" alert />
-        <SidebarItem icon={<Receipt size={20} />} text="Billings" alert />
+      <Sidebar className="w-10 bg-side-active/30">
+        {iconMapping.map((item) => (
+          <SidebarItem
+            key={item.text}
+            icon={item.icon} // Dynamically set the icon based on the text
+            text={item.iconText}
+            alert={item.alert} // Display alert if true
+            active={getActiveSidebarItem(item.table)} // Update active state based on route
+            to={item.to}
+          />
+        ))}
         <hr className="my-3" />
-        <SidebarItem icon={<Settings size={20} />} text="Settings" alert />
-        <SidebarItem icon={<LifeBuoy size={20} />} text="Help" alert />
       </Sidebar>
 
       {/* Main content for internal users */}
-      <div>
+      <div className="flex-1 overflow-auto bg-side-active/30">
+        <Header pathname={getTablenameFromPath()} />
         <Routes>
           {authRoute.map((route) => (
             <Route
+              exact={route.exact}
               path={route.path}
-              //   element={<ProtectedRoute element={route.element} />}
               element={route.element}
               key={route.id}
             />
@@ -60,37 +137,27 @@ const InternalLayout = () => {
   );
 };
 
-// Layout for external users (public users)
 const PublicLayout = () => {
   return (
-    <div className={`${theme}`}>
-      {/* Header or any other common components for public users */}
-      <div>
-        <Routes>
-          {publicRoutes.map((route) => (
-            <Route path={route.path} element={route.element} key={route.id} />
-          ))}
-        </Routes>
-      </div>
+    <div className={`h-screen ${theme}`}>
+      <Routes>
+        {publicRoutes.map((route) => (
+          <Route
+            exact={route.exact}
+            path={route.path}
+            element={route.element}
+            key={route.id}
+          />
+        ))}
+      </Routes>
     </div>
   );
 };
 
-// Main routing logic
 const AllRoutes = () => {
   const authState = useSelector((state) => state.user.authState);
 
-  return (
-    <>
-      {authState ? (
-        // Show Internal Layout for logged-in users (employee)
-        <InternalLayout />
-      ) : (
-        // Show Public Layout for external users
-        <PublicLayout />
-      )}
-    </>
-  );
+  return <>{authState ? <InternalLayout /> : <PublicLayout />}</>;
 };
 
 export default AllRoutes;

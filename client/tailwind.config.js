@@ -6,18 +6,14 @@ module.exports = {
       colors: {
         background: "rgba(var(--background))",
 
+        "text-primary": "rgba(var(--text-primary))",
+        "text-secondary": "rgba(var(--text-secondary))",
+
         "side-active": "rgba(var(--side-active))",
         "sidetext-active": "rgba(var(--sidetext-active))",
 
         border: "rgba(var(--border))",
-        card: "rgba(var(--card))",
-
-        "copy-primary": "rgba(var(--copy-primary))",
-        "copy-secondary": "rgba(var(--copy-secondary))",
-
-        cta: "rgba(var(--cta))",
-        "cta-active": "rgba(var(--cta-active))",
-        "cta-text": "rgba(var(--cta-text))",
+        "background-head": "rgba(var(--background-head))",
       },
     },
   },
