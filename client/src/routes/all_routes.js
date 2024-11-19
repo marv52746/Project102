@@ -6,7 +6,7 @@ export const all_routes = {
   // internal
   dashboard: "/",
   list: "/list/:tablename",
-  form: "/form/:tablename/:id",
+  form: "/form/:tablename/:view/:id",
 
   patients: "/list/patients",
   doctors: "/list/doctors",

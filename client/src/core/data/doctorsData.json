@@ -1,0 +1,180 @@
+{
+  "doctors": [
+    {
+      "id": 200001,
+      "name": "Dr. Manoj Kumar",
+      "image": "200001.jpeg",
+      "specialization": "General Medicine",
+      "qualification": "MBBS, MD",
+      "years_of_experience": 15,
+      "phone": "+91 91234 56789",
+      "email": "manoj.kumar@email.com",
+      "clinic_location": "Downtown Clinic, Bangalore",
+      "consultation_fee": "$90",
+      "working_hours": {
+        "monday": "09:00 AM - 01:00 PM, 04:00 PM - 08:00 PM",
+        "tuesday": "09:00 AM - 01:00 PM, 04:00 PM - 08:00 PM",
+        "wednesday": "09:00 AM - 01:00 PM",
+        "thursday": "09:00 AM - 01:00 PM, 04:00 PM - 08:00 PM",
+        "friday": "09:00 AM - 01:00 PM, 04:00 PM - 08:00 PM",
+        "saturday": "Closed",
+        "sunday": "Closed"
+      },
+      "languages_spoken": ["English", "Hindi", "Kannada"],
+      "reviews": [
+        {
+          "patient_name": "Daniel Smith",
+          "rating": 5,
+          "feedback": "Dr. Kumar is an excellent doctor. He listens carefully and provides clear instructions for treatment."
+        },
+        {
+          "patient_name": "Emily Davis",
+          "rating": 4,
+          "feedback": "Very knowledgeable and professional. His treatment for hypertension has worked wonders."
+        }
+      ],
+      "available_for_online_consultation": true,
+      "social_media_links": {
+        "linkedin": "https://linkedin.com/in/dr-manoj-kumar",
+        "twitter": "https://twitter.com/drmanojkumar"
+      },
+      "emergency_contact": {
+        "name": "Dr. Priya Sharma",
+        "phone": "+91 98765 43210",
+        "email": "priya.sharma@email.com"
+      }
+    },
+    {
+      "id": 200002,
+      "name": "Dr. Riya Sharma",
+      "image": "200002.jpeg",
+      "specialization": "Dermatology",
+      "qualification": "MBBS, MD Dermatology",
+      "years_of_experience": 10,
+      "phone": "+91 91000 23456",
+      "email": "riya.sharma@email.com",
+      "clinic_location": "Uptown Dermatology Center, Bangalore",
+      "consultation_fee": "$120",
+      "working_hours": {
+        "monday": "10:00 AM - 01:00 PM, 03:00 PM - 06:00 PM",
+        "tuesday": "10:00 AM - 01:00 PM, 03:00 PM - 06:00 PM",
+        "wednesday": "10:00 AM - 01:00 PM",
+        "thursday": "10:00 AM - 01:00 PM, 03:00 PM - 06:00 PM",
+        "friday": "10:00 AM - 01:00 PM, 03:00 PM - 06:00 PM",
+        "saturday": "Closed",
+        "sunday": "Closed"
+      },
+      "languages_spoken": ["English", "Hindi", "Punjabi"],
+      "reviews": [
+        {
+          "patient_name": "Sophia Johnson",
+          "rating": 5,
+          "feedback": "Dr. Sharma's treatment for eczema has been incredibly effective. She's very attentive and professional."
+        },
+        {
+          "patient_name": "Priya Mehta",
+          "rating": 4,
+          "feedback": "Great experience. The prescribed medication worked well, but waiting time could be improved."
+        }
+      ],
+      "available_for_online_consultation": true,
+      "social_media_links": {
+        "linkedin": "https://linkedin.com/in/dr-riya-sharma",
+        "twitter": "https://twitter.com/drriyasharma"
+      },
+      "emergency_contact": {
+        "name": "Dr. Anjali Verma",
+        "phone": "+91 77777 88888",
+        "email": "anjali.verma@email.com"
+      }
+    },
+    {
+      "id": 200003,
+      "name": "Dr. Paul Williams",
+      "image": "200003.jpeg",
+      "specialization": "Cardiology",
+      "qualification": "MBBS, MD, FACC",
+      "years_of_experience": 18,
+      "phone": "+91 91876 54321",
+      "email": "paul.williams@email.com",
+      "clinic_location": "City Cardiology Clinic, Bangalore",
+      "consultation_fee": "$150",
+      "working_hours": {
+        "monday": "09:00 AM - 01:00 PM, 02:00 PM - 06:00 PM",
+        "tuesday": "09:00 AM - 01:00 PM, 02:00 PM - 06:00 PM",
+        "wednesday": "09:00 AM - 01:00 PM",
+        "thursday": "09:00 AM - 01:00 PM, 02:00 PM - 06:00 PM",
+        "friday": "09:00 AM - 01:00 PM, 02:00 PM - 06:00 PM",
+        "saturday": "Closed",
+        "sunday": "Closed"
+      },
+      "languages_spoken": ["English", "French"],
+      "reviews": [
+        {
+          "patient_name": "James Wilson",
+          "rating": 5,
+          "feedback": "Dr. Williams is extremely knowledgeable and helped me manage my heart condition. Highly recommend."
+        },
+        {
+          "patient_name": "Neha Gupta",
+          "rating": 4,
+          "feedback": "Very thorough and professional. The only issue is his clinic's waiting time, which could be improved."
+        }
+      ],
+      "available_for_online_consultation": false,
+      "social_media_links": {
+        "linkedin": "https://linkedin.com/in/dr-paul-williams",
+        "twitter": "https://twitter.com/drpaulwilliams"
+      },
+      "emergency_contact": {
+        "name": "Dr. Ravi Kumar",
+        "phone": "+91 98888 77777",
+        "email": "ravi.kumar@email.com"
+      }
+    },
+    {
+      "id": 200004,
+      "name": "Dr. Anjali Verma",
+      "image": "200004.jpeg",
+      "specialization": "Pediatrics",
+      "qualification": "MBBS, MD Pediatrics",
+      "years_of_experience": 12,
+      "phone": "+91 92345 67890",
+      "email": "anjali.verma@email.com",
+      "clinic_location": "Little Care Children's Clinic, Bangalore",
+      "consultation_fee": "$80",
+      "working_hours": {
+        "monday": "09:00 AM - 01:00 PM, 03:00 PM - 06:00 PM",
+        "tuesday": "09:00 AM - 01:00 PM, 03:00 PM - 06:00 PM",
+        "wednesday": "09:00 AM - 01:00 PM",
+        "thursday": "09:00 AM - 01:00 PM, 03:00 PM - 06:00 PM",
+        "friday": "09:00 AM - 01:00 PM, 03:00 PM - 06:00 PM",
+        "saturday": "Closed",
+        "sunday": "Closed"
+      },
+      "languages_spoken": ["English", "Hindi", "Tamil"],
+      "reviews": [
+        {
+          "patient_name": "Priya Sharma",
+          "rating": 5,
+          "feedback": "Dr. Verma is a wonderful pediatrician. She is very patient with my kids and explains everything clearly."
+        },
+        {
+          "patient_name": "Amit Kumar",
+          "rating": 4,
+          "feedback": "Very professional, but the waiting time could be a bit long. Overall, a great doctor for kids."
+        }
+      ],
+      "available_for_online_consultation": true,
+      "social_media_links": {
+        "linkedin": "https://linkedin.com/in/dr-anjali-verma",
+        "twitter": "https://twitter.com/dranjaliverma"
+      },
+      "emergency_contact": {
+        "name": "Dr. Meera Reddy",
+        "phone": "+91 98888 12345",
+        "email": "meera.reddy@email.com"
+      }
+    }
+  ]
+}

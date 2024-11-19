@@ -11,7 +11,7 @@ const AppointmentsTable = ({ appointments }) => {
     <div className="col-md-12">
       <div className="bg-background shadow-md rounded-lg p-4">
         <h3 className="text-xl font-semibold text-sidetext-active">
-          Appointments
+          Appointments Today
         </h3>
         <div className="overflow-x-auto mt-4">
           <table className="min-w-full table-auto border-collapse">

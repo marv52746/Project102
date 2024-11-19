@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import ExportLinks from "./ExportLinks";
 
 const TableList = ({ title, data, columns }) => {
   const [search, setSearch] = useState("");
@@ -44,7 +45,7 @@ const TableList = ({ title, data, columns }) => {
   };
 
   const handleRowClick = (item) => {
-    navigate(`/form/${tablename}/${item.id}`);
+    navigate(`/form/${tablename}/view/${item.id}`);
   };
 
   return (
@@ -53,9 +54,7 @@ const TableList = ({ title, data, columns }) => {
         {/* <h3 className="text-2xl font-semibold mb-4 text-sidetext-active">
           {title}
         </h3> */}
-        <button className="bg-green-500 px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition">
-          Create New
-        </button>
+
         <div className="flex justify-center items-center">
           {/* Search Input */}
           <input
@@ -66,6 +65,9 @@ const TableList = ({ title, data, columns }) => {
             className="form-control form-control-sm w-80 border border-gray-300 rounded-md px-3 py-1 text-sm  focus:border-text-secondary  focus:outline-none"
           />
         </div>
+        <button className="bg-green-500 px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition">
+          Create New
+        </button>
       </div>
 
       <div className="table-responsive mb-4">
@@ -85,31 +87,7 @@ const TableList = ({ title, data, columns }) => {
             </select>
             <label className="text-sm text-gray-600">entries</label>
           </div>
-          {/* Export Links */}
-          <nav aria-label="Export Options" className="mr-2">
-            <ul className="flex justify-center space-x-4">
-              <li>
-                <button className="text-sm text-blue-500 hover:text-blue-700">
-                  CSV
-                </button>
-              </li>
-              <li>
-                <button className="text-sm text-blue-500 hover:text-blue-700">
-                  Print
-                </button>
-              </li>
-              <li>
-                <button className="text-sm text-blue-500 hover:text-blue-700">
-                  PDF
-                </button>
-              </li>
-              <li>
-                <button className="text-sm text-blue-500 hover:text-blue-700">
-                  Excel
-                </button>
-              </li>
-            </ul>
-          </nav>
+          <ExportLinks />
         </div>
 
         <table className="min-w-full table-auto border-collapse">

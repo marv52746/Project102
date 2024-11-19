@@ -1,22 +1,9 @@
 import React from "react";
 import TableList from "../../core/components/TableList";
+import mockPatientData from "../../core/data/mockPatientData.json";
 
 function Patients() {
-  const generatePatientData = (num) => {
-    const statuses = ["Completed", "Pending", "Cancelled"];
-    return Array.from({ length: num }, (_, index) => ({
-      id: index + 1,
-      name: `Patient ${index + 1}`,
-      age: 20 + (index % 30),
-      phone: `1234-567-${Math.floor(Math.random() * 900) + 100}`,
-      lastVisit: `${Math.floor(Math.random() * 30) + 1}-0${
-        Math.floor(Math.random() * 12) + 1
-      }-2023`,
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-    }));
-  };
-
-  const patientData = generatePatientData(50);
+  const patients = mockPatientData.patients;
 
   const columns = [
     { field: "id", title: "Patient ID" },
@@ -29,7 +16,7 @@ function Patients() {
 
   return (
     <div className="container mx-auto p-4">
-      <TableList title="Patients" data={patientData} columns={columns} />
+      <TableList title="Patients" data={patients} columns={columns} />
     </div>
   );
 }

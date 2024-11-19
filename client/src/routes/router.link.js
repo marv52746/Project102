@@ -8,34 +8,26 @@ import Form from "../pages/private/Form";
 
 const routes = all_routes;
 
-export const publicRoutes = [
+export const publicRoutesArray = [
   {
-    id: 1,
     path: routes.home,
     name: "home",
     element: <Home />,
-    route: Route,
   },
   {
-    id: 2,
     path: routes.signin,
     name: "signin",
     // element: <Signin />,
-    route: Route,
   },
   {
-    id: 3,
     path: routes.about,
     name: "about",
     // element: <About />,
-    route: Route,
   },
   {
-    id: 4,
     path: routes.contact,
     name: "contact",
     // element: <Contact />,
-    route: Route,
   },
 ];
 
@@ -51,6 +43,14 @@ const routesArray = [
 ];
 
 export const authRoute = routesArray.map((route, index) => ({
+  id: index + 1, // Dynamic ID based on index
+  path: route.path,
+  name: route.name,
+  element: route.element,
+  route: Route,
+}));
+
+export const publicRoutes = publicRoutesArray.map((route, index) => ({
   id: index + 1, // Dynamic ID based on index
   path: route.path,
   name: route.name,

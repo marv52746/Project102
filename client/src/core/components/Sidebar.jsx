@@ -24,6 +24,27 @@ export default function Sidebar({ children }) {
   const dropdownRef = useRef(null); // Ref for the dropdown
   const moreVerticalRef = useRef(null); // Ref for the MoreVertical button
 
+  // Check if the screen width is small and set the state accordingly
+  useEffect(() => {
+    const updateExpandedState = () => {
+      if (window.innerWidth <= 950) {
+        // You can adjust this value for your needs
+        setExpanded(false);
+      } else {
+        setExpanded(true);
+      }
+    };
+
+    // Update on initial load and resize events
+    updateExpandedState();
+    window.addEventListener("resize", updateExpandedState);
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener("resize", updateExpandedState);
+    };
+  }, []);
+
   const handleLogout = () => {
     dispatch(logoutUser());
     navigate("/");
@@ -135,8 +156,9 @@ export function SidebarItem({ icon, text, active, alert, to }) {
   const { expanded } = useContext(SidebarContext);
 
   return (
-    <li
-      className={`
+    <Link to={to} className="flex items-center w-full">
+      <li
+        className={`
         relative flex items-center py-2 px-3 my-1
         font-medium rounded-md cursor-pointer
         transition-colors group
@@ -146,8 +168,7 @@ export function SidebarItem({ icon, text, active, alert, to }) {
             : "hover:bg-side-active/30 text-text-primary"
         }
     `}
-    >
-      <Link to={to} className="flex items-center w-full">
+      >
         {icon}
         <span
           className={`overflow-hidden transition-all ${
@@ -156,27 +177,28 @@ export function SidebarItem({ icon, text, active, alert, to }) {
         >
           {text}
         </span>
-      </Link>
-      {alert && (
-        <div
-          className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
-            expanded ? "" : "top-2"
-          }`}
-        />
-      )}
 
-      {!expanded && (
-        <div
-          className={`
+        {alert && (
+          <div
+            className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
+              expanded ? "" : "top-2"
+            }`}
+          />
+        )}
+
+        {!expanded && (
+          <div
+            className={`
           absolute left-full rounded-md px-2 py-1 ml-6
           bg-indigo-100 text-indigo-800 text-sm
           invisible opacity-20 -translate-x-3 transition-all
           group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
       `}
-        >
-          {text}
-        </div>
-      )}
-    </li>
+          >
+            {text}
+          </div>
+        )}
+      </li>
+    </Link>
   );
 }
