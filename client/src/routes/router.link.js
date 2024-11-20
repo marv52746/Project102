@@ -41,7 +41,11 @@ const routesArray = [
 
   { path: routes.list, name: "list", element: <List /> },
   { path: routes.form, name: "form", element: <Form /> },
-  { path: routes.orgChart, name: "org-chart", element: <OrganizationChart /> },
+  {
+    path: routes.orgChart,
+    name: "organizational-structure-diagram",
+    element: <OrganizationChart />,
+  },
 ];
 
 export const authRoute = routesArray.map((route, index) => ({

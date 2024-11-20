@@ -14,6 +14,7 @@ import {
 import Sidebar, { SidebarItem } from "../core/components/Sidebar";
 import Header from "../core/components/Header";
 import { all_routes } from "./all_routes";
+import { getParmsFromPath } from "../core/utils/stringUtils";
 
 const theme = "light";
 
@@ -72,44 +73,23 @@ const iconMapping = [
     table: "room-allotments",
   },
   {
-    text: "Organization",
+    text: "Org Chart",
     icon: <Network size={20} />,
     alert: true,
     active: false,
-    iconText: "Organization",
-    table: "org-chart",
+    iconText: "Org Chart",
+    table: "organizational-structure-diagram",
     to: all_routes.orgChart,
   },
 ];
 
 const InternalLayout = () => {
   const location = useLocation(); // Get the current location (URL)
-
-  // Function to extract tablename based on the current URL
-  const getTablenameFromPath = () => {
-    const path = location.pathname.split("/"); // Split path into segments
-
-    if (path[1] === "") {
-      // Root path ("/")
-      return "dashboard"; // Default to "dashboard" for the root path
-    }
-
-    if (path[1] === "list" && path[2]) {
-      // List path ("/list/:tablename")
-      return path[2]; // Extract tablename from the URL
-    }
-
-    if (path[1] === "form" && path[2]) {
-      // Form path ("/form/:tablename/:id")
-      return path[2]; // Extract tablename from the URL (ignore the id)
-    }
-
-    return ""; // Return empty string if no match
-  };
+  const parms = getParmsFromPath(location);
 
   // Function to determine the active item based on the current route
   const getActiveSidebarItem = (route) => {
-    return route === getTablenameFromPath() ? "active" : "";
+    return route === parms.tablename ? "active" : "";
   };
 
   return (
@@ -131,7 +111,7 @@ const InternalLayout = () => {
 
       {/* Main content for internal users */}
       <div className="flex-1 overflow-auto bg-side-active/30">
-        <Header pathname={getTablenameFromPath()} />
+        <Header parms={parms} />
         <Routes>
           {authRoute.map((route) => (
             <Route

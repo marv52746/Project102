@@ -3,8 +3,6 @@ import { PlusIcon, MinusIcon } from "lucide-react"; // Using Lucid UI icons for 
 
 // Card component to display individual cards for each person
 const Card = ({ data, expandedState, setExpandedState, level = 0 }) => {
-  const levelColor = "#3730AB";
-
   // Function to handle expanding/collapsing for this card
   const handleToggle = (levelIndex) => {
     setExpandedState((prev) => ({
@@ -15,23 +13,33 @@ const Card = ({ data, expandedState, setExpandedState, level = 0 }) => {
 
   return (
     <ul className="flex justify-center">
-      {data.map((item) => {
+      {data.map((item, index) => {
         const avatarImage = item.avatar;
 
         return (
-          <Fragment key={item.levelIndex}>
+          <Fragment key={index}>
             <li>
               <div className="card">
-                <div className="image">
-                  <img
-                    src={avatarImage}
-                    alt="Profile"
-                    style={{ borderColor: levelColor }}
-                  />
-                </div>
-                <div className="card-body card-footer relative">
-                  <h4>{item.name}</h4>
-                  <p>{item.jobTitle}</p>
+                {/* Flexbox container for image and details */}
+                <div className="card-content flex items-center">
+                  {/* Image section */}
+                  <div className="image">
+                    <img
+                      src={avatarImage}
+                      alt="Profile"
+                      className="" // Updated styling
+                    />
+                  </div>
+
+                  {/* Details section */}
+                  <div className="card-body">
+                    <h4>{item.name}</h4>
+                    <p>{item.jobTitle}</p>
+                    <p>{item.phone}</p>
+                    <p>
+                      <a href={`mailto:${item.email}`}>{item.email}</a>
+                    </p>
+                  </div>
                 </div>
 
                 {/* Toggle expand/collapse on click */}
@@ -203,7 +211,6 @@ const Chart = () => {
     data[0].children.forEach((node) => {
       initialState[node.levelIndex] = true; // Expand the second-level nodes by default
     });
-    console.log(initialState);
     return initialState;
   });
 

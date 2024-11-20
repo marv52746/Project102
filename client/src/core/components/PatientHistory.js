@@ -45,8 +45,8 @@ function PatientHistory({ visits }) {
                 // onClick={() => handleRowClick(item)}
               >
                 {/* Dynamic Table Row Data */}
-                {columns.map((col) => (
-                  <td key={col.field} className="p-3">
+                {columns.map((col, index) => (
+                  <td key={index} className="p-3">
                     {col.field === "status" ? (
                       <span
                         className={`badge px-2 py-1 rounded-full text-white text-xs ${
