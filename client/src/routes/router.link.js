@@ -5,6 +5,7 @@ import Home from "../pages/public/Home";
 import Dashboard from "../pages/private/Dashboard";
 import List from "../pages/private/List";
 import Form from "../pages/private/Form";
+import OrganizationChart from "../pages/private/OrganizationChart";
 
 const routes = all_routes;
 
@@ -40,6 +41,7 @@ const routesArray = [
 
   { path: routes.list, name: "list", element: <List /> },
   { path: routes.form, name: "form", element: <Form /> },
+  { path: routes.orgChart, name: "org-chart", element: <OrganizationChart /> },
 ];
 
 export const authRoute = routesArray.map((route, index) => ({

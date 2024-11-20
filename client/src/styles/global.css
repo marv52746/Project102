@@ -2,6 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global font and background for the page */
+body {
+  font-family: "Sen", sans-serif;
+  background: #f9f9fa;
+}
+/* Resetting margins and padding for all elements */
+* {
+  padding: 0;
+  margin: 0;
+}
+
+/* Regular focus */
+input:focus,
+textarea:focus,
+select:focus,
+button:focus {
+  outline: none;
+  border-width: 1px;
+  border-color: rgba(var(--text-secondary));
+  border-style: solid; /* Ensure solid border */
+}
+
+/* Focus only when visible (typically with keyboard navigation) */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  border-color: rgba(
+    var(--text-secondary)
+  ); /* Same or different styling for keyboard navigation */
+}
+
 .light {
   --background: 255, 255, 255;
   --text-primary: 75, 90, 104;

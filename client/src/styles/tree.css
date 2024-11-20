@@ -1,0 +1,194 @@
+.follow {
+  float: right;
+  margin-right: 79px;
+}
+
+.follow img {
+  width: 25px;
+  position: relative;
+  top: 7px;
+}
+
+/* Organizational tree list styles */
+.org-tree {
+  height: 100%;
+  width: 100%;
+  background: rgba(var(--background));
+}
+.org-tree ul {
+  padding-top: 20px;
+  position: relative;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+.org-tree li {
+  float: left;
+  text-align: center;
+  list-style-type: none;
+  position: relative;
+  padding: 20px 5px 0 5px;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+/* Draw connectors between tree nodes using ::before and ::after */
+.org-tree li::before,
+.org-tree li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 50%;
+  border-top: 1px solid #ccc;
+  width: 50%;
+  height: 20px;
+}
+
+.org-tree li::after {
+  right: auto;
+  left: 50%;
+  border-left: 1px solid #ccc;
+}
+
+.org-tree li:only-child::after,
+.org-tree li:only-child::before {
+  display: none;
+}
+
+.org-tree li:only-child {
+  padding-top: 0;
+}
+
+.org-tree li:first-child::before,
+.org-tree li:last-child::after {
+  border: 0 none;
+}
+
+.org-tree li:last-child::before {
+  border-right: 1px solid #ccc;
+  border-radius: 0 5px 0 0;
+  -webkit-border-radius: 0 5px 0 0;
+  -moz-border-radius: 0 5px 0 0;
+}
+
+.org-tree li:first-child::after {
+  border-radius: 5px 0 0 0;
+  -webkit-border-radius: 5px 0 0 0;
+  -moz-border-radius: 5px 0 0 0;
+}
+
+/* Styles for when the org tree is expanded */
+.org-tree ul ul::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  border-left: 1px solid #ccc;
+  width: 0;
+  height: 20px;
+}
+
+/* Link style for nodes */
+.org-tree li a {
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  text-decoration: none;
+  color: #666;
+  font-family: arial, verdana, tahoma;
+  font-size: 11px;
+  display: inline-block;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+.org-tree li a:hover,
+.org-tree li a:hover + ul li a {
+  background: #c8e4f8;
+  color: #000;
+  border: 1px solid #94a0b4;
+}
+
+.org-tree li a:hover + ul li::after,
+.org-tree li a:hover + ul li::before,
+.org-tree li a:hover + ul::before,
+.org-tree li a:hover + ul ul::before {
+  border-color: #94a0b4;
+}
+
+/* Card styles for each individual node */
+.card {
+  position: relative;
+  padding-top: 50px;
+}
+
+.card .image {
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -10px;
+  z-index: 100;
+}
+
+/* Avatar image styles */
+.card .image img {
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  border: 7px solid #96f6b7; /* Green border around image */
+}
+
+/* Card body (the part with the name and job title) */
+.card .card-body {
+  margin-top: 1rem;
+  background: #fff;
+  height: 56px;
+  text-align: center;
+  width: 250px;
+  padding-top: 60px;
+  border-radius: 16px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Name and job title */
+.card .card-body h2 {
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.card .card-body p {
+  line-height: 20px;
+  font-size: small;
+}
+
+/* Footer with action buttons */
+.card .card-footer {
+  padding: 3px;
+  /* background: rgba(var(--text-secondary), 0.3); */
+  background: #d4ddff;
+  text-align: center;
+  bottom: 0;
+  position: relative;
+  width: 250px;
+  border-radius: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Icons in footer */
+.card .card-footer img {
+  width: 25px;
+  margin: 5px;
+}

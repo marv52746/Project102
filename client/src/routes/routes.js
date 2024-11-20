@@ -9,6 +9,7 @@ import {
   Bed,
   NotebookPen,
   Accessibility,
+  Network,
 } from "lucide-react";
 import Sidebar, { SidebarItem } from "../core/components/Sidebar";
 import Header from "../core/components/Header";
@@ -69,6 +70,15 @@ const iconMapping = [
     active: false,
     iconText: "Room Allotments",
     table: "room-allotments",
+  },
+  {
+    text: "Organization",
+    icon: <Network size={20} />,
+    alert: true,
+    active: false,
+    iconText: "Organization",
+    table: "org-chart",
+    to: all_routes.orgChart,
   },
 ];
 

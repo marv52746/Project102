@@ -7,6 +7,7 @@ export const all_routes = {
   dashboard: "/",
   list: "/list/:tablename",
   form: "/form/:tablename/:view/:id",
+  orgChart: "/org-chart",
 
   patients: "/list/patients",
   doctors: "/list/doctors",
