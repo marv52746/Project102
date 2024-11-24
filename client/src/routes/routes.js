@@ -10,6 +10,8 @@ import {
   NotebookPen,
   Accessibility,
   Network,
+  Calendar,
+  Baby,
 } from "lucide-react";
 import Sidebar, { SidebarItem } from "../core/components/Sidebar";
 import Header from "../core/components/Header";
@@ -57,6 +59,15 @@ const iconMapping = [
     table: "appointments",
   },
   {
+    text: "Birth Reports",
+    icon: <Baby size={20} />,
+    alert: false,
+    active: false,
+    iconText: "Birth Reports",
+    to: all_routes.birthReports,
+    table: "birth-reports",
+  },
+  {
     text: "Payments",
     icon: <Receipt size={20} />,
     alert: true,
@@ -80,6 +91,15 @@ const iconMapping = [
     iconText: "Org Chart",
     table: "organizational-structure-diagram",
     to: all_routes.orgChart,
+  },
+  {
+    text: "Birthing Calendar",
+    icon: <Calendar size={20} />,
+    alert: false,
+    active: false,
+    iconText: "Birthing Calendar",
+    table: "calendar",
+    to: all_routes.calendar,
   },
 ];
 
@@ -111,7 +131,7 @@ const InternalLayout = () => {
 
       {/* Main content for internal users */}
       <div className="flex-1 overflow-auto bg-side-active/30">
-        <Header parms={parms} />
+        {parms.tablename !== "calendar" && <Header parms={parms} />}
         <Routes>
           {authRoute.map((route) => (
             <Route

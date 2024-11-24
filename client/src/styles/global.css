@@ -14,30 +14,30 @@ body {
 }
 
 /* Regular focus */
-input:focus,
+/* input:focus,
 textarea:focus,
 select:focus,
 button:focus {
   outline: none;
   border-width: 1px;
   border-color: rgba(var(--text-secondary));
-  border-style: solid; /* Ensure solid border */
-}
+  border-style: solid;
+} */
 
 /* Focus only when visible (typically with keyboard navigation) */
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible,
 button:focus-visible {
-  border-color: rgba(
-    var(--text-secondary)
-  ); /* Same or different styling for keyboard navigation */
+  border-color: rgba(var(--text-secondary));
 }
 
 .light {
   --background: 255, 255, 255;
   --text-primary: 75, 90, 104;
   --text-secondary: 55, 48, 163;
+
+  --btn-primary: 233, 238, 255;
 
   --side-active: 212, 221, 255;
   --sidetext-active: 55, 48, 163;

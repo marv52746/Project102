@@ -9,6 +9,8 @@ module.exports = {
         "text-primary": "rgba(var(--text-primary))",
         "text-secondary": "rgba(var(--text-secondary))",
 
+        "btn-primary": "rgba(var(--btn-primary))",
+
         "side-active": "rgba(var(--side-active))",
         "sidetext-active": "rgba(var(--sidetext-active))",
 

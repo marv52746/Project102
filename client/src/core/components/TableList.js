@@ -62,7 +62,7 @@ const TableList = ({ title, data, columns }) => {
             value={search}
             onChange={handleChangeSearch}
             placeholder="Search"
-            className="form-control form-control-sm w-80 border border-gray-300 rounded-md px-3 py-1 text-sm  focus:border-text-secondary  focus:outline-none"
+            className="form-control form-control-sm w-80 border border-gray-300 rounded-md px-4 py-2 text-sm  focus:border-text-secondary  focus:outline-none"
           />
         </div>
         <button className="bg-green-500 px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition">
@@ -92,7 +92,7 @@ const TableList = ({ title, data, columns }) => {
 
         <table className="min-w-full table-auto border-collapse">
           <thead>
-            <tr className="bg-gray-100 text-left">
+            <tr className=" text-left border-b">
               {/* Dynamic Table Headers */}
               {columns.map((col) => (
                 <th
@@ -108,8 +108,8 @@ const TableList = ({ title, data, columns }) => {
             {paginatedData.map((item, index) => (
               <tr
                 key={item.id}
-                className={`${
-                  index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                className={`border-b ${
+                  index % 2 === 0 ? "" : "bg-white"
                 } hover:bg-side-active hover:text-text-secondary hover:cursor-pointer transition-colors duration-200`}
                 onClick={() => handleRowClick(item)}
               >

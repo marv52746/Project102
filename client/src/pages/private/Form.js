@@ -8,6 +8,7 @@ import DoctorDetails from "./DoctorDetails";
 import DoctorEdit from "./DoctorEdit";
 import AppointmentDetails from "./AppointmentDetails";
 import AppointmentEdit from "./AppointmentEdit";
+import BirthReportDetails from "./BirthReportDetails";
 
 function Form() {
   const { tablename, view, id } = useParams();
@@ -24,6 +25,10 @@ function Form() {
     appointments: {
       view: <AppointmentDetails id={id} />,
       edit: <AppointmentEdit id={id} />,
+    },
+    "birth-reports": {
+      view: <BirthReportDetails id={id} />,
+      edit: <PatientEdit id={id} />,
     },
   };
 

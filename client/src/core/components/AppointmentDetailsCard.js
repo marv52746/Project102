@@ -9,10 +9,10 @@ const AppointmentDetailsCard = ({ tableData }) => {
     navigate(`/form/${tablename}/edit/${id}`);
   };
   return (
-    <div className="p-4 rounded-lg shadow-lg bg-white w-full">
-      <h3 className="text-xl font-semibold mb-4 text-text-secondary">
+    <div className="flex flex-col p-4 rounded-lg shadow-lg bg-white w-full">
+      {/* <h3 className="text-xl font-semibold mb-4 text-text-secondary">
         Appointment Details
-      </h3>
+      </h3> */}
 
       <div className="table-responsive overflow-x-auto mb-4">
         <table className="min-w-full table-auto border-collapse border border-gray-200">

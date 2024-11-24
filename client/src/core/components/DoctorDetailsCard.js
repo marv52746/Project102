@@ -3,9 +3,9 @@ import React from "react";
 const DoctorDetailsCard = ({ doctorInfo, tableData }) => {
   return (
     <div className="w-full p-4 bg-white rounded-lg shadow-md">
-      <h3 className="text-2xl font-semibold mb-6 text-text-secondary">
+      {/* <h3 className="text-2xl font-semibold mb-6 text-text-secondary">
         Doctor Details
-      </h3>
+      </h3> */}
       <div className="flex flex-wrap -mx-4">
         {/* Doctor Card */}
         <div className="w-full md:w-1/3 px-4 mb-6">

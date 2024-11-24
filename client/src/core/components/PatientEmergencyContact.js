@@ -2,8 +2,7 @@ import React from "react";
 
 function PatientEmergencyContact({ emergencyContact, insurance }) {
   return (
-    <div className="md:w-1/2 mx-auto bg-white shadow-lg p-6 rounded-lg flex flex-col">
-      {/* Emergency Contact Table */}
+    <>
       <div className="overflow-x-auto flex-grow mb-6">
         <h4 className="text-lg font-semibold mb-2 text-text-secondary">
           Emergency Contact
@@ -30,7 +29,6 @@ function PatientEmergencyContact({ emergencyContact, insurance }) {
         </table>
       </div>
 
-      {/* Insurance Provider Table */}
       <div className="overflow-x-auto flex-grow">
         <h4 className="text-lg font-semibold mb-2 text-text-secondary">
           Insurance Provider
@@ -56,7 +54,7 @@ function PatientEmergencyContact({ emergencyContact, insurance }) {
           </tbody>
         </table>
       </div>
-    </div>
+    </>
   );
 }
 

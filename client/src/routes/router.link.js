@@ -6,6 +6,7 @@ import Dashboard from "../pages/private/Dashboard";
 import List from "../pages/private/List";
 import Form from "../pages/private/Form";
 import OrganizationChart from "../pages/private/OrganizationChart";
+import Calendar from "../pages/private/Calendar";
 
 const routes = all_routes;
 
@@ -45,6 +46,11 @@ const routesArray = [
     path: routes.orgChart,
     name: "organizational-structure-diagram",
     element: <OrganizationChart />,
+  },
+  {
+    path: routes.calendar,
+    name: "calendar",
+    element: <Calendar />,
   },
 ];
 

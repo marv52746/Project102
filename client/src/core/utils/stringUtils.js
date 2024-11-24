@@ -27,6 +27,11 @@ const getFormattedView = (tablename, view) => {
       edit: "Edit Appointment",
       create: "Create Appointment",
     },
+    "birth-reports": {
+      view: "Birth Report Details",
+      edit: "Edit Birth Report",
+      create: "Create Birth Report",
+    },
     payments: {
       view: "Payment Details",
       edit: "Edit Payment",
@@ -44,6 +49,7 @@ export const getParmsFromPath = (location) => {
 
   const params = {
     tablename: null,
+    tableLink: "",
     view: null,
     id: null,
   };
@@ -58,6 +64,7 @@ export const getParmsFromPath = (location) => {
 
   // Handle "list" and "form" segments
   if (path[1] === "list" || (path[1] === "form" && path[2])) {
+    params.tableLink = `/list/${path[2]}`;
     params.tablename = path[2];
     params.view = getFormattedView(path[2], path[3]);
     params.id = path[4];

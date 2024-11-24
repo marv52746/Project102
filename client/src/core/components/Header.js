@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Fullscreen, Search, Bell, Home } from "lucide-react";
 import { formatPath } from "../utils/stringUtils";
+import { Link } from "react-router-dom";
 
 function Header({ parms }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -12,6 +13,7 @@ function Header({ parms }) {
     setIsNotificationsOpen(!isNotificationsOpen);
 
   const showHeader = false;
+
   return (
     <>
       {showHeader && (
@@ -114,14 +116,14 @@ function Header({ parms }) {
         <div className="w-1/2 ml-auto text-right">
           <ol className="inline-flex items-center space-x-2 text-sidetext-active justify-end bg-side-active px-5 py-2.5 rounded-2xl ">
             <li>
-              <a href="/" className="flex items-center">
+              <Link to="/" className="flex items-center">
                 <Home size={20} className="text-xl mr-2" />
-              </a>
+              </Link>
             </li>
 
             {parms.tablename && (
               <li className="before:content-['/'] before:mr-2">
-                {formatPath(parms.tablename)}
+                <Link to={parms.tableLink}>{formatPath(parms.tablename)}</Link>
               </li>
             )}
 
