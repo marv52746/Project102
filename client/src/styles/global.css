@@ -26,6 +26,7 @@ button:focus {
 
 /* Focus only when visible (typically with keyboard navigation) */
 input:focus-visible,
+text:focus-visible,
 textarea:focus-visible,
 select:focus-visible,
 button:focus-visible {

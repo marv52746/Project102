@@ -95,7 +95,7 @@ export default function Sidebar({ children }) {
         </div>
 
         <SidebarContext.Provider value={{ expanded }}>
-          <ul className="flex-1 px-3">{children}</ul>
+          <ul className="flex-1 px-3 overflow-y-auto">{children}</ul>
         </SidebarContext.Provider>
 
         <div className="border-t flex p-3 relative">

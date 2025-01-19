@@ -12,6 +12,7 @@ import {
   Network,
   Calendar,
   Baby,
+  Clock,
 } from "lucide-react";
 import Sidebar, { SidebarItem } from "../core/components/Sidebar";
 import Header from "../core/components/Header";
@@ -34,59 +35,78 @@ const iconMapping = [
   {
     text: "Patients",
     icon: <Accessibility size={20} />,
-    alert: false,
+    alert: true,
     active: false,
     iconText: "Patients",
     to: all_routes.patients,
     table: "patients",
   },
   {
-    text: "Doctors",
+    text: "Staff",
     icon: <UserCircle size={20} />,
     alert: false,
     active: false,
-    iconText: "Doctors",
-    to: all_routes.doctors,
-    table: "doctors",
+    iconText: "Staff",
+    to: all_routes.staff,
+    table: "staff",
   },
   {
     text: "Appointments",
     icon: <NotebookPen size={20} />,
-    alert: false,
+    alert: true,
     active: false,
     iconText: "Appointments",
     to: all_routes.appointments,
     table: "appointments",
   },
+  // {
+  //   text: "Birth Reports",
+  //   icon: <Baby size={20} />,
+  //   alert: false,
+  //   active: false,
+  //   iconText: "Birth Reports",
+  //   to: all_routes.birthReports,
+  //   table: "birth-reports",
+  // },
   {
-    text: "Birth Reports",
+    text: "Pregnancies",
     icon: <Baby size={20} />,
     alert: false,
     active: false,
-    iconText: "Birth Reports",
-    to: all_routes.birthReports,
-    table: "birth-reports",
+    iconText: "Pregnancies",
+    to: all_routes.pregnancies,
+    table: "pregnancies",
+  },
+  {
+    text: "Labor and Deliveries",
+    icon: <Clock size={20} />,
+    alert: true,
+    active: false,
+    iconText: "Labor and Deliveries",
+    to: all_routes.laborAndDeliveries,
+    table: "labor-and-deliveries",
   },
   {
     text: "Payments",
     icon: <Receipt size={20} />,
-    alert: true,
+    alert: false,
     active: false,
     iconText: "Payments",
+    to: all_routes.payments,
     table: "payments",
   },
-  {
-    text: "Room Allotments",
-    icon: <Bed size={20} />,
-    alert: true,
-    active: false,
-    iconText: "Room Allotments",
-    table: "room-allotments",
-  },
+  // {
+  //   text: "Room Allotments",
+  //   icon: <Bed size={20} />,
+  //   alert: true,
+  //   active: false,
+  //   iconText: "Room Allotments",
+  //   table: "room-allotments",
+  // },
   {
     text: "Org Chart",
     icon: <Network size={20} />,
-    alert: true,
+    alert: false,
     active: false,
     iconText: "Org Chart",
     table: "organizational-structure-diagram",
@@ -101,6 +121,15 @@ const iconMapping = [
     table: "calendar",
     to: all_routes.calendar,
   },
+  // {
+  //   text: "Test Page",
+  //   icon: <Calendar size={20} />,
+  //   alert: false,
+  //   active: false,
+  //   iconText: "Test Page",
+  //   table: "testPage",
+  //   to: all_routes.testPage,
+  // },
 ];
 
 const InternalLayout = () => {
@@ -126,7 +155,7 @@ const InternalLayout = () => {
             to={item.to}
           />
         ))}
-        <hr className="my-3" />
+        {/* <hr className="my-3" /> */}
       </Sidebar>
 
       {/* Main content for internal users */}

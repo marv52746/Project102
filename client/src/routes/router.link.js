@@ -6,7 +6,9 @@ import Dashboard from "../pages/private/Dashboard";
 import List from "../pages/private/List";
 import Form from "../pages/private/Form";
 import OrganizationChart from "../pages/private/OrganizationChart";
-import Calendar from "../pages/private/Calendar";
+import Calendar2 from "../pages/private/Calendar/Calendar2";
+import Login from "../pages/main/login";
+import SignUp from "../pages/main/signup";
 
 const routes = all_routes;
 
@@ -17,19 +19,14 @@ export const publicRoutesArray = [
     element: <Home />,
   },
   {
-    path: routes.signin,
-    name: "signin",
-    // element: <Signin />,
+    path: routes.login,
+    name: "login",
+    element: <Login />,
   },
   {
-    path: routes.about,
-    name: "about",
-    // element: <About />,
-  },
-  {
-    path: routes.contact,
-    name: "contact",
-    // element: <Contact />,
+    path: routes.signup,
+    name: "signup",
+    element: <SignUp />,
   },
 ];
 
@@ -50,7 +47,12 @@ const routesArray = [
   {
     path: routes.calendar,
     name: "calendar",
-    element: <Calendar />,
+    element: <Calendar2 />,
+  },
+  {
+    path: routes.testPage,
+    name: "testPage",
+    element: <Calendar2 />,
   },
 ];
 

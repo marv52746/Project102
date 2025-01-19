@@ -1,0 +1,12 @@
+{
+  "discharge_summary": [
+    {
+      "discharge_id": 1,
+      "patient_id": 1,
+      "discharge_date": "2024-11-23",
+      "discharge_notes": "Patient is recovering well. Prescribed pain relief and iron supplements.",
+      "doctor_id": 1,
+      "status": "Discharged"
+    }
+  ]
+}

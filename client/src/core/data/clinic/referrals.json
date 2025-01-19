@@ -1,0 +1,11 @@
+{
+  "referrals": [
+    {
+      "referral_id": 1,
+      "patient_id": 1,
+      "referrer_name": "Dr. Smith",
+      "referral_date": "2024-10-01",
+      "reason_for_referral": "Specialist Consultation for high-risk pregnancy."
+    }
+  ]
+}

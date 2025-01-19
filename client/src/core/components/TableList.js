@@ -87,7 +87,7 @@ const TableList = ({ title, data, columns }) => {
             </select>
             <label className="text-sm text-gray-600">entries</label>
           </div>
-          <ExportLinks />
+          <ExportLinks data={filteredData} />
         </div>
 
         <table className="min-w-full table-auto border-collapse">
@@ -128,8 +128,21 @@ const TableList = ({ title, data, columns }) => {
                       >
                         {item.status}
                       </span>
+                    ) : col.field === "avatar" || col.field === "image" ? (
+                      // If the column field is "avatar", render a rounded avatar
+                      <img
+                        src={
+                          item[col.field]
+                            ? process.env.PUBLIC_URL +
+                              `/assets/images/${item[col.field]}`
+                            : process.env.PUBLIC_URL +
+                              "/assets/images/default-male.jpg"
+                        } // Assuming the avatar URL is in the item field
+                        alt="Avatar"
+                        className="w-10 h-10 rounded-full" // Adjust size and rounded styling
+                      />
                     ) : (
-                      item[col.field] // Render the data for other fields
+                      item[col.field] || "-" // Render the data for other fields
                     )}
                   </td>
                 ))}

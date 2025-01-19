@@ -1,0 +1,15 @@
+{
+  "billing_and_insurance": [
+    {
+      "claim_id": 1,
+      "patient_id": 1,
+      "insurance_provider": "XYZ Insurance",
+      "policy_number": "XYZ12345",
+      "claim_amount": 5000.0,
+      "claim_status": "Paid",
+      "date_of_claim": "2024-10-15",
+      "insurance_paid_amount": 4500.0,
+      "patient_balance": 500.0
+    }
+  ]
+}

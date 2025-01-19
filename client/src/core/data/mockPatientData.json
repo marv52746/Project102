@@ -3,6 +3,7 @@
     {
       "id": 1000001,
       "name": "Daniel Smith",
+      "avatar": "big-avatar-2.jpg",
       "age": 35,
       "phone": "+91 11111 11111",
       "lastVisit": "12-03-2023",
@@ -103,6 +104,7 @@
     {
       "id": 1000002,
       "name": "Sophia Johnson",
+      "avatar": "big-avatar-1.jpg",
       "age": 29,
       "phone": "+91 98765 43210",
       "lastVisit": "20-02-2023",
@@ -166,6 +168,7 @@
     {
       "id": 1000003,
       "name": "James Wilson",
+      "avatar": "big-avatar-5.jpg",
       "age": 42,
       "phone": "+91 81234 56789",
       "lastVisit": "05-03-2023",
@@ -229,6 +232,7 @@
     {
       "id": 1000004,
       "name": "Emily Davis",
+      "avatar": "big-avatar-3.jpg",
       "age": 34,
       "phone": "+91 93456 12345",
       "lastVisit": "17-02-2023",

@@ -1,0 +1,12 @@
+{
+  "lab_tests": [
+    {
+      "lab_test_id": 1,
+      "patient_id": 1,
+      "test_type": "Ultrasound",
+      "test_date": "2024-10-10",
+      "results": "Normal fetal development. No abnormalities detected.",
+      "status": "Completed"
+    }
+  ]
+}
