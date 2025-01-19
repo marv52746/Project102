@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Fullscreen, Search, Bell, Home } from "lucide-react";
 import { formatPath } from "../utils/stringUtils";
+import { Link } from "react-router-dom";
 
-function Header({ pathname }) {
+function Header({ parms }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
@@ -11,9 +12,8 @@ function Header({ pathname }) {
   const toggleNotifications = () =>
     setIsNotificationsOpen(!isNotificationsOpen);
 
-  const formattedPath = formatPath(pathname); // Use the utility function
-
   const showHeader = false;
+
   return (
     <>
       {showHeader && (
@@ -110,19 +110,28 @@ function Header({ pathname }) {
       <div className="flex justify-between items-center py-4 px-6 w-full bg-background-head">
         <div className="w-1/2">
           <h3 className="text-2xl font-semibold text-sidetext-active">
-            {formattedPath}
+            {parms.view ? parms.view : formatPath(parms.tablename)}
           </h3>
         </div>
         <div className="w-1/2 ml-auto text-right">
           <ol className="inline-flex items-center space-x-2 text-sidetext-active justify-end bg-side-active px-5 py-2.5 rounded-2xl ">
             <li>
-              <a href="/" className="flex items-center">
+              <Link to="/" className="flex items-center">
                 <Home size={20} className="text-xl mr-2" />
-              </a>
+              </Link>
             </li>
-            <li className="before:content-['/'] before:mr-2">
-              {formattedPath}
-            </li>
+
+            {parms.tablename && (
+              <li className="before:content-['/'] before:mr-2">
+                <Link to={parms.tableLink}>{formatPath(parms.tablename)}</Link>
+              </li>
+            )}
+
+            {parms.view && (
+              <li className="before:content-['/'] before:mr-2">
+                {formatPath(parms.view)}
+              </li>
+            )}
           </ol>
         </div>
       </div>

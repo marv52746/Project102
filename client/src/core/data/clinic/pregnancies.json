@@ -1,0 +1,103 @@
+{
+  "pregnancies": [
+    {
+      "id": 7000001,
+      "patient_id": 1000003,
+      "lmp_date": "2023-09-10",
+      "ultrasound_date": "2023-09-25",
+      "edd": "2024-06-17",
+      "status": "Completed",
+      "created_at": "2023-09-01",
+      "delivery_ids": [5000001],
+      "notes": "The pregnancy is progressing normally. No complications observed. Routine prenatal check-ups have been conducted, and everything is on track for the expected delivery date."
+    },
+    {
+      "id": 7000002,
+      "patient_id": 1000004,
+      "lmp_date": "2023-10-05",
+      "ultrasound_date": "2023-10-15",
+      "edd": "2024-07-20",
+      "status": "Completed",
+      "created_at": "2023-10-01",
+      "delivery_ids": [5000002],
+      "notes": "The pregnancy is progressing well, but minor bleeding was noted. The patient is being monitored closely, and a C-section is planned due to the bleeding."
+    },
+    {
+      "id": 7000003,
+      "patient_id": 1000005,
+      "lmp_date": "2023-08-15",
+      "ultrasound_date": "2023-08-30",
+      "edd": "2024-05-30",
+      "status": "Completed",
+      "created_at": "2023-08-01",
+      "delivery_ids": [5000003],
+      "notes": "Routine prenatal care shows no signs of complications. The baby’s growth is on track, and the pregnancy is progressing normally."
+    },
+    {
+      "id": 7000004,
+      "patient_id": 1000006,
+      "lmp_date": "2023-11-01",
+      "ultrasound_date": "2023-11-10",
+      "edd": "2024-08-25",
+      "status": "Completed",
+      "created_at": "2023-11-01",
+      "delivery_ids": [5000004],
+      "notes": "The patient is being monitored for early signs of complications. Routine check-ups are ongoing, and the patient’s condition is stable."
+    },
+    {
+      "id": 7000005,
+      "patient_id": 1000007,
+      "lmp_date": "2023-12-05",
+      "ultrasound_date": "2023-12-12",
+      "edd": "2024-09-15",
+      "status": "Completed",
+      "created_at": "2023-12-01",
+      "delivery_ids": [5000005],
+      "notes": "The pregnancy is progressing without complications. The baby is healthy, and the expected due date is in September."
+    },
+    {
+      "id": 7000006,
+      "patient_id": 1000008,
+      "lmp_date": "2024-01-10",
+      "ultrasound_date": "2024-01-15",
+      "edd": "2024-10-02",
+      "status": "Completed",
+      "created_at": "2024-01-01",
+      "delivery_ids": [5000006],
+      "notes": "Routine ultrasound confirmed the pregnancy. The baby’s growth is on track, and the patient is doing well. No complications noted at this stage."
+    },
+    {
+      "id": 7000007,
+      "patient_id": 1000009,
+      "lmp_date": "2024-02-20",
+      "ultrasound_date": "2024-02-25",
+      "edd": "2024-11-10",
+      "status": "Completed",
+      "created_at": "2024-02-01",
+      "delivery_ids": [5000007],
+      "notes": "Prenatal care is ongoing. The baby’s development is normal, and there are no signs of complications at this stage."
+    },
+    {
+      "id": 7000008,
+      "patient_id": 1000010,
+      "lmp_date": "2024-03-10",
+      "ultrasound_date": "2024-03-20",
+      "edd": "2024-12-15",
+      "status": "Completed",
+      "created_at": "2024-03-01",
+      "delivery_ids": [5000008],
+      "notes": "Pregnancy is on track. No complications have been noted, and the baby’s growth is normal. The expected delivery date is December."
+    },
+    {
+      "id": 7000009,
+      "patient_id": 1000011,
+      "lmp_date": "2024-04-05",
+      "ultrasound_date": "2024-04-15",
+      "edd": "2025-01-02",
+      "status": "Completed",
+      "created_at": "2024-04-01",
+      "delivery_ids": [5000009],
+      "notes": "The pregnancy is in the early stages. Routine checkups are scheduled, and the patient is being monitored regularly."
+    }
+  ]
+}

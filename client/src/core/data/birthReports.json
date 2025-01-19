@@ -1,0 +1,220 @@
+{
+  "birthReports": [
+    {
+      "id": 1000001,
+      "patientName": "Sarah Green",
+      "forecastDate": "2024-12-10",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "",
+      "stage": "Pre-birth"
+    },
+    {
+      "id": 1000002,
+      "patientName": "Amy Black",
+      "forecastDate": "2024-12-14",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "",
+      "stage": "Pre-birth"
+    },
+    {
+      "id": 1000003,
+      "patientName": "Maria Clark",
+      "forecastDate": "2024-12-25",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "",
+      "stage": "Pre-birth"
+    },
+    {
+      "id": 1000004,
+      "patientName": "John Doe",
+      "forecastDate": "2025-01-05",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "",
+      "stage": "Pre-birth"
+    },
+    {
+      "id": 1000005,
+      "patientName": "Lily Evans",
+      "forecastDate": "2024-10-29",
+      "actualBirthDate": "2024-10-29",
+      "actualTime": "16:20:00",
+      "birthType": "Natural",
+      "stage": "Post-birth"
+    },
+    {
+      "id": 1000006,
+      "patientName": "Michael Blue",
+      "forecastDate": "2024-11-20",
+      "actualBirthDate": "2024-11-20",
+      "actualTime": "10:10:00",
+      "birthType": "C-Section",
+      "stage": "Post-birth"
+    },
+    {
+      "id": 1000007,
+      "patientName": "Jessica White",
+      "forecastDate": "2024-11-20",
+      "actualBirthDate": "2024-11-22",
+      "actualTime": "10:10:00",
+      "birthType": "C-Section",
+      "stage": "Post-birth"
+    },
+    {
+      "id": 1000008,
+      "patientName": "Emily Harris",
+      "forecastDate": "2024-11-05",
+      "actualBirthDate": "2024-11-04",
+      "actualTime": "12:00:00",
+      "birthType": "Natural",
+      "stage": "Post-birth"
+    },
+    {
+      "id": 1000009,
+      "patientName": "David King",
+      "forecastDate": "2025-01-01",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "",
+      "stage": "Pre-birth"
+    },
+    {
+      "id": 1000010,
+      "patientName": "Olivia Scott",
+      "forecastDate": "2025-01-25",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "",
+      "stage": "Review"
+    },
+    {
+      "id": 1000011,
+      "patientName": "Sophia Taylor",
+      "forecastDate": "2024-11-20",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "C-Section",
+      "stage": "Pre-birth"
+    },
+    {
+      "id": 1000012,
+      "patientName": "Isabella Martin",
+      "forecastDate": "2024-12-12",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "",
+      "stage": "Pre-birth"
+    },
+    {
+      "id": 1000013,
+      "patientName": "Ethan Moore",
+      "forecastDate": "2024-11-18",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "",
+      "stage": "Pre-birth"
+    },
+    {
+      "id": 1000014,
+      "patientName": "Charlotte Lee",
+      "forecastDate": "2025-02-01",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "",
+      "stage": "Pre-birth"
+    },
+    {
+      "id": 1000015,
+      "patientName": "Benjamin Walker",
+      "forecastDate": "2025-03-05",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "",
+      "stage": "Pre-birth"
+    },
+    {
+      "id": 1000016,
+      "patientName": "Ava King",
+      "forecastDate": "2024-11-22",
+      "actualBirthDate": "2024-11-20",
+      "actualTime": "14:30:00",
+      "birthType": "C-Section",
+      "stage": "Post-birth"
+    },
+    {
+      "id": 1000017,
+      "patientName": "Mason Harris",
+      "forecastDate": "2024-11-25",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "",
+      "stage": "Review"
+    },
+    {
+      "id": 1000018,
+      "patientName": "James Clark",
+      "forecastDate": "2025-01-15",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "",
+      "stage": "Pre-birth"
+    },
+    {
+      "id": 1000019,
+      "patientName": "Liam Robinson",
+      "forecastDate": "2024-12-20",
+      "actualBirthDate": "",
+      "actualTime": "",
+      "birthType": "",
+      "stage": "Pre-birth"
+    },
+    {
+      "id": 1000020,
+      "patientName": "Mia Brown",
+      "forecastDate": "2024-11-10",
+      "actualBirthDate": "2024-11-10",
+      "actualTime": "10:10:00",
+      "birthType": "C-Section",
+      "stage": "Post-birth"
+    },
+    {
+      "id": 1000021,
+      "patientName": "Mia Brown 2",
+      "forecastDate": "2024-11-05",
+      "actualBirthDate": "2024-11-05",
+      "actualTime": "10:10:00",
+      "birthType": "C-Section",
+      "stage": "Post-birth"
+    },
+    {
+      "id": 1000022,
+      "patientName": "Mia Brown 3",
+      "forecastDate": "2024-11-05",
+      "actualBirthDate": "2024-11-05",
+      "actualTime": "10:10:00",
+      "birthType": "C-Section",
+      "stage": "Post-birth"
+    },
+    {
+      "id": 1000023,
+      "patientName": "Mia Brown 4",
+      "forecastDate": "2024-11-05",
+      "actualBirthDate": "2024-11-05",
+      "actualTime": "10:10:00",
+      "birthType": "C-Section",
+      "stage": "Post-birth"
+    },
+    {
+      "id": 1000024,
+      "patientName": "Mia Brown 5",
+      "forecastDate": "2024-11-05",
+      "actualBirthDate": "2024-11-05",
+      "actualTime": "10:10:00",
+      "birthType": "C-Section",
+      "stage": "Post-birth"
+    }
+  ]
+}

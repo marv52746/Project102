@@ -1,0 +1,312 @@
+{
+  "patients": [
+    {
+      "id": 1000001,
+      "status": "Active",
+      "name": "Emily Johnson",
+      "avatar": "big-avatar-2.jpg",
+      "age": 34,
+      "gender": "Female",
+      "dob": "1990-05-22",
+      "address": "123 Main St, Cityville",
+      "phone": "987-654-3210",
+      "email": "emily.johnson@email.com",
+      "emergency_contact": {
+        "name": "James Johnson",
+        "phone": "987-654-3200",
+        "relationship": "Husband"
+      },
+      "insurance_provider": {
+        "provider": "HealthCare Plus",
+        "policyNumber": "HC123456789",
+        "validUntil": "2025-12-31"
+      }
+    },
+    {
+      "id": 1000002,
+      "status": "Active",
+      "name": "Sophia Williams",
+      "avatar": "big-avatar-3.jpg",
+      "age": 29,
+      "gender": "Female",
+      "dob": "1995-02-15",
+      "address": "456 Oak Ave, Brookdale",
+      "phone": "555-123-4567",
+      "email": "sophia.williams@email.com",
+      "emergency_contact": {
+        "name": "Robert Williams",
+        "phone": "555-123-4568",
+        "relationship": "Father"
+      },
+      "insurance_provider": {
+        "provider": "MedCare Insurance",
+        "policyNumber": "MC987654321",
+        "validUntil": "2024-08-15"
+      }
+    },
+    {
+      "id": 1000003,
+      "status": "Active",
+      "name": "Olivia Brown",
+      "avatar": "big-avatar-4.jpg",
+      "age": 26,
+      "gender": "Female",
+      "dob": "1998-09-30",
+      "address": "789 Pine St, Riverside",
+      "phone": "555-876-5432",
+      "email": "olivia.brown@email.com",
+      "emergency_contact": {
+        "name": "Emma Brown",
+        "phone": "555-876-5433",
+        "relationship": "Mother"
+      },
+      "insurance_provider": {
+        "provider": "CareFirst Health",
+        "policyNumber": "CF567890123",
+        "validUntil": "2026-02-20"
+      }
+    },
+    {
+      "id": 1000004,
+      "status": "Active",
+      "name": "Isabella Taylor",
+      "avatar": "big-avatar-5.jpg",
+      "age": 31,
+      "gender": "Female",
+      "dob": "1993-11-12",
+      "address": "1010 Maple Rd, Springfield",
+      "phone": "555-234-5678",
+      "email": "isabella.taylor@email.com",
+      "emergency_contact": {
+        "name": "David Taylor",
+        "phone": "555-234-5679",
+        "relationship": "Brother"
+      },
+      "insurance_provider": {
+        "provider": "LifeCare Insurance",
+        "policyNumber": "LC234567890",
+        "validUntil": "2027-01-10"
+      }
+    },
+    {
+      "id": 1000005,
+      "status": "Active",
+      "name": "Ava Martinez",
+      "avatar": "big-avatar-6.jpg",
+      "age": 38,
+      "gender": "Female",
+      "dob": "1986-07-19",
+      "address": "2020 Birch Ln, Greenfield",
+      "phone": "555-567-8901",
+      "email": "ava.martinez@email.com",
+      "emergency_contact": {
+        "name": "Carlos Martinez",
+        "phone": "555-567-8902",
+        "relationship": "Spouse"
+      },
+      "insurance_provider": {
+        "provider": "Global Health Plan",
+        "policyNumber": "GH654321987",
+        "validUntil": "2025-05-25"
+      }
+    },
+    {
+      "id": 1000006,
+      "status": "Active",
+      "name": "Grace Mitchell",
+      "avatar": "big-avatar-7.jpg",
+      "age": 30,
+      "gender": "Female",
+      "dob": "1994-02-10",
+      "address": "123 Willow St, Pleasantville",
+      "phone": "555-678-9012",
+      "email": "grace.mitchell@email.com",
+      "emergency_contact": {
+        "name": "Sarah Mitchell",
+        "phone": "555-678-9013",
+        "relationship": "Mother"
+      },
+      "insurance_provider": {
+        "provider": "BlueShield Health",
+        "policyNumber": "BSH234567890",
+        "validUntil": "2026-04-30"
+      }
+    },
+    {
+      "id": 1000007,
+      "status": "Active",
+      "name": "Madison White",
+      "avatar": "big-avatar-8.jpg",
+      "age": 28,
+      "gender": "Female",
+      "dob": "1996-11-25",
+      "address": "456 Elm St, Rivertown",
+      "phone": "555-234-5671",
+      "email": "madison.white@email.com",
+      "emergency_contact": {
+        "name": "William White",
+        "phone": "555-234-5672",
+        "relationship": "Father"
+      },
+      "insurance_provider": {
+        "provider": "Prime Health",
+        "policyNumber": "PH654321987",
+        "validUntil": "2025-06-30"
+      }
+    },
+    {
+      "id": 1000008,
+      "status": "Active",
+      "name": "Charlotte Davis",
+      "avatar": "big-avatar-9.jpg",
+      "age": 35,
+      "gender": "Female",
+      "dob": "1989-07-17",
+      "address": "789 Oak Rd, Brookfield",
+      "phone": "555-987-6543",
+      "email": "charlotte.davis@email.com",
+      "emergency_contact": {
+        "name": "Michael Davis",
+        "phone": "555-987-6544",
+        "relationship": "Husband"
+      },
+      "insurance_provider": {
+        "provider": "WellCare Insurance",
+        "policyNumber": "WC987654321",
+        "validUntil": "2027-12-31"
+      }
+    },
+    {
+      "id": 1000009,
+      "status": "Active",
+      "name": "Lily Robinson",
+      "avatar": "big-avatar-10.jpg",
+      "age": 32,
+      "gender": "Female",
+      "dob": "1992-03-05",
+      "address": "1020 Cedar Ave, Forest Park",
+      "phone": "555-432-8765",
+      "email": "lily.robinson@email.com",
+      "emergency_contact": {
+        "name": "Paul Robinson",
+        "phone": "555-432-8766",
+        "relationship": "Spouse"
+      },
+      "insurance_provider": {
+        "provider": "FamilyCare Health",
+        "policyNumber": "FCH123459876",
+        "validUntil": "2026-07-14"
+      }
+    },
+    {
+      "id": 1000010,
+      "status": "Active",
+      "name": "Nora Harris",
+      "avatar": "big-avatar-11.jpg",
+      "age": 27,
+      "gender": "Female",
+      "dob": "1997-08-14",
+      "address": "303 Pine Ln, Hillview",
+      "phone": "555-543-6789",
+      "email": "nora.harris@email.com",
+      "emergency_contact": {
+        "name": "James Harris",
+        "phone": "555-543-6790",
+        "relationship": "Brother"
+      },
+      "insurance_provider": {
+        "provider": "MedCare Plus",
+        "policyNumber": "MCP234567891",
+        "validUntil": "2025-03-30"
+      }
+    },
+    {
+      "id": 1000011,
+      "status": "Active",
+      "name": "Ella Moore",
+      "avatar": "big-avatar-12.jpg",
+      "age": 29,
+      "gender": "Female",
+      "dob": "1995-12-12",
+      "address": "404 Birch Rd, Oldtown",
+      "phone": "555-654-7890",
+      "email": "ella.moore@email.com",
+      "emergency_contact": {
+        "name": "Laura Moore",
+        "phone": "555-654-7891",
+        "relationship": "Mother"
+      },
+      "insurance_provider": {
+        "provider": "CarePlus Health",
+        "policyNumber": "CP987654321",
+        "validUntil": "2026-02-15"
+      }
+    },
+    {
+      "id": 1000012,
+      "status": "Active",
+      "name": "Scarlett King",
+      "avatar": "big-avatar-13.jpg",
+      "age": 31,
+      "gender": "Female",
+      "dob": "1993-04-20",
+      "address": "505 Cedar Rd, Maple Town",
+      "phone": "555-765-4321",
+      "email": "scarlett.king@email.com",
+      "emergency_contact": {
+        "name": "Robert King",
+        "phone": "555-765-4322",
+        "relationship": "Father"
+      },
+      "insurance_provider": {
+        "provider": "Aetna Health",
+        "policyNumber": "AH654321987",
+        "validUntil": "2025-09-30"
+      }
+    },
+    {
+      "id": 1000013,
+      "status": "Active",
+      "name": "Zara Patel",
+      "avatar": "big-avatar-14.jpg",
+      "age": 33,
+      "gender": "Female",
+      "dob": "1991-01-28",
+      "address": "606 Willow Ln, Crestview",
+      "phone": "555-876-5430",
+      "email": "zara.patel@email.com",
+      "emergency_contact": {
+        "name": "Vikram Patel",
+        "phone": "555-876-5431",
+        "relationship": "Husband"
+      },
+      "insurance_provider": {
+        "provider": "United Health",
+        "policyNumber": "UH234567890",
+        "validUntil": "2026-11-25"
+      }
+    },
+    {
+      "id": 1000014,
+      "status": "Active",
+      "name": "Sophie Adams",
+      "avatar": "big-avatar-15.jpg",
+      "age": 25,
+      "gender": "Female",
+      "dob": "1999-06-17",
+      "address": "707 Maple Ave, Newtown",
+      "phone": "555-432-1234",
+      "email": "sophie.adams@email.com",
+      "emergency_contact": {
+        "name": "Megan Adams",
+        "phone": "555-432-1235",
+        "relationship": "Mother"
+      },
+      "insurance_provider": {
+        "provider": "HealthSecure",
+        "policyNumber": "HS234567891",
+        "validUntil": "2025-09-05"
+      }
+    }
+  ]
+}

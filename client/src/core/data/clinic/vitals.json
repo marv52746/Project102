@@ -1,0 +1,14 @@
+{
+  "vitals": [
+    {
+      "vital_id": 1,
+      "patient_id": 1,
+      "appointment_id": 101,
+      "weight": 70.0,
+      "blood_pressure": "120/80",
+      "heart_rate": 75,
+      "temperature": 98.6,
+      "date_taken": "2024-10-15T10:15:00Z"
+    }
+  ]
+}

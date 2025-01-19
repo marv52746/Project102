@@ -1,0 +1,195 @@
+.follow {
+  float: right;
+  margin-right: 79px;
+}
+
+.follow img {
+  width: 25px;
+  position: relative;
+  top: 7px;
+}
+
+/* Organizational tree list styles */
+.org-tree {
+  display: flex;
+  height: 100%;
+  flex-wrap: wrap;
+  overflow-x: auto; /* Allow horizontal scrolling */
+  max-height: 89vh; /* Limit max height of the tree */
+  overflow-y: auto; /* Enable vertical scrolling */
+
+  justify-content: start; /* Horizontally center all cards */
+  align-items: center; /* Vertically center the items */
+  flex-direction: column; /* Stack the cards vertically */
+}
+
+.org-tree ul {
+  padding-top: 20px;
+  position: relative;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+.org-tree li {
+  float: left;
+  text-align: center;
+  list-style-type: none;
+  position: relative;
+  padding: 20px 5px 0 5px;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+/* Adjust positioning of ::before and ::after connectors */
+.org-tree li::before,
+.org-tree li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 20px;
+  border-top: 1px solid #ccc;
+  transition: all 0.3s ease;
+}
+
+.org-tree li::before {
+  right: 50%; /* Align to the left half */
+}
+
+.org-tree li::after {
+  left: 50%; /* Align to the right half */
+  border-left: 1px solid #ccc;
+}
+
+.org-tree li:only-child::after,
+.org-tree li:only-child::before {
+  display: none;
+}
+
+.org-tree li:only-child {
+  padding-top: 0;
+}
+
+.org-tree li:first-child::before,
+.org-tree li:last-child::after {
+  border: 0 none;
+}
+
+.org-tree li:last-child::before {
+  border-right: 1px solid #ccc;
+  border-radius: 0 5px 0 0;
+  -webkit-border-radius: 0 5px 0 0;
+  -moz-border-radius: 0 5px 0 0;
+}
+
+.org-tree li:first-child::after {
+  border-radius: 5px 0 0 0;
+  -webkit-border-radius: 5px 0 0 0;
+  -moz-border-radius: 5px 0 0 0;
+}
+
+/* Styles for when the org tree is expanded */
+.org-tree ul ul::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  border-left: 1px solid #ccc;
+  width: 0;
+  height: 20px;
+}
+
+/* Link style for nodes */
+.org-tree li a {
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  text-decoration: none;
+  color: #666;
+  font-family: arial, verdana, tahoma;
+  font-size: 11px;
+  display: inline-block;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+.org-tree li a:hover,
+.org-tree li a:hover + ul li a {
+  background: #c8e4f8;
+  color: #000;
+  border: 1px solid #94a0b4;
+}
+
+.org-tree li a:hover + ul li::after,
+.org-tree li a:hover + ul li::before,
+.org-tree li a:hover + ul::before,
+.org-tree li a:hover + ul ul::before {
+  border-color: #94a0b4;
+}
+
+/* Card styles for each individual node */
+.card {
+  position: relative;
+  display: flex; /* Flexbox to align items horizontally */
+  align-items: center; /* Vertically align items to the center */
+  padding: 10px; /* Adjust padding around the card */
+  width: 260px; /* Card width */
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adding a shadow */
+  margin: 10px; /* Adding margin between cards */
+  margin: 0 auto;
+}
+
+/* Image section (left part) */
+.card .image {
+  margin-right: 10px;
+}
+
+.card .image img {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  /* border: 7px solid #96f6b7;  */
+}
+
+/* Card body (right part) */
+.card .card-body {
+  flex-grow: 1; /* Allow this part to grow and take up available space */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center the text vertically */
+}
+
+.card .card-body h4 {
+  font-weight: 600;
+  font-size: 14px;
+  text-align: left; /* Align text to the left */
+}
+
+.card .card-body p {
+  font-size: 12px;
+  color: #555;
+  text-align: left; /* Align text to the left */
+}
+
+/* Footer with action buttons */
+.card .card-footer {
+  display: flex;
+  justify-content: center;
+  padding: 5px;
+  background: #d4ddff;
+  border-radius: 8px;
+  width: 100%;
+  margin-top: 10px; /* Space between body and footer */
+}
+
+.card .card-footer img {
+  width: 25px;
+  margin: 0 5px;
+}

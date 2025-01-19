@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import ExportLinks from "./ExportLinks";
 
 const TableList = ({ title, data, columns }) => {
   const [search, setSearch] = useState("");
@@ -44,7 +45,7 @@ const TableList = ({ title, data, columns }) => {
   };
 
   const handleRowClick = (item) => {
-    navigate(`/form/${tablename}/${item.id}`);
+    navigate(`/form/${tablename}/view/${item.id}`);
   };
 
   return (
@@ -53,9 +54,7 @@ const TableList = ({ title, data, columns }) => {
         {/* <h3 className="text-2xl font-semibold mb-4 text-sidetext-active">
           {title}
         </h3> */}
-        <button className="bg-green-500 px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition">
-          Create New
-        </button>
+
         <div className="flex justify-center items-center">
           {/* Search Input */}
           <input
@@ -63,9 +62,12 @@ const TableList = ({ title, data, columns }) => {
             value={search}
             onChange={handleChangeSearch}
             placeholder="Search"
-            className="form-control form-control-sm w-80 border border-gray-300 rounded-md px-3 py-1 text-sm  focus:border-text-secondary  focus:outline-none"
+            className="form-control form-control-sm w-80 border border-gray-300 rounded-md px-4 py-2 text-sm  focus:border-text-secondary  focus:outline-none"
           />
         </div>
+        <button className="bg-green-500 px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition">
+          Create New
+        </button>
       </div>
 
       <div className="table-responsive mb-4">
@@ -85,36 +87,12 @@ const TableList = ({ title, data, columns }) => {
             </select>
             <label className="text-sm text-gray-600">entries</label>
           </div>
-          {/* Export Links */}
-          <nav aria-label="Export Options" className="mr-2">
-            <ul className="flex justify-center space-x-4">
-              <li>
-                <button className="text-sm text-blue-500 hover:text-blue-700">
-                  CSV
-                </button>
-              </li>
-              <li>
-                <button className="text-sm text-blue-500 hover:text-blue-700">
-                  Print
-                </button>
-              </li>
-              <li>
-                <button className="text-sm text-blue-500 hover:text-blue-700">
-                  PDF
-                </button>
-              </li>
-              <li>
-                <button className="text-sm text-blue-500 hover:text-blue-700">
-                  Excel
-                </button>
-              </li>
-            </ul>
-          </nav>
+          <ExportLinks data={filteredData} />
         </div>
 
         <table className="min-w-full table-auto border-collapse">
           <thead>
-            <tr className="bg-gray-100 text-left">
+            <tr className=" text-left border-b">
               {/* Dynamic Table Headers */}
               {columns.map((col) => (
                 <th
@@ -130,8 +108,8 @@ const TableList = ({ title, data, columns }) => {
             {paginatedData.map((item, index) => (
               <tr
                 key={item.id}
-                className={`${
-                  index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                className={`border-b ${
+                  index % 2 === 0 ? "" : "bg-white"
                 } hover:bg-side-active hover:text-text-secondary hover:cursor-pointer transition-colors duration-200`}
                 onClick={() => handleRowClick(item)}
               >
@@ -150,8 +128,21 @@ const TableList = ({ title, data, columns }) => {
                       >
                         {item.status}
                       </span>
+                    ) : col.field === "avatar" || col.field === "image" ? (
+                      // If the column field is "avatar", render a rounded avatar
+                      <img
+                        src={
+                          item[col.field]
+                            ? process.env.PUBLIC_URL +
+                              `/assets/images/${item[col.field]}`
+                            : process.env.PUBLIC_URL +
+                              "/assets/images/default-male.jpg"
+                        } // Assuming the avatar URL is in the item field
+                        alt="Avatar"
+                        className="w-10 h-10 rounded-full" // Adjust size and rounded styling
+                      />
                     ) : (
-                      item[col.field] // Render the data for other fields
+                      item[col.field] || "-" // Render the data for other fields
                     )}
                   </td>
                 ))}

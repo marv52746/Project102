@@ -23,7 +23,7 @@ const ChartComponent = ({ title, data, chartType }) => {
           {chartType === "line" ? (
             <LineChart data={data}>
               <CartesianGrid stroke="none" />
-              <XAxis dataKey="year" />
+              <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
               {/* <Legend /> */}
@@ -38,7 +38,7 @@ const ChartComponent = ({ title, data, chartType }) => {
           ) : (
             <BarChart data={data}>
               <CartesianGrid stroke="none" />
-              <XAxis dataKey="year" />
+              <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
               {/* <Legend /> */}

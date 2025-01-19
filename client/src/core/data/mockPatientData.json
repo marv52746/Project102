@@ -1,0 +1,297 @@
+{
+  "patients": [
+    {
+      "id": 1000001,
+      "name": "Daniel Smith",
+      "avatar": "big-avatar-2.jpg",
+      "age": 35,
+      "phone": "+91 11111 11111",
+      "lastVisit": "12-03-2023",
+      "status": "Active",
+      "dob": "1989-10-26",
+      "gender": "Male",
+      "address": "Koramangala, Bangalore, India",
+      "email": "daniel.smith@email.com",
+      "medicalHistory": [
+        {
+          "condition": "Asthma",
+          "diagnosisDate": "2010-06-15",
+          "status": "Ongoing"
+        },
+        {
+          "condition": "Knee Surgery",
+          "diagnosisDate": "2015-03-20",
+          "status": "Resolved"
+        }
+      ],
+      "visits": [
+        {
+          "doctor_name": "Dr. Manoj Kumar",
+          "doctor_specialization": "General Medicine",
+          "visit_type": "First Consultation",
+          "cost": "$90",
+          "visit_date": "03-03-2023",
+          "diagnosis": "Hypertension",
+          "treatment_provided": "Blood Pressure Medication",
+          "prescription": "Amlodipine 5mg - 30 days supply",
+          "patient_feedback": "Very satisfied with the consultation and clear instructions.",
+          "follow_up_date": "03-30-2023",
+          "payment_status": "Paid",
+          "payment_method": "Credit Card",
+          "status": "Completed",
+          "location": "Downtown Clinic"
+        },
+        {
+          "doctor_name": "Dr. Riya Sharma",
+          "doctor_specialization": "Dermatology",
+          "visit_type": "Follow-up",
+          "cost": "$120",
+          "visit_date": "04-02-2023",
+          "diagnosis": "Eczema",
+          "treatment_provided": "Topical steroids prescribed",
+          "prescription": "Hydrocortisone 1% cream - 14 days supply",
+          "patient_feedback": "The treatment is helping, but I need a follow-up in 2 weeks.",
+          "follow_up_date": "04-16-2023",
+          "payment_status": "Pending",
+          "payment_method": "Insurance",
+          "status": "Completed",
+          "location": "Uptown Dermatology Center"
+        },
+        {
+          "doctor_name": "Dr. Paul Williams",
+          "doctor_specialization": "Cardiology",
+          "visit_type": "Routine Checkup",
+          "cost": "$150",
+          "visit_date": "04-10-2023",
+          "diagnosis": "Normal",
+          "treatment_provided": "Annual check-up and ECG",
+          "prescription": "None",
+          "patient_feedback": "Everything seems fine, very thorough check-up.",
+          "follow_up_date": "04-10-2024",
+          "payment_status": "Paid",
+          "payment_method": "Cash",
+          "status": "Completed",
+          "location": "City Cardiology Clinic"
+        }
+      ],
+      "paymentTransactions": [
+        {
+          "date": "12-03-2023",
+          "cost": "$300",
+          "discount": "15%",
+          "type": "Check",
+          "status": "Pending"
+        }
+      ],
+      "emergencyContact": {
+        "name": "John Smith",
+        "relationship": "Brother",
+        "phone": "+91 99999 99999",
+        "address": "Koramangala, Bangalore, India"
+      },
+      "insurance": {
+        "provider": "HealthCare Corp",
+        "policyNumber": "HC1234567890",
+        "coverageType": "Full",
+        "validUntil": "2025-12-31"
+      },
+      "followUpReminder": {
+        "date": "2024-03-01",
+        "type": "Follow-up Consultation",
+        "status": "Pending"
+      }
+    },
+    {
+      "id": 1000002,
+      "name": "Sophia Johnson",
+      "avatar": "big-avatar-1.jpg",
+      "age": 29,
+      "phone": "+91 98765 43210",
+      "lastVisit": "20-02-2023",
+      "status": "Active",
+      "dob": "1995-05-14",
+      "gender": "Female",
+      "address": "Whitefield, Bangalore, India",
+      "email": "sophia.johnson@email.com",
+      "medicalHistory": [
+        {
+          "condition": "Allergy",
+          "diagnosisDate": "2018-09-10",
+          "status": "Ongoing"
+        }
+      ],
+      "visits": [
+        {
+          "doctor_name": "Dr. Riya Sharma",
+          "doctor_specialization": "Allergy Specialist",
+          "visit_type": "Initial Consultation",
+          "cost": "$80",
+          "visit_date": "20-02-2023",
+          "diagnosis": "Allergic Rhinitis",
+          "treatment_provided": "Antihistamines prescribed",
+          "prescription": "Loratadine 10mg - 15 days supply",
+          "patient_feedback": "Consultation was helpful, waiting to see if the treatment works.",
+          "follow_up_date": "20-03-2023",
+          "payment_status": "Paid",
+          "payment_method": "Insurance",
+          "status": "Completed",
+          "location": "Health Clinic"
+        }
+      ],
+      "paymentTransactions": [
+        {
+          "date": "20-02-2023",
+          "cost": "$500",
+          "discount": "10%",
+          "type": "Credit Card",
+          "status": "Completed"
+        }
+      ],
+      "emergencyContact": {
+        "name": "Emma Johnson",
+        "relationship": "Mother",
+        "phone": "+91 88888 88888",
+        "address": "Whitefield, Bangalore, India"
+      },
+      "insurance": {
+        "provider": "LifeHealth",
+        "policyNumber": "LH987654321",
+        "coverageType": "Partial",
+        "validUntil": "2024-11-30"
+      },
+      "followUpReminder": {
+        "date": "2024-04-01",
+        "type": "Allergy Test",
+        "status": "Pending"
+      }
+    },
+    {
+      "id": 1000003,
+      "name": "James Wilson",
+      "avatar": "big-avatar-5.jpg",
+      "age": 42,
+      "phone": "+91 81234 56789",
+      "lastVisit": "05-03-2023",
+      "status": "Active",
+      "dob": "1982-07-22",
+      "gender": "Male",
+      "address": "Indiranagar, Bangalore, India",
+      "email": "james.wilson@email.com",
+      "medicalHistory": [
+        {
+          "condition": "Back Pain",
+          "diagnosisDate": "2020-02-10",
+          "status": "Resolved"
+        }
+      ],
+      "visits": [
+        {
+          "doctor_name": "Dr. Manoj Kumar",
+          "doctor_specialization": "Orthopedics",
+          "visit_type": "Follow-up",
+          "cost": "$100",
+          "visit_date": "05-03-2023",
+          "diagnosis": "Lumbar Disc Issue",
+          "treatment_provided": "Physical Therapy and Pain Medication",
+          "prescription": "Ibuprofen 400mg - 15 days supply",
+          "patient_feedback": "Feeling better after physical therapy sessions.",
+          "follow_up_date": "12-03-2023",
+          "payment_status": "Paid",
+          "payment_method": "Cash",
+          "status": "Completed",
+          "location": "Spine Center"
+        }
+      ],
+      "paymentTransactions": [
+        {
+          "date": "05-03-2023",
+          "cost": "$400",
+          "discount": "20%",
+          "type": "Insurance",
+          "status": "Completed"
+        }
+      ],
+      "emergencyContact": {
+        "name": "John Wilson",
+        "relationship": "Brother",
+        "phone": "+91 77777 77777",
+        "address": "Indiranagar, Bangalore, India"
+      },
+      "insurance": {
+        "provider": "HealthCare Plus",
+        "policyNumber": "HC789654123",
+        "coverageType": "Full",
+        "validUntil": "2025-06-30"
+      },
+      "followUpReminder": {
+        "date": "2024-06-15",
+        "type": "Spine X-Ray",
+        "status": "Pending"
+      }
+    },
+    {
+      "id": 1000004,
+      "name": "Emily Davis",
+      "avatar": "big-avatar-3.jpg",
+      "age": 34,
+      "phone": "+91 93456 12345",
+      "lastVisit": "17-02-2023",
+      "status": "Active",
+      "dob": "1989-09-05",
+      "gender": "Female",
+      "address": "Jayanagar, Bangalore, India",
+      "email": "emily.davis@email.com",
+      "medicalHistory": [
+        {
+          "condition": "Hypertension",
+          "diagnosisDate": "2015-12-05",
+          "status": "Ongoing"
+        }
+      ],
+      "visits": [
+        {
+          "doctor_name": "Dr. Manoj Kumar",
+          "doctor_specialization": "General Medicine",
+          "visit_type": "Follow-up",
+          "cost": "$90",
+          "visit_date": "17-02-2023",
+          "diagnosis": "Blood Pressure Issues",
+          "treatment_provided": "Blood Pressure Medication",
+          "prescription": "Amlodipine 5mg - 30 days supply",
+          "patient_feedback": "The medication is working well, feel much better.",
+          "follow_up_date": "17-03-2023",
+          "payment_status": "Paid",
+          "payment_method": "Credit Card",
+          "status": "Completed",
+          "location": "Health Clinic"
+        }
+      ],
+      "paymentTransactions": [
+        {
+          "date": "17-02-2023",
+          "cost": "$150",
+          "discount": "5%",
+          "type": "Cash",
+          "status": "Completed"
+        }
+      ],
+      "emergencyContact": {
+        "name": "John Davis",
+        "relationship": "Husband",
+        "phone": "+91 77777 88888",
+        "address": "Jayanagar, Bangalore, India"
+      },
+      "insurance": {
+        "provider": "MedCare",
+        "policyNumber": "MC789456321",
+        "coverageType": "Partial",
+        "validUntil": "2024-08-15"
+      },
+      "followUpReminder": {
+        "date": "2024-02-15",
+        "type": "Blood Pressure Check",
+        "status": "Pending"
+      }
+    }
+  ]
+}

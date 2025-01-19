@@ -1,0 +1,17 @@
+{
+  "room_allotments": [
+    {
+      "room_allotment_id": 101,
+      "patient_id": 1,
+      "room_number": "R-12",
+      "room_type": "Private",
+      "check_in_date": "2024-11-21T14:00:00Z",
+      "check_out_date": "2024-11-22T16:00:00Z",
+      "length_of_stay": 1,
+      "room_rate": 200.0,
+      "total_room_charge": 200.0,
+      "labor_id": 501,
+      "status": "Checked Out"
+    }
+  ]
+}

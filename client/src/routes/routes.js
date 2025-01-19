@@ -9,10 +9,15 @@ import {
   Bed,
   NotebookPen,
   Accessibility,
+  Network,
+  Calendar,
+  Baby,
+  Clock,
 } from "lucide-react";
 import Sidebar, { SidebarItem } from "../core/components/Sidebar";
 import Header from "../core/components/Header";
 import { all_routes } from "./all_routes";
+import { getParmsFromPath } from "../core/utils/stringUtils";
 
 const theme = "light";
 
@@ -30,76 +35,110 @@ const iconMapping = [
   {
     text: "Patients",
     icon: <Accessibility size={20} />,
-    alert: false,
+    alert: true,
     active: false,
     iconText: "Patients",
     to: all_routes.patients,
     table: "patients",
   },
   {
-    text: "Doctors",
+    text: "Staff",
     icon: <UserCircle size={20} />,
     alert: false,
     active: false,
-    iconText: "Doctors",
-    to: all_routes.doctors,
-    table: "doctors",
+    iconText: "Staff",
+    to: all_routes.staff,
+    table: "staff",
   },
   {
     text: "Appointments",
     icon: <NotebookPen size={20} />,
-    alert: false,
+    alert: true,
     active: false,
     iconText: "Appointments",
     to: all_routes.appointments,
     table: "appointments",
   },
+  // {
+  //   text: "Birth Reports",
+  //   icon: <Baby size={20} />,
+  //   alert: false,
+  //   active: false,
+  //   iconText: "Birth Reports",
+  //   to: all_routes.birthReports,
+  //   table: "birth-reports",
+  // },
+  {
+    text: "Pregnancies",
+    icon: <Baby size={20} />,
+    alert: false,
+    active: false,
+    iconText: "Pregnancies",
+    to: all_routes.pregnancies,
+    table: "pregnancies",
+  },
+  {
+    text: "Labor and Deliveries",
+    icon: <Clock size={20} />,
+    alert: true,
+    active: false,
+    iconText: "Labor and Deliveries",
+    to: all_routes.laborAndDeliveries,
+    table: "labor-and-deliveries",
+  },
   {
     text: "Payments",
     icon: <Receipt size={20} />,
-    alert: true,
+    alert: false,
     active: false,
     iconText: "Payments",
+    to: all_routes.payments,
     table: "payments",
   },
+  // {
+  //   text: "Room Allotments",
+  //   icon: <Bed size={20} />,
+  //   alert: true,
+  //   active: false,
+  //   iconText: "Room Allotments",
+  //   table: "room-allotments",
+  // },
   {
-    text: "Room Allotments",
-    icon: <Bed size={20} />,
-    alert: true,
+    text: "Org Chart",
+    icon: <Network size={20} />,
+    alert: false,
     active: false,
-    iconText: "Room Allotments",
-    table: "room-allotments",
+    iconText: "Org Chart",
+    table: "organizational-structure-diagram",
+    to: all_routes.orgChart,
   },
+  {
+    text: "Birthing Calendar",
+    icon: <Calendar size={20} />,
+    alert: false,
+    active: false,
+    iconText: "Birthing Calendar",
+    table: "calendar",
+    to: all_routes.calendar,
+  },
+  // {
+  //   text: "Test Page",
+  //   icon: <Calendar size={20} />,
+  //   alert: false,
+  //   active: false,
+  //   iconText: "Test Page",
+  //   table: "testPage",
+  //   to: all_routes.testPage,
+  // },
 ];
 
 const InternalLayout = () => {
   const location = useLocation(); // Get the current location (URL)
-
-  // Function to extract tablename based on the current URL
-  const getTablenameFromPath = () => {
-    const path = location.pathname.split("/"); // Split path into segments
-
-    if (path[1] === "") {
-      // Root path ("/")
-      return "dashboard"; // Default to "dashboard" for the root path
-    }
-
-    if (path[1] === "list" && path[2]) {
-      // List path ("/list/:tablename")
-      return path[2]; // Extract tablename from the URL
-    }
-
-    if (path[1] === "form" && path[2]) {
-      // Form path ("/form/:tablename/:id")
-      return path[2]; // Extract tablename from the URL (ignore the id)
-    }
-
-    return ""; // Return empty string if no match
-  };
+  const parms = getParmsFromPath(location);
 
   // Function to determine the active item based on the current route
   const getActiveSidebarItem = (route) => {
-    return route === getTablenameFromPath() ? "active" : "";
+    return route === parms.tablename ? "active" : "";
   };
 
   return (
@@ -116,12 +155,12 @@ const InternalLayout = () => {
             to={item.to}
           />
         ))}
-        <hr className="my-3" />
+        {/* <hr className="my-3" /> */}
       </Sidebar>
 
       {/* Main content for internal users */}
       <div className="flex-1 overflow-auto bg-side-active/30">
-        <Header pathname={getTablenameFromPath()} />
+        {parms.tablename !== "calendar" && <Header parms={parms} />}
         <Routes>
           {authRoute.map((route) => (
             <Route
