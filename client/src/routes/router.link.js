@@ -6,10 +6,10 @@ import Dashboard from "../pages/private/Dashboard";
 import List from "../pages/private/List";
 import Form from "../pages/private/Form";
 import OrganizationChart from "../pages/private/OrganizationChart";
-import Calendar2 from "../pages/private/Calendar/Calendar2";
 import Login from "../pages/main/login";
 import SignUp from "../pages/main/signup";
 import Portal from "../pages/public/Portal";
+import CalendarPage from "../pages/private/Calendar/CalendarPage";
 
 const routes = all_routes;
 
@@ -53,13 +53,13 @@ const routesArray = [
   {
     path: routes.calendar,
     name: "calendar",
-    element: <Calendar2 />,
+    element: <CalendarPage />,
   },
-  {
-    path: routes.testPage,
-    name: "testPage",
-    element: <Calendar2 />,
-  },
+  // {
+  //   path: routes.testPage,
+  //   name: "testPage",
+  //   element: <CalendarPage />,
+  // },
 ];
 
 export const authRoute = routesArray.map((route, index) => ({

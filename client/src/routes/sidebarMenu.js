@@ -104,11 +104,11 @@ export const iconMapping = [
     table: "organizational-structure-diagram",
   },
   {
-    text: "Birthing Calendar",
+    text: "Calendar",
     icon: <Calendar size={20} />,
     alert: false,
     active: false,
-    iconText: "Birthing Calendar",
+    iconText: "Calendar",
     to: all_routes.calendar,
     table: "calendar",
   },

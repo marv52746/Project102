@@ -10,6 +10,7 @@ const propertyRoutes = require("./core/propertyRoutes");
 const patientRoutes = require("./medical/patientRoutes");
 const vitalRoutes = require("./medical/vitalRoutes");
 const appointmentRoutes = require("./medical/appointmentRoutes");
+const calendarRoute = require("./medical/calendarRoute");
 const birthReportRoutes = require("./medical/birthReportRoutes");
 const doctorActivityRoutes = require("./medical/doctorActivityRoutes");
 const laboratoryRoutes = require("./medical/laboratoryRoutes");
@@ -24,6 +25,8 @@ router.use("/file", fileRoutes);
 router.use("/users", userRoutes);
 router.use("/properties", propertyRoutes);
 router.use("/auth", authRoutes); // ✅ REGISTER AUTH ROUTE HERE
+
+router.use("/calendar", calendarRoute);
 
 router.use("/patients", patientRoutes);
 router.use("/vitals", vitalRoutes);
