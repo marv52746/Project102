@@ -1,31 +1,75 @@
 import { jwtDecode } from "jwt-decode";
-import React, { useEffect } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { loggedUserData } from "../../core/services/slices/userSlice";
 import { showNotification } from "../../core/services/slices/notificationSlice";
 import { all_routes } from "../../routes/all_routes";
+import apiService from "../../core/services/apiService";
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleCredentialResponse = (response) => {
-    const userObject = jwtDecode(response.credential); // Decode JWT if needed
-    const token = response.credential; // This is the JWT token
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-    // Dispatch action to store user data in Redux and session storage
-    dispatch(loggedUserData({ ...userObject, token }));
+  // const handleCredentialResponse = (response) => {
+  //   const userObject = jwtDecode(response.credential); // Decode JWT if needed
+  //   const token = response.credential; // This is the JWT token
 
-    dispatch(
-      showNotification({
-        message: "Login Successfully!",
-        type: "success",
-      })
-    );
+  //   // Dispatch action to store user data in Redux and session storage
+  //   dispatch(loggedUserData({ ...userObject, token }));
 
-    if (token) {
-      navigate("/");
+  //   dispatch(
+  //     showNotification({
+  //       message: "Login Successfully!",
+  //       type: "success",
+  //     })
+  //   );
+
+  //   if (token) {
+  //     navigate("/");
+  //   }
+  // };
+
+  const handleCredentialResponse = async (response) => {
+    try {
+      const googleToken = response.credential;
+
+      // Send to backend for verification + app token generation
+      const backendResponse = await apiService.post(dispatch, "auth/google", {
+        token: googleToken,
+      });
+
+      const appToken = backendResponse.token;
+      const userObject = jwtDecode(appToken); // This now contains app role, etc.
+
+      dispatch(loggedUserData({ ...userObject, token: appToken }));
+
+      dispatch(
+        showNotification({
+          message: "Login Successfully!",
+          type: "success",
+        })
+      );
+
+      const allowedRoles = ["admin", "doctor", "staff", "owner"];
+      if (allowedRoles.includes(userObject.role)) {
+        navigate("/dashboard");
+      } else {
+        navigate("/portal");
+      }
+    } catch (err) {
+      console.error("Google login failed", err);
+      dispatch(
+        showNotification({
+          message: "Google login failed",
+          type: "error",
+        })
+      );
     }
   };
 
@@ -49,40 +93,84 @@ const Login = () => {
     };
 
     loadGoogleScript();
-  });
+  }, []);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await apiService.post(dispatch, "auth/login", {
+        email,
+        password,
+      });
+
+      const token = response.token;
+      const userObject = jwtDecode(token);
+
+      dispatch(loggedUserData({ ...userObject, token }));
+      dispatch(
+        showNotification({
+          message: "Login Successfully!",
+          type: "success",
+        })
+      );
+
+      // Check user's role and redirect accordingly
+      const allowedRoles = ["admin", "doctor", "staff", "owner"];
+      if (allowedRoles.includes(userObject.role)) {
+        navigate("/dashboard"); // Internal users
+      } else {
+        navigate("/portal"); // External users without access
+      }
+    } catch (err) {
+      console.error("Login failed", err);
+      // Error is already handled in apiService with showNotification
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen px-4 py-8 bg-gray-100">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold mb-6 text-center">Welcome back</h1>
+        <form onSubmit={handleLogin}>
+          <div className="mb-4">
+            <input
+              placeholder="Email Address"
+              type="email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full p-3 border border-gray-300 rounded-md"
+            />
+          </div>
 
-        <div className="mb-4">
-          <input
-            placeholder="Email Address"
-            type="email"
-            name="email"
-            required
-            className="w-full p-3 border border-gray-300 rounded-md"
-          />
-        </div>
+          <div className="mb-6 relative ">
+            <input
+              placeholder="Password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full p-3 border border-gray-300 rounded-md pr-10"
+            />
 
-        <div className="mb-6">
-          <input
-            placeholder="Password"
-            type="password"
-            name="password"
-            required
-            className="w-full p-3 border border-gray-300 rounded-md"
-          />
-        </div>
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOff size={25} /> : <Eye size={25} />}
+            </button>
+          </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-3 rounded-md hover:bg-blue-600"
-        >
-          Continue
-        </button>
-
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-3 rounded-md hover:bg-blue-600"
+          >
+            Continue
+          </button>
+        </form>
         <div className="text-center mt-4">
           <p>
             Don't have an account?{" "}

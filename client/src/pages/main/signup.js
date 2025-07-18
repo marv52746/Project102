@@ -1,8 +1,115 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { all_routes } from "../../routes/all_routes";
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loggedUserData } from "../../core/services/slices/userSlice";
+import { showNotification } from "../../core/services/slices/notificationSlice";
+import apiService from "../../core/services/apiService";
+import { jwtDecode } from "jwt-decode";
 
 const SignUp = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordCheck, setPasswordCheck] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordCheck, setShowPasswordcheck] = useState(false);
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    if (password !== passwordCheck) {
+      dispatch(
+        showNotification({
+          message: "Passwords do not match",
+          type: "error",
+        })
+      );
+      return;
+    }
+
+    try {
+      const response = await apiService.post(dispatch, "auth/signup", {
+        email,
+        password,
+      });
+
+      const token = response.token;
+      const userObject = jwtDecode(token);
+
+      dispatch(loggedUserData({ ...userObject, token }));
+      dispatch(
+        showNotification({
+          message: "Account created successfully!",
+          type: "success",
+        })
+      );
+
+      const allowedRoles = ["admin", "doctor", "staff", "owner"];
+      if (allowedRoles.includes(userObject.role)) {
+        navigate("/dashboard");
+      } else {
+        navigate("/portal");
+      }
+    } catch (err) {
+      console.error("Signup failed", err);
+    }
+  };
+
+  const handleGoogleResponse = async (response) => {
+    try {
+      const googleToken = response.credential;
+      const apiRes = await apiService.post(dispatch, "auth/google", {
+        token: googleToken,
+      });
+
+      const appToken = apiRes.token;
+      const userObject = jwtDecode(appToken);
+
+      dispatch(loggedUserData({ ...userObject, token: appToken }));
+      dispatch(
+        showNotification({
+          message: "Signed up with Google successfully!",
+          type: "success",
+        })
+      );
+
+      const allowedRoles = ["admin", "doctor", "staff", "owner"];
+      if (allowedRoles.includes(userObject.role)) {
+        navigate("/dashboard");
+      } else {
+        navigate("/portal");
+      }
+    } catch (err) {
+      console.error("Google signup failed", err);
+    }
+  };
+
+  useEffect(() => {
+    const loadGoogleScript = () => {
+      const script = document.createElement("script");
+      script.src = "https://accounts.google.com/gsi/client";
+      script.async = true;
+      script.onload = () => {
+        window.google.accounts.id.initialize({
+          client_id: process.env.REACT_APP_CLIENT_ID,
+          callback: handleGoogleResponse,
+        });
+
+        window.google.accounts.id.renderButton(
+          document.getElementById("google-signup-button"),
+          { theme: "outline", size: "large" }
+        );
+      };
+      document.body.appendChild(script);
+    };
+
+    loadGoogleScript();
+  }, []);
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
@@ -10,42 +117,61 @@ const SignUp = () => {
           Create your account
         </h1>
 
-        <div className="mb-4">
-          <input
-            placeholder="Email Address"
-            type="email"
-            name="email"
-            required
-            className="w-full p-3 border border-gray-300 rounded-md"
-          />
-        </div>
+        <form onSubmit={handleSignup}>
+          <div className="mb-4">
+            <input
+              placeholder="Email Address"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full p-3 border border-gray-300 rounded-md"
+            />
+          </div>
 
-        <div className="mb-4">
-          <input
-            placeholder="Password"
-            type="password"
-            name="password"
-            required
-            className="w-full p-3 border border-gray-300 rounded-md"
-          />
-        </div>
+          <div className="mb-4 relative">
+            <input
+              placeholder="Password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full p-3 border border-gray-300 rounded-md pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOff size={25} /> : <Eye size={25} />}
+            </button>
+          </div>
 
-        <div className="mb-6">
-          <input
-            placeholder="Confirm Password"
-            type="password"
-            name="passwordCheck"
-            required
-            className="w-full p-3 border border-gray-300 rounded-md"
-          />
-        </div>
+          <div className="mb-6 relative">
+            <input
+              placeholder="Confirm Password"
+              type={showPasswordCheck ? "text" : "password"}
+              value={passwordCheck}
+              onChange={(e) => setPasswordCheck(e.target.value)}
+              required
+              className="w-full p-3 border border-gray-300 rounded-md"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPasswordcheck(!showPasswordCheck)}
+              className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+            >
+              {showPasswordCheck ? <EyeOff size={25} /> : <Eye size={25} />}
+            </button>
+          </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-3 rounded-md hover:bg-blue-600"
-        >
-          Continue
-        </button>
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-3 rounded-md hover:bg-blue-600"
+          >
+            Continue
+          </button>
+        </form>
 
         <div className="text-center mt-4">
           <p>
@@ -58,6 +184,14 @@ const SignUp = () => {
             </Link>
           </p>
         </div>
+
+        <div className="my-6 text-center flex items-center">
+          <hr className="flex-grow border-t border-gray-300" />
+          <span className="mx-4 text-gray-500 text-xs">OR</span>
+          <hr className="flex-grow border-t border-gray-300" />
+        </div>
+
+        <div id="google-signup-button" className="flex justify-center"></div>
       </div>
     </div>
   );

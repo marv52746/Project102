@@ -1,60 +1,60 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 // Import the components for Patient and Doctor views and edits
-import PatientDetails from "./Patients/PatientDetails";
-import PatientEdit from "./Patients/PatientEdit";
-import DoctorDetails from "./Staff/DoctorDetails";
-import DoctorEdit from "./Staff/DoctorEdit";
-import AppointmentDetails from "./Appointments/AppointmentDetails";
-import BirthReportDetails from "./LaborAndPregnancies/BirthReportDetails";
-import PregnancyForm from "./LaborAndPregnancies/PregnancyForm";
-import LaborForm from "./LaborAndPregnancies/LaborForm";
-import PaymentForm from "./Payments/PaymentForm";
+
+import { useDispatch, useSelector } from "react-redux";
+import { internalRoles } from "../../core/constants/rolePresets";
+import FormNew from "../../core/components/FormNew";
+import { listConfigMap } from "../../core/constants/listConfigMap";
+import FormFormat from "../../core/components/FormFormat";
+import apiService from "../../core/services/apiService";
 
 function Form() {
   const { tablename, view, id } = useParams();
+  const dispatch = useDispatch();
 
-  const componentMap = {
-    patients: {
-      view: <PatientDetails id={id} />,
-      edit: <PatientEdit id={id} />,
-    },
-    staff: {
-      view: <DoctorDetails id={id} />,
-      edit: <DoctorEdit id={id} />,
-    },
-    appointments: {
-      view: <AppointmentDetails id={id} />,
-      edit: <AppointmentDetails id={id} />,
-      // edit: <AppointmentEdit id={id} />,
-    },
-    pregnancies: {
-      view: <PregnancyForm id={id} />,
-      edit: <PregnancyForm id={id} />,
-    },
-    payments: {
-      view: <PaymentForm id={id} />,
-      edit: <PaymentForm id={id} />,
-    },
-    "labor-and-deliveries": {
-      view: <LaborForm id={id} />,
-      edit: <LaborForm id={id} />,
-    },
-    "birth-reports": {
-      view: <BirthReportDetails id={id} />,
-      edit: <PatientEdit id={id} />,
-    },
-  };
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(view !== "create");
 
-  // If tablename and view exist in the component map, return the corresponding component
-  const component = componentMap[tablename]?.[view];
+  const userInfo = useSelector((state) => state.user.userInfo);
+  const hasValidRole = userInfo && internalRoles.includes(userInfo.role);
 
-  if (component) {
-    return component;
-  }
+  useEffect(() => {
+    if (view !== "create") {
+      const fetchDetails = async () => {
+        try {
+          const record = await apiService.get(dispatch, `${tablename}/${id}`);
+          setData(record);
+        } catch (error) {
+          console.error(`Error fetching ${tablename} details:`, error);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-  return <div>Invalid route or parameters.</div>;
+      fetchDetails();
+    }
+  }, [view, id, tablename, dispatch]);
+
+  if (!hasValidRole) return <div>Access denied</div>;
+  if (loading) return <div className="p-4">Loading...</div>;
+  if (view !== "create" && !data)
+    return <div className="p-4">Record not found.</div>;
+
+  const config = listConfigMap[tablename];
+  if (!config) return <div>Invalid route or parameters.</div>;
+
+  const fields = config.getFields(view);
+
+  const component =
+    view === "create" ? (
+      <FormNew fields={fields} />
+    ) : (
+      <FormFormat fields={fields} data={data} />
+    );
+
+  return component;
 }
 
 export default Form;

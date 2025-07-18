@@ -1,136 +1,15 @@
 import React from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { authRoute, publicRoutes } from "./router.link";
 import { useSelector } from "react-redux";
-import {
-  Receipt,
-  UserCircle,
-  LayoutDashboard,
-  Bed,
-  NotebookPen,
-  Accessibility,
-  Network,
-  Calendar,
-  Baby,
-  Clock,
-} from "lucide-react";
 import Sidebar, { SidebarItem } from "../core/components/Sidebar";
 import Header from "../core/components/Header";
 import { all_routes } from "./all_routes";
 import { getParmsFromPath } from "../core/utils/stringUtils";
-
+import { internalRoles } from "../core/constants/rolePresets";
+import Notification from "../core/components/Notification";
+import { iconMapping } from "./sidebarMenu";
 const theme = "light";
-
-// Updated iconMapping as an array of objects
-const iconMapping = [
-  {
-    text: "Dashboard",
-    icon: <LayoutDashboard size={20} />,
-    alert: false,
-    active: false,
-    iconText: "Dashboard",
-    to: all_routes.dashboard,
-    table: "dashboard",
-  },
-  {
-    text: "Patients",
-    icon: <Accessibility size={20} />,
-    alert: true,
-    active: false,
-    iconText: "Patients",
-    to: all_routes.patients,
-    table: "patients",
-  },
-  {
-    text: "Staff",
-    icon: <UserCircle size={20} />,
-    alert: false,
-    active: false,
-    iconText: "Staff",
-    to: all_routes.staff,
-    table: "staff",
-  },
-  {
-    text: "Appointments",
-    icon: <NotebookPen size={20} />,
-    alert: true,
-    active: false,
-    iconText: "Appointments",
-    to: all_routes.appointments,
-    table: "appointments",
-  },
-  // {
-  //   text: "Birth Reports",
-  //   icon: <Baby size={20} />,
-  //   alert: false,
-  //   active: false,
-  //   iconText: "Birth Reports",
-  //   to: all_routes.birthReports,
-  //   table: "birth-reports",
-  // },
-  {
-    text: "Pregnancies",
-    icon: <Baby size={20} />,
-    alert: false,
-    active: false,
-    iconText: "Pregnancies",
-    to: all_routes.pregnancies,
-    table: "pregnancies",
-  },
-  {
-    text: "Labor and Deliveries",
-    icon: <Clock size={20} />,
-    alert: true,
-    active: false,
-    iconText: "Labor and Deliveries",
-    to: all_routes.laborAndDeliveries,
-    table: "labor-and-deliveries",
-  },
-  {
-    text: "Payments",
-    icon: <Receipt size={20} />,
-    alert: false,
-    active: false,
-    iconText: "Payments",
-    to: all_routes.payments,
-    table: "payments",
-  },
-  // {
-  //   text: "Room Allotments",
-  //   icon: <Bed size={20} />,
-  //   alert: true,
-  //   active: false,
-  //   iconText: "Room Allotments",
-  //   table: "room-allotments",
-  // },
-  {
-    text: "Org Chart",
-    icon: <Network size={20} />,
-    alert: false,
-    active: false,
-    iconText: "Org Chart",
-    table: "organizational-structure-diagram",
-    to: all_routes.orgChart,
-  },
-  {
-    text: "Birthing Calendar",
-    icon: <Calendar size={20} />,
-    alert: false,
-    active: false,
-    iconText: "Birthing Calendar",
-    table: "calendar",
-    to: all_routes.calendar,
-  },
-  // {
-  //   text: "Test Page",
-  //   icon: <Calendar size={20} />,
-  //   alert: false,
-  //   active: false,
-  //   iconText: "Test Page",
-  //   table: "testPage",
-  //   to: all_routes.testPage,
-  // },
-];
 
 const InternalLayout = () => {
   const location = useLocation(); // Get the current location (URL)
@@ -195,8 +74,40 @@ const PublicLayout = () => {
 
 const AllRoutes = () => {
   const authState = useSelector((state) => state.user.authState);
+  const location = useLocation();
+  const userInfo = useSelector((state) => state.user.userInfo);
 
-  return <>{authState ? <InternalLayout /> : <PublicLayout />}</>;
+  const hasValidRole = userInfo && internalRoles.includes(userInfo.role);
+
+  const isPublicPath = publicRoutes.some(
+    (route) => route.path === location.pathname
+  );
+
+  let content;
+
+  // Case 1: Logged-in user with valid role trying to access /login → redirect to dashboard
+  if (authState && hasValidRole && location.pathname === all_routes.login) {
+    content = <Navigate to={all_routes.dashboard} replace />;
+  }
+  // Case 2: Logged-in but invalid role
+  else if (authState && !hasValidRole) {
+    content = <PublicLayout />;
+  }
+  // Case 3: Not logged in and trying to access a protected route
+  else if (!authState && !isPublicPath) {
+    content = <Navigate to={all_routes.login} replace />;
+  }
+  // Final: Route correctly
+  else {
+    content = authState && hasValidRole ? <InternalLayout /> : <PublicLayout />;
+  }
+
+  return (
+    <>
+      <Notification />
+      {content}
+    </>
+  );
 };
 
 export default AllRoutes;

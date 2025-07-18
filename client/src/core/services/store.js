@@ -13,7 +13,7 @@ import storage from "redux-persist/lib/storage"; // Default storage for web
 import { thunk } from "redux-thunk"; // Import Redux Thunk
 
 import userReducer from "./slices/userSlice";
-// import notificationReducer from "./slices/notificationSlice";
+import notificationReducer from "./slices/notificationSlice";
 // import orderListSlice from "./slices/orderListSlice";
 // import saleListSlice from "./slices/saleListSlice";
 // import customerSlice from "./slices/customerSlice";
@@ -38,7 +38,7 @@ const store = configureStore({
     // saleList: createPersistedReducer(saleListSlice),
     // customerList: createPersistedReducer(customerSlice),
     // productList: createPersistedReducer(productListSlice),
-    // notification: notificationReducer,
+    notification: notificationReducer,
     // theme: themeSlice,
   },
   middleware: (getDefaultMiddleware) =>

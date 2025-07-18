@@ -7,6 +7,7 @@ import {
   HeartPulse,
   Scale,
 } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 
 // Helper function to map icons dynamically
 const iconMap = {
@@ -32,6 +33,9 @@ const HealthInfoCard = ({ title, value, category, icon }) => (
 );
 
 const PatientDetailsCardv2 = ({ tableData }) => {
+  const { tablename, id } = useParams();
+  const navigate = useNavigate();
+
   // Example BMI data
   const bmi = 25.2; // Example BMI value
   const bmiCategory =
@@ -88,6 +92,14 @@ const PatientDetailsCardv2 = ({ tableData }) => {
     },
   ];
 
+  const handleEdit = (item) => {
+    navigate(`/form/${tablename}/edit/${id}`);
+  };
+
+  const handleDelete = (item) => {
+    navigate(`/form/${tablename}/delete/${id}`);
+  };
+
   return (
     <div className="w-full p-4 bg-white rounded-lg shadow-md">
       <div className="flex flex-wrap -mx-4">
@@ -95,11 +107,10 @@ const PatientDetailsCardv2 = ({ tableData }) => {
         <div className="w-full md:w-1/3 px-4 mb-6">
           <div className="shadow-lg rounded-lg overflow-hidden">
             <img
-              className="w-full h-60 object-cover"
+              className="w-full h-60 object-contain"
               src={
                 tableData.avatar
-                  ? process.env.PUBLIC_URL +
-                    `/assets/images/${tableData.avatar}`
+                  ? process.env.REACT_APP_BASE_URL_IMAGE + tableData.avatar
                   : process.env.PUBLIC_URL + "/assets/images/default-male.jpg"
               }
               alt={tableData.name}
@@ -110,10 +121,16 @@ const PatientDetailsCardv2 = ({ tableData }) => {
                 {tableData.description || "No description available."}
               </p>
               <div className="flex space-x-4">
-                <button className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 flex items-center">
+                <button
+                  onClick={() => handleEdit(tableData)}
+                  className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 flex items-center"
+                >
                   Edit Patient
                 </button>
-                <button className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600 flex items-center">
+                <button
+                  onClick={() => handleDelete(tableData)}
+                  className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600 flex items-center"
+                >
                   Delete Patient
                 </button>
               </div>

@@ -100,7 +100,7 @@ export default function Sidebar({ children }) {
 
         <div className="border-t flex p-3 relative">
           <img
-            src={userInfo?.picture}
+            src={`${process.env.REACT_APP_BASE_URL_IMAGE}${userInfo.avatar}`}
             alt=""
             className="w-10 h-10 rounded-md"
           />

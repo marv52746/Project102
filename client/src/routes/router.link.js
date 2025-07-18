@@ -9,6 +9,7 @@ import OrganizationChart from "../pages/private/OrganizationChart";
 import Calendar2 from "../pages/private/Calendar/Calendar2";
 import Login from "../pages/main/login";
 import SignUp from "../pages/main/signup";
+import Portal from "../pages/public/Portal";
 
 const routes = all_routes;
 
@@ -27,6 +28,11 @@ export const publicRoutesArray = [
     path: routes.signup,
     name: "signup",
     element: <SignUp />,
+  },
+  {
+    path: routes.portal,
+    name: "portal",
+    element: <Portal />,
   },
 ];
 

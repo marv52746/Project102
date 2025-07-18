@@ -1,6 +1,6 @@
 // src/core/services/apiService.js
 import axios from "axios";
-import { showNotification } from "./slices/notificationSlice"; // Adjust the import path as necessary
+import { showNotification } from "./slices/notificationSlice"; // Adjust path as needed
 
 const baseURL = process.env.REACT_APP_BASE_URL;
 
@@ -11,12 +11,29 @@ const apiClient = axios.create({
   },
 });
 
+// Utility: Converts JS object to FormData if needed
+const prepareData = (data) => {
+  const hasFile = Object.values(data).some((value) => value instanceof File);
+  if (!hasFile)
+    return { data, headers: { "Content-Type": "application/json" } };
+
+  const formData = new FormData();
+  Object.entries(data).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      formData.append(key, value);
+    }
+  });
+
+  return { data: formData, headers: { "Content-Type": "multipart/form-data" } };
+};
+
+// Shared handler
 const handleApiResponse = async (
   dispatch,
   apiCall,
   successMessage,
   errorMessage,
-  showSuccess = true // Add a parameter to control success notification
+  showSuccess = true
 ) => {
   try {
     const response = await apiCall();
@@ -33,37 +50,52 @@ const handleApiResponse = async (
     console.error(errorMessage, error);
     dispatch(
       showNotification({
-        message: `${errorMessage}: ${error.message}`,
+        message: `${errorMessage}: ${
+          error?.response?.data?.error || error.message
+        }`,
         type: "error",
       })
     );
-    throw error; // Rethrow the error to handle it in the calling function if needed
+    throw error;
   }
 };
 
+// API methods
 const apiService = {
-  get: (dispatch, resource) =>
+  get: (dispatch, resource, query) =>
     handleApiResponse(
       dispatch,
-      () => apiClient.get(`/${resource}`),
-      "", // No success message for fetch
+      () =>
+        apiClient.get(`/${resource}`, {
+          params: query, // 👈 this enables query string like ?role=doctor
+        }),
+      "",
       "Error fetching resource",
-      false // Do not show success notification
+      false
     ),
-  post: (dispatch, resource, data) =>
+
+  put: (dispatch, resource, id, data, isMultipart = false) =>
     handleApiResponse(
       dispatch,
-      () => apiClient.post(`/${resource}`, data),
-      "Created successfully",
-      "Error creating resource"
-    ),
-  put: (dispatch, resource, id, data) =>
-    handleApiResponse(
-      dispatch,
-      () => apiClient.put(`/${resource}/${id}`, data),
+      () =>
+        apiClient.put(`/${resource}/${id}`, data, {
+          headers: isMultipart ? { "Content-Type": "multipart/form-data" } : {},
+        }),
       "Updated successfully",
       "Error updating resource"
     ),
+
+  post: (dispatch, resource, data, isMultipart = false) =>
+    handleApiResponse(
+      dispatch,
+      () =>
+        apiClient.post(`/${resource}`, data, {
+          headers: isMultipart ? { "Content-Type": "multipart/form-data" } : {},
+        }),
+      "Created successfully",
+      "Error creating resource"
+    ),
+
   delete: (dispatch, resource, id) =>
     handleApiResponse(
       dispatch,

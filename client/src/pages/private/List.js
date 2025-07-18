@@ -1,35 +1,78 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import Patients from "./Patients/Patients";
-import Doctors from "./Staff/Doctors";
-import Appointments from "./Appointments/Appointments";
-import BirthReport from "./LaborAndPregnancies/BirthReport";
-import Pregnancies from "./LaborAndPregnancies/Pregnancies";
-import LaborAndDelivery from "./LaborAndPregnancies/LaborAndDelivery";
-import Payments from "./Payments/Payments";
+import { useSelector } from "react-redux";
+import { internalRoles } from "../../core/constants/rolePresets";
+import ListFormat from "../../core/components/ListFormat"; // adjust this path
+import { getUserFormFields } from "../../core/constants/userPresets";
+import { getPropertyFields } from "../../core/constants/propertiesPresets";
+import { getAppointmentFields } from "../../core/constants/appointmentPresets";
+
+const listConfigMap = {
+  //   patients: {
+  //     apiURL: "patients",
+  //     fieldData: patientFields,
+  //     title: "Patients",
+  //   },
+  //   staff: {
+  //     apiURL: "staff",
+  //     fieldData: doctorFields,
+  //     title: "Staff",
+  //   },
+  users: {
+    apiURL: "users",
+    fieldData: getUserFormFields("list"),
+    title: "Users",
+  },
+  properties: {
+    apiURL: "properties",
+    fieldData: getPropertyFields(),
+    title: "System Properties",
+  },
+  appointments: {
+    apiURL: "appointments",
+    fieldData: getAppointmentFields(),
+    title: "Appointments",
+  },
+  //   "birth-reports": {
+  //     apiURL: "birth-reports",
+  //     fieldData: birthReportFields,
+  //     title: "Birth Reports",
+  //   },
+  //   pregnancies: {
+  //     apiURL: "pregnancies",
+  //     fieldData: pregnancyFields,
+  //     title: "Pregnancies",
+  //   },
+  //   "labor-and-deliveries": {
+  //     apiURL: "labor-and-deliveries",
+  //     fieldData: laborDeliveryFields,
+  //     title: "Labor & Deliveries",
+  //   },
+  //   payments: {
+  //     apiURL: "payments",
+  //     fieldData: paymentFields,
+  //     title: "Payments",
+  //   },
+};
 
 function List() {
   const { tablename } = useParams();
+  const userInfo = useSelector((state) => state.user.userInfo);
+  const hasValidRole = userInfo && internalRoles.includes(userInfo.role);
 
-  // Conditionally render components based on the `tablename`
-  switch (tablename) {
-    case "patients":
-      return <Patients />;
-    case "staff":
-      return <Doctors />;
-    case "appointments":
-      return <Appointments />;
-    case "birth-reports":
-      return <BirthReport />;
-    case "pregnancies":
-      return <Pregnancies />;
-    case "labor-and-deliveries":
-      return <LaborAndDelivery />;
-    case "payments":
-      return <Payments />;
-    default:
-      return <div>Page not found</div>; // Handle cases where tablename doesn't match any
-  }
+  if (!hasValidRole) return <div>Access denied</div>;
+
+  const config = listConfigMap[tablename];
+  if (!config) return <div>Page not found</div>;
+
+  return (
+    <ListFormat
+      apiURL={config.apiURL}
+      fieldData={config.fieldData}
+      mode="view"
+      title={config.title}
+    />
+  );
 }
 
 export default List;

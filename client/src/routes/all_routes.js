@@ -4,15 +4,18 @@ export const all_routes = {
   singin: "/signin",
   login: "/login",
   signup: "/signup",
+  portal: "/portal",
 
   // internal
   dashboard: "/",
   list: "/list/:tablename",
-  form: "/form/:tablename/:view/:id",
+  form: "/form/:tablename/:view/:id?",
   orgChart: "/organizational-structure-diagram",
   calendar: "/calendar",
   testPage: "/testPage",
 
+  users: "/list/users",
+  properties: "/list/properties",
   patients: "/list/patients",
   doctors: "/list/doctors",
   staff: "/list/staff",

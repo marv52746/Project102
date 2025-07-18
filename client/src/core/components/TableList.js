@@ -2,7 +2,27 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ExportLinks from "./ExportLinks";
 
-const TableList = ({ title, data, columns }) => {
+// Helper to get nested value like "patient.name"
+const getNestedValue = (obj, path) => {
+  const value = path.split(".").reduce((acc, key) => acc?.[key], obj);
+
+  if (value == null) return; // null or undefined
+
+  // Format ISO date strings
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
+    const date = new Date(value);
+    return date.toLocaleDateString("en-CA"); // format as YYYY-MM-DD
+  }
+
+  // Render .name from reference object
+  if (typeof value === "object") {
+    return value.name || "[Object]";
+  }
+
+  return value;
+};
+
+const TableList = ({ label, data, columns }) => {
   const [search, setSearch] = useState("");
   const [entries, setEntries] = useState(10); // Number of entries per page
   const [currentPage, setCurrentPage] = useState(1); // Current page
@@ -45,14 +65,18 @@ const TableList = ({ title, data, columns }) => {
   };
 
   const handleRowClick = (item) => {
-    navigate(`/form/${tablename}/view/${item.id}`);
+    navigate(`/form/${tablename}/view/${item._id}`);
+  };
+
+  const handleCreateNew = () => {
+    navigate(`/form/${tablename}/create`);
   };
 
   return (
     <div className="px-4 py-2 shadow-lg bg-white rounded-lg overflow-hidden">
       <div className="flex justify-between mb-2">
         {/* <h3 className="text-2xl font-semibold mb-4 text-sidetext-active">
-          {title}
+          {label}
         </h3> */}
 
         <div className="flex justify-center items-center">
@@ -65,7 +89,10 @@ const TableList = ({ title, data, columns }) => {
             className="form-control form-control-sm w-80 border border-gray-300 rounded-md px-4 py-2 text-sm  focus:border-text-secondary  focus:outline-none"
           />
         </div>
-        <button className="bg-green-500 px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition">
+        <button
+          onClick={handleCreateNew}
+          className="bg-green-500 px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition"
+        >
           Create New
         </button>
       </div>
@@ -96,10 +123,10 @@ const TableList = ({ title, data, columns }) => {
               {/* Dynamic Table Headers */}
               {columns.map((col) => (
                 <th
-                  key={col.field}
+                  key={col.name}
                   className="p-3 font-semibold text-sm text-gray-600"
                 >
-                  {col.title}
+                  {col.label}
                 </th>
               ))}
             </tr>
@@ -107,45 +134,52 @@ const TableList = ({ title, data, columns }) => {
           <tbody>
             {paginatedData.map((item, index) => (
               <tr
-                key={item.id}
+                key={item._id}
                 className={`border-b ${
                   index % 2 === 0 ? "" : "bg-white"
                 } hover:bg-side-active hover:text-text-secondary hover:cursor-pointer transition-colors duration-200`}
                 onClick={() => handleRowClick(item)}
               >
                 {/* Dynamic Table Row Data */}
-                {columns.map((col) => (
-                  <td key={col.field} className="p-3">
-                    {col.field === "status" ? (
-                      <span
-                        className={`badge px-2 py-1 rounded-full text-white text-xs ${
-                          item.status === "Completed"
-                            ? "bg-green-500"
-                            : item.status === "Pending"
-                            ? "bg-yellow-500"
-                            : "bg-red-500"
-                        }`}
-                      >
-                        {item.status}
-                      </span>
-                    ) : col.field === "avatar" || col.field === "image" ? (
-                      // If the column field is "avatar", render a rounded avatar
-                      <img
-                        src={
-                          item[col.field]
-                            ? process.env.PUBLIC_URL +
-                              `/assets/images/${item[col.field]}`
-                            : process.env.PUBLIC_URL +
-                              "/assets/images/default-male.jpg"
-                        } // Assuming the avatar URL is in the item field
-                        alt="Avatar"
-                        className="w-10 h-10 rounded-full" // Adjust size and rounded styling
-                      />
-                    ) : (
-                      item[col.field] || "-" // Render the data for other fields
-                    )}
-                  </td>
-                ))}
+                {columns.map((col) => {
+                  const value = getNestedValue(item, col.name);
+                  // if (col.name == "avatar") console.log(value);
+                  return (
+                    <td key={col.name} className="p-3">
+                      {
+                        col.name === "status" ? (
+                          <span
+                            className={`badge px-2 py-1 rounded-full text-white text-xs ${
+                              item.status === "Completed"
+                                ? "bg-green-500"
+                                : item.status === "Pending"
+                                ? "bg-yellow-500"
+                                : "bg-red-500"
+                            }`}
+                          >
+                            {value}
+                          </span>
+                        ) : col.name === "avatar" || col.name === "image" ? (
+                          // If the column name is "avatar", render a rounded avatar
+                          <img
+                            src={
+                              value
+                                ? `${
+                                    process.env.REACT_APP_BASE_URL_IMAGE + value
+                                  }?t=${new Date().getTime()}`
+                                : process.env.PUBLIC_URL +
+                                  "/assets/images/default-male.jpg"
+                            } // Assuming the avatar URL is in the item name
+                            alt="Avatar"
+                            className="w-10 h-10 rounded-full" // Adjust size and rounded styling
+                          />
+                        ) : (
+                          value || "-"
+                        ) // Render the data for other names
+                      }
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
