@@ -10,6 +10,7 @@ import { useContext, createContext, useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../services/slices/userSlice";
 import { Link, useNavigate } from "react-router-dom";
+import { getAvatarUrl } from "../utils/avatarURL";
 
 const SidebarContext = createContext();
 
@@ -100,7 +101,8 @@ export default function Sidebar({ children }) {
 
         <div className="border-t flex p-3 relative">
           <img
-            src={`${process.env.REACT_APP_BASE_URL_IMAGE}${userInfo.avatar}`}
+            // src={`${process.env.REACT_APP_BASE_URL_IMAGE}${userInfo.avatar}`}
+            src={getAvatarUrl(userInfo.avatar)}
             alt=""
             className="w-10 h-10 rounded-md"
           />

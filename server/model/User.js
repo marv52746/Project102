@@ -28,8 +28,12 @@ const userSchema = new mongoose.Schema({
     type: String,
   },
   avatar: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
+    ref: "uploads.files", // Optional: for populating file info if needed
   },
+  // avatar: {
+  //   type: String,
+  // },
   // avatar: {
   //   data: Buffer,
   //   contentType: String,

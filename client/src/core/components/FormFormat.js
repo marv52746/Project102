@@ -4,6 +4,7 @@ import { Edit, PlusCircle, Save, Trash } from "lucide-react";
 import apiService from "../services/apiService";
 import { useDispatch, useSelector } from "react-redux";
 import { showNotification } from "../services/slices/notificationSlice";
+import { getAvatarUrl } from "../utils/avatarURL";
 
 const FormFormat = ({ data, fields }) => {
   const { tablename, id, view } = useParams();
@@ -428,18 +429,16 @@ const FormFormat = ({ data, fields }) => {
                         inputData[field.name] &&
                         typeof inputData[field.name] === "string" && (
                           <img
-                            // src={`${process.env.REACT_APP_BASE_URL_IMAGE}${
+                            src={getAvatarUrl(inputData[field.name])}
+                            // src={
                             //   inputData[field.name]
-                            // }`}
-                            src={
-                              inputData[field.name]
-                                ? `${
-                                    process.env.REACT_APP_BASE_URL_IMAGE +
-                                    inputData[field.name]
-                                  }?t=${new Date().getTime()}`
-                                : process.env.PUBLIC_URL +
-                                  "/assets/images/default-male.jpg"
-                            }
+                            //     ? `${
+                            //         process.env.REACT_APP_BASE_URL_IMAGE +
+                            //         inputData[field.name]
+                            //       }?t=${new Date().getTime()}`
+                            //     : process.env.PUBLIC_URL +
+                            //       "/assets/images/default-male.jpg"
+                            // }
                             alt="Avatar"
                             className="mt-2 w-24 h-24 object-cover rounded-full"
                           />

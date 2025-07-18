@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ExportLinks from "./ExportLinks";
+import { getAvatarUrl } from "../utils/avatarURL";
 
 // Helper to get nested value like "patient.name"
 const getNestedValue = (obj, path) => {
@@ -162,14 +163,15 @@ const TableList = ({ label, data, columns }) => {
                         ) : col.name === "avatar" || col.name === "image" ? (
                           // If the column name is "avatar", render a rounded avatar
                           <img
-                            src={
-                              value
-                                ? `${
-                                    process.env.REACT_APP_BASE_URL_IMAGE + value
-                                  }?t=${new Date().getTime()}`
-                                : process.env.PUBLIC_URL +
-                                  "/assets/images/default-male.jpg"
-                            } // Assuming the avatar URL is in the item name
+                            src={getAvatarUrl(value)}
+                            // src={
+                            //   value
+                            //     ? `${
+                            //         process.env.REACT_APP_BASE_URL_IMAGE + value
+                            //       }?t=${new Date().getTime()}`
+                            //     : process.env.PUBLIC_URL +
+                            //       "/assets/images/default-male.jpg"
+                            // } // Assuming the avatar URL is in the item name
                             alt="Avatar"
                             className="w-10 h-10 rounded-full" // Adjust size and rounded styling
                           />

@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../../controller/core/userController");
 const multer = require("multer");
-const upload = require("../../middleware/upload");
+// const upload = require("../../middleware/upload");
+const upload = require("../../middleware/uploadMemory"); // 👈 memory-based multer
 const checkRole = require("../../middleware/checkRole");
 
 router.post(

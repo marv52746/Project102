@@ -1,19 +1,9 @@
 const fs = require("fs");
-const mongoose = require("mongoose");
-const { GridFSBucket } = require("mongodb");
-const { Readable } = require("stream");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const { UserDb } = require("../../model/User");
 const { PatientDb } = require("../../model/Patient");
 const BaseController = require("./baseController");
-
-const conn = mongoose.connection;
-let gfs;
-
-conn.once("open", () => {
-  gfs = new GridFSBucket(conn.db, { bucketName: "uploads" });
-});
 
 class UserController extends BaseController {
   constructor() {
@@ -31,46 +21,36 @@ class UserController extends BaseController {
           .json({ error: "Email and password are required" });
       }
 
-      // 1. Hash password
+      // 1. Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // 2. Create user without avatar first
+      // 2. Temporarily get filename (rename after saving user)
+      const tempAvatar = req.file ? req.file.filename : null;
+
+      // 3. Create user
       const user = new UserDb({
         ...userData,
         email,
         username: email,
         password: hashedPassword,
-        avatar: null,
+        avatar: null, // set later
       });
-
       const savedUser = await user.save();
 
-      // 3. Upload avatar to GridFS (if present)
-      if (req.file && req.file.buffer) {
-        const readableStream = new Readable();
-        readableStream.push(req.file.buffer);
-        readableStream.push(null); // signal end of stream
+      // 4. Rename file if uploaded
+      if (tempAvatar) {
+        const ext = path.extname(tempAvatar);
+        const newFilename = `${savedUser._id}${ext}`;
+        const uploadDir = path.join(__dirname, "../../uploads/avatars");
 
-        const uploadStream = gfs.openUploadStream(`${savedUser._id}`);
+        const oldPath = path.join(uploadDir, tempAvatar);
+        const newPath = path.join(uploadDir, newFilename);
+        fs.renameSync(oldPath, newPath);
 
-        readableStream.pipe(uploadStream);
-
-        const fileId = await new Promise((resolve, reject) => {
-          uploadStream.on("finish", () => resolve(uploadStream.id));
-          uploadStream.on("error", reject);
-        });
-
-        // 4. Update user with GridFS file ID
-        savedUser.avatar = fileId;
+        savedUser.avatar = `/uploads/avatars/${newFilename}`;
         await savedUser.save();
       }
 
-      // res.status(201).json({
-      //   ...savedUser.toObject(),
-      //   avatarUrl: savedUser.avatar
-      //     ? `${process.env.BASE_URL}/api/file/${savedUser.avatar}`
-      //     : null,
-      // });
       res.status(201).json(savedUser);
     } catch (error) {
       console.error("Create User Error:", error);
@@ -94,48 +74,34 @@ class UserController extends BaseController {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // ✅ 1. Delete old avatar in GridFS
-      if (user.avatar) {
-        try {
-          await gfs.delete(new mongoose.Types.ObjectId(user.avatar));
-        } catch (err) {
-          console.warn("Old avatar delete failed or not found:", err.message);
+      if (req.file) {
+        // 1. Delete old avatar if it exists
+        if (user.avatar) {
+          const oldAvatarPath = path.join(__dirname, `../../${user.avatar}`);
+          if (fs.existsSync(oldAvatarPath)) {
+            fs.unlinkSync(oldAvatarPath);
+          }
         }
+
+        // 2. Rename new uploaded file
+        const ext = path.extname(req.file.originalname);
+        const newFileName = `${userId}${ext}`;
+        const uploadDir = path.join(__dirname, "../../uploads/avatars");
+
+        const oldPath = path.join(uploadDir, req.file.filename);
+        const newPath = path.join(uploadDir, newFileName);
+        fs.renameSync(oldPath, newPath);
+
+        updates.avatar = `/uploads/avatars/${newFileName}`;
       }
 
-      // ✅ 2. Upload new avatar to GridFS
-      if (req.file && req.file.buffer) {
-        const readableStream = new Readable();
-        readableStream.push(req.file.buffer);
-        readableStream.push(null); // end of stream
-
-        const uploadStream = gfs.openUploadStream(`${userId}`);
-
-        readableStream.pipe(uploadStream);
-
-        await new Promise((resolve, reject) => {
-          uploadStream.on("finish", () => {
-            updates.avatar = uploadStream.id; // Store ObjectId of file
-            resolve();
-          });
-          uploadStream.on("error", reject);
-        });
-      }
-
-      // ✅ 3. Update user record
       const updatedUser = await UserDb.findByIdAndUpdate(
         userId,
         { $set: updates },
         { new: true }
       );
 
-      res.status(201).json(updatedUser);
-      // res.status(200).json({
-      //   ...updatedUser.toObject(),
-      //   avatarUrl: updatedUser.avatar
-      //     ? `${process.env.BASE_URL}/api/file/${updatedUser.avatar}`
-      //     : null,
-      // });
+      res.status(200).json(updatedUser);
     } catch (error) {
       console.error("Update User Error:", error);
       res.status(500).json({ error: error.message });

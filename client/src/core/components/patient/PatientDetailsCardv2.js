@@ -8,6 +8,7 @@ import {
   Scale,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import { getAvatarUrl } from "../../utils/avatarURL";
 
 // Helper function to map icons dynamically
 const iconMap = {
@@ -108,11 +109,12 @@ const PatientDetailsCardv2 = ({ tableData }) => {
           <div className="shadow-lg rounded-lg overflow-hidden">
             <img
               className="w-full h-60 object-contain"
-              src={
-                tableData.avatar
-                  ? process.env.REACT_APP_BASE_URL_IMAGE + tableData.avatar
-                  : process.env.PUBLIC_URL + "/assets/images/default-male.jpg"
-              }
+              // src={
+              //   tableData.avatar
+              //     ? process.env.REACT_APP_BASE_URL_IMAGE + tableData.avatar
+              //     : process.env.PUBLIC_URL + "/assets/images/default-male.jpg"
+              // }
+              src={getAvatarUrl(tableData.avatar)}
               alt={tableData.name}
             />
             <div className="p-4">

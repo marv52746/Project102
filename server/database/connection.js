@@ -4,8 +4,8 @@ const connect = async () => {
   try {
     // mongodb connection
     const con = await mongoose.connect(process.env.MONGO_URI, {
-      // useNewUrlParser: true,
-      // useUnifiedTopology: true,
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
       connectTimeoutMS: 30000, // 30 seconds
       socketTimeoutMS: 45000, // 45 seconds
     });

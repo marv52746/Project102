@@ -20,7 +20,7 @@ const billingRoutes = require("./finance/billingRoutes");
 const sendReminders = require("../jobs/appointmentReminder");
 
 // Register routes
-router.use("/files", fileRoutes);
+router.use("/file", fileRoutes);
 router.use("/users", userRoutes);
 router.use("/properties", propertyRoutes);
 router.use("/auth", authRoutes); // ✅ REGISTER AUTH ROUTE HERE
