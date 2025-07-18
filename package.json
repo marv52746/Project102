@@ -1,0 +1,50 @@
+{
+  "name": "my-mern-desktop-app",
+  "version": "1.0.0",
+  "main": "main.js",
+  "description": "My MERN desktop app",
+  "author": "Your Name",
+  "scripts": {
+    "start": "npm run electron:serve",
+    "build-client": "cd client && npm run build",
+    "react:start": "cd client && npm start",
+    "server:start": "cd server && nodemon server.js",
+    "electron:start": "wait-on tcp:3000 && cross-env NODE_ENV=development electron .",
+    "electron:serve": "concurrently -k -n \"SERVER,REACT,ELECTRON\" -c \"yellow,cyan,blue\" \"npm run server:start\" \"npm run react:start\" \"npm run electron:start\"",
+    "electron:build": "rimraf dist && npm run build-client && electron-builder"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^28.1.0",
+    "electron-builder": "^26.0.19",
+    "nodemon": "^3.1.10",
+    "rimraf": "^6.0.1",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.example.myapp",
+    "productName": "MyMERNApp",
+    "publish": null,
+    "files": [
+      "main.js",
+      "package.json",
+      "client/build/**",
+      "server/**/*",
+      ".env"
+    ],
+    "extraMetadata": {
+      "main": "main.js"
+    },
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    }
+  },
+  "dependencies": {
+    "electron-is-dev": "^3.0.1"
+  }
+}

@@ -12,20 +12,20 @@ const apiClient = axios.create({
 });
 
 // Utility: Converts JS object to FormData if needed
-const prepareData = (data) => {
-  const hasFile = Object.values(data).some((value) => value instanceof File);
-  if (!hasFile)
-    return { data, headers: { "Content-Type": "application/json" } };
+// const prepareData = (data) => {
+//   const hasFile = Object.values(data).some((value) => value instanceof File);
+//   if (!hasFile)
+//     return { data, headers: { "Content-Type": "application/json" } };
 
-  const formData = new FormData();
-  Object.entries(data).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      formData.append(key, value);
-    }
-  });
+//   const formData = new FormData();
+//   Object.entries(data).forEach(([key, value]) => {
+//     if (value !== undefined && value !== null) {
+//       formData.append(key, value);
+//     }
+//   });
 
-  return { data: formData, headers: { "Content-Type": "multipart/form-data" } };
-};
+//   return { data: formData, headers: { "Content-Type": "multipart/form-data" } };
+// };
 
 // Shared handler
 const handleApiResponse = async (

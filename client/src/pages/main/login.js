@@ -93,7 +93,7 @@ const Login = () => {
     };
 
     loadGoogleScript();
-  }, []);
+  });
 
   const handleLogin = async (e) => {
     e.preventDefault();
