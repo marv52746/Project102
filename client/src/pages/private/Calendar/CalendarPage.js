@@ -11,6 +11,7 @@ import CalendarPatientList from "../../../core/components/calendar/CalendarPatie
 import apiService from "../../../core/services/apiService";
 import { getStatusClass } from "../../../core/utils/calendarUtils";
 import { useDispatch } from "react-redux";
+import { showNotification } from "../../../core/services/slices/notificationSlice";
 
 const formatDate = (date) => {
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -55,8 +56,8 @@ const CalendarPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [daysInMonth, setDaysInMonth] = useState([]);
   const [appointments, setAppointments] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [error, setError] = useState(null);
   const [selectedReport, setSelectedReport] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dropdownData, setDropdownData] = useState(null);
@@ -64,11 +65,11 @@ const CalendarPage = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const dropdownRef = useRef(null);
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const fetchAppointments = useCallback(async () => {
     try {
-      setIsLoading(true);
+      // setIsLoading(true);
       const month = currentDate.getMonth() + 1;
       const year = currentDate.getFullYear();
       const data = await apiService.get(
@@ -85,11 +86,14 @@ const CalendarPage = () => {
 
       setAppointments(map);
     } catch (err) {
-      setError("Failed to load appointments");
-    } finally {
-      setIsLoading(false);
+      dispatch(
+        showNotification({
+          message: "Failed to load appointments!",
+          type: "error",
+        })
+      );
     }
-  }, [currentDate]);
+  }, [currentDate, dispatch]);
 
   useEffect(() => {
     fetchAppointments();
