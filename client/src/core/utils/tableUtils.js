@@ -14,6 +14,5 @@ export const getNestedValue = (obj, path) => {
   if (typeof value === "object") {
     return value.name || "[Object]";
   }
-
   return value;
 };

@@ -94,20 +94,21 @@ class UserController extends BaseController {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // ✅ 1. Delete old avatar in GridFS
-      if (user.avatar) {
-        try {
-          await gfs.delete(new mongoose.Types.ObjectId(user.avatar));
-        } catch (err) {
-          console.warn("Old avatar delete failed or not found:", err.message);
-        }
-      }
-
-      // ✅ 2. Upload new avatar to GridFS
+      // ✅ If new avatar is uploaded
       if (req.file && req.file.buffer) {
+        // Delete old avatar from GridFS
+        if (user.avatar) {
+          try {
+            await gfs.delete(new mongoose.Types.ObjectId(user.avatar));
+          } catch (err) {
+            console.warn("Old avatar delete failed or not found:", err.message);
+          }
+        }
+
+        // Upload new avatar to GridFS
         const readableStream = new Readable();
         readableStream.push(req.file.buffer);
-        readableStream.push(null); // end of stream
+        readableStream.push(null);
 
         const uploadStream = gfs.openUploadStream(`${userId}`);
 
@@ -115,14 +116,14 @@ class UserController extends BaseController {
 
         await new Promise((resolve, reject) => {
           uploadStream.on("finish", () => {
-            updates.avatar = uploadStream.id; // Store ObjectId of file
+            updates.avatar = uploadStream.id;
             resolve();
           });
           uploadStream.on("error", reject);
         });
       }
 
-      // ✅ 3. Update user record
+      // Update user record
       const updatedUser = await UserDb.findByIdAndUpdate(
         userId,
         { $set: updates },
@@ -130,12 +131,6 @@ class UserController extends BaseController {
       );
 
       res.status(201).json(updatedUser);
-      // res.status(200).json({
-      //   ...updatedUser.toObject(),
-      //   avatarUrl: updatedUser.avatar
-      //     ? `${process.env.BASE_URL}/api/file/${updatedUser.avatar}`
-      //     : null,
-      // });
     } catch (error) {
       console.error("Update User Error:", error);
       res.status(500).json({ error: error.message });

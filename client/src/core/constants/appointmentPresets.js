@@ -35,6 +35,7 @@ export const appointmentFormFields = [
     ref: "users", // table/endpoint to call
     query: { role: "patient" },
     showOn: "all",
+    required: true,
   },
   {
     name: "doctor",
@@ -43,36 +44,43 @@ export const appointmentFormFields = [
     ref: "users", // table/endpoint to call
     query: { role: "doctor" }, // 👈 Add this to filter by role
     showOn: "all",
+    required: true,
   },
   {
     name: "date",
     label: "Date",
     type: "date",
     showOn: "all",
+    default: new Date(),
+    required: true,
   },
   {
     name: "time",
     label: "Time",
     type: "time",
     showOn: "all",
+    default: new Date(),
+    required: true,
+  },
+
+  {
+    name: "reason",
+    label: "Reason",
+    type: "textarea",
+    showOn: "all",
+    required: true,
   },
   {
     name: "status",
     label: "Status",
     type: "select",
     options: appointmentStatusOptions,
-    showOn: "all",
+    showOn: "edit,view",
   },
-  {
-    name: "reason",
-    label: "Reason",
-    type: "text",
-    showOn: "all",
-  },
-  {
-    name: "notes",
-    label: "Notes",
-    type: "textarea",
-    showOn: "all",
-  },
+  // {
+  //   name: "notes",
+  //   label: "Notes",
+  //   type: "textarea",
+  //   showOn: "all",
+  // },
 ];

@@ -15,7 +15,37 @@ export const getFields = (tableColumn, formFields) => {
 };
 
 export const shouldShowField = (field, view) => {
-  console.log(field.showOn);
   const showOn = (field.showOn || "all").split(",").map((s) => s.trim());
   return showOn.includes("all") || showOn.includes(view);
+};
+
+export const getInputValue = (inputData, field) => {
+  let val = inputData[field.name];
+
+  const isEmpty = val === undefined || val === null || val === "";
+
+  // If value is empty, use default
+  if (isEmpty) {
+    val = field.default;
+
+    if (val === undefined || val === null || val === "") {
+      return ""; // Still no usable value
+    }
+  }
+
+  if (field.type === "date") {
+    return new Date(val).toISOString().split("T")[0]; // "YYYY-MM-DD"
+  }
+
+  if (field.type === "datetime-local") {
+    return new Date(val).toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
+  }
+
+  if (field.type === "time") {
+    return typeof val === "string"
+      ? val
+      : new Date(val).toTimeString().slice(0, 5); // "HH:MM"
+  }
+
+  return val;
 };

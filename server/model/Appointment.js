@@ -8,13 +8,13 @@ const appointmentSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      match: /^APT-\d{4}$/, // Optional validation
+      match: /^APT-\d{7}$/, // Format: APT-0000001
     },
     patient: {
       type: Schema.Types.ObjectId,
       ref: "user",
       required: true,
-      index: true, // faster queries
+      index: true,
     },
     doctor: {
       type: Schema.Types.ObjectId,
@@ -29,7 +29,7 @@ const appointmentSchema = new Schema(
     time: {
       type: String,
       required: true,
-      match: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, // optional validation HH:mm
+      match: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, // HH:mm format
     },
     reason: {
       type: String,
@@ -46,11 +46,6 @@ const appointmentSchema = new Schema(
       enum: ["scheduled", "completed", "cancelled", "no-show", "rescheduled"],
       default: "scheduled",
     },
-    // rescheduled_from: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: "appointment",
-    //   default: null,
-    // },
     created_by: {
       type: Schema.Types.ObjectId,
       ref: "user",
@@ -68,17 +63,21 @@ const appointmentSchema = new Schema(
   }
 );
 
-// Auto-generate appointment_no before saving (optional)
+// Compound index to prevent double-booking
+appointmentSchema.index({ doctor: 1, date: 1, time: 1 }, { unique: true });
+
+// Auto-generate appointment_no before saving
 appointmentSchema.pre("validate", async function (next) {
   if (this.isNew && !this.appointment_no) {
     try {
-      const lastAppointment = await AppointmentDb.findOne({}).sort({
-        created_on: -1,
-      });
+      const lastAppointment = await this.constructor
+        .findOne({})
+        .sort({ created_on: -1 })
+        .lean();
 
       const lastNumber =
-        lastAppointment?.appointment_no?.split("-")[1] || "0000";
-      const nextNumber = String(parseInt(lastNumber) + 1).padStart(4, "0");
+        lastAppointment?.appointment_no?.split("-")[1] || "0000001";
+      const nextNumber = String(parseInt(lastNumber, 10) + 1).padStart(7, "0");
 
       this.appointment_no = `APT-${nextNumber}`;
     } catch (err) {
@@ -88,9 +87,6 @@ appointmentSchema.pre("validate", async function (next) {
 
   next();
 });
-
-// Optional: Add a compound index for date + doctor to prevent double-booking
-appointmentSchema.index({ doctor: 1, date: 1, time: 1 }, { unique: true });
 
 const AppointmentDb = mongoose.model("appointment", appointmentSchema);
 module.exports = { AppointmentDb };

@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { showNotification } from "../services/slices/notificationSlice";
 import { getAvatarUrl } from "../utils/avatarURL";
 import { adminOnlyRoles } from "../constants/rolePresets";
-import { shouldShowField } from "../utils/fieldUtils";
+import { getInputValue, shouldShowField } from "../utils/fieldUtils";
 
 const FormFormat = ({ data, fields }) => {
   const { tablename, id, view } = useParams();
@@ -53,6 +53,7 @@ const FormFormat = ({ data, fields }) => {
   }, [fields, dispatch]);
 
   useEffect(() => {
+    // console.log(data);
     setInputData(data || {});
   }, [data]);
 
@@ -146,33 +147,19 @@ const FormFormat = ({ data, fields }) => {
     }));
   };
 
-  const getInputValue = (field) => {
-    const val = inputData[field.name];
-
-    if (!val) return "";
-    if (field.type === "date") {
-      return new Date(val).toISOString().split("T")[0]; // "YYYY-MM-DD"
-    }
-
-    if (field.type === "datetime-local") {
-      return new Date(val).toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
-    }
-
-    if (field.type === "time") {
-      return typeof val === "string"
-        ? val
-        : new Date(val).toTimeString().slice(0, 5); // "HH:MM"
-    }
-
-    return val;
-  };
-
   const isReadOnly = isViewing || (!hasUpdateDeletePermission && !isCreating);
 
   return (
-    <div className="flex flex-col p-6 rounded-lg shadow-lg bg-white w-full">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault(); // Stop real page reload
+        handleSubmit(); // Call your function
+      }}
+      encType="multipart/form-data"
+      className="flex flex-col p-6 rounded-lg shadow-lg bg-white w-full"
+    >
       <div className="mb-6">
-        <form encType="multipart/form-data">
+        <>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {fields.map((field, index) => {
               if (!shouldShowField(field, view)) return null;
@@ -220,7 +207,11 @@ const FormFormat = ({ data, fields }) => {
                     <select
                       id={field.name}
                       name={field.name}
-                      value={inputData[field.name] || ""}
+                      value={
+                        field.type === "reference"
+                          ? inputData[field.name]?._id || ""
+                          : getInputValue(inputData, field)
+                      }
                       onChange={handleChange}
                       disabled={field.disabled || isReadOnly}
                       required={isRequired}
@@ -245,7 +236,7 @@ const FormFormat = ({ data, fields }) => {
                     <textarea
                       id={field.name}
                       name={field.name}
-                      value={inputData[field.name] || ""}
+                      value={getInputValue(inputData, field)}
                       onChange={handleChange}
                       disabled={field.disabled || isReadOnly}
                       required={isRequired}
@@ -295,7 +286,7 @@ const FormFormat = ({ data, fields }) => {
                       id={field.name}
                       name={field.name}
                       type={field.type}
-                      value={getInputValue(field)}
+                      value={getInputValue(inputData, field)}
                       onChange={handleChange}
                       disabled={field.disabled || isReadOnly}
                       required={isRequired}
@@ -306,7 +297,7 @@ const FormFormat = ({ data, fields }) => {
               );
             })}
           </div>
-        </form>
+        </>
       </div>
 
       <div className="flex space-x-4 mt-6">
@@ -323,8 +314,7 @@ const FormFormat = ({ data, fields }) => {
 
         {isCreating && (
           <button
-            type="button"
-            onClick={handleSubmit}
+            type="submit"
             className="flex items-center px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg"
           >
             <PlusCircle className="mr-2" />
@@ -334,8 +324,7 @@ const FormFormat = ({ data, fields }) => {
 
         {isEditing && (
           <button
-            type="button"
-            onClick={handleSubmit}
+            type="submit"
             className="flex items-center px-4 py-2 text-white bg-yellow-600 hover:bg-yellow-700 rounded-lg"
           >
             <Save className="mr-2" />
@@ -354,7 +343,7 @@ const FormFormat = ({ data, fields }) => {
           </button>
         )}
       </div>
-    </div>
+    </form>
   );
 };
 
