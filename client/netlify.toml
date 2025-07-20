@@ -2,6 +2,10 @@
   publish = "build"
   command = "npm run build"
 
+[build.environment]
+  # If using Create React App or similar setup
+  CI = "false"
+  
 [[redirects]]
   from = "/*"
   to = "/index.html"
