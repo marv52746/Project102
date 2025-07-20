@@ -1,5 +1,11 @@
 import React from "react";
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useParams,
+} from "react-router-dom";
 import { authRoute, publicRoutes } from "./router.link";
 import { useSelector } from "react-redux";
 import Sidebar, { SidebarItem } from "../core/components/Sidebar";
@@ -38,7 +44,11 @@ const InternalLayout = () => {
       </Sidebar>
 
       {/* Main content for internal users */}
-      <div className="flex-1 overflow-auto bg-side-active/30">
+      <div
+        className={`flex-1 bg-side-active/30 ${
+          parms.tablename === "calendar" ? "overflow-hidden" : "overflow-auto"
+        }`}
+      >
         {parms.tablename !== "calendar" && <Header parms={parms} />}
         <Routes>
           {authRoute.map((route) => (

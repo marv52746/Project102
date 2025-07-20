@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { getStatusClass } from "../../utils/calendarUtils";
 
 const CalendarPatientList = ({
   title,
@@ -37,7 +38,9 @@ const CalendarPatientList = ({
             onClick={() => handleOpenModal(patient)} // Assume `handleOpenModal` is defined elsewhere
           >
             <div
-              className={`w-3 h-3 rounded-full ${statusColor} transition-all duration-300`}
+              className={`w-3 h-3 rounded-full ${getStatusClass(
+                patient.status
+              )} transition-all duration-300`}
             ></div>
             <div className="flex flex-col">
               <span className="font-medium text-gray-800">

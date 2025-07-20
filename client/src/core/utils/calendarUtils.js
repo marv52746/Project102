@@ -5,9 +5,9 @@ export const getStatusClass = (status) => {
     case "cancelled":
       return "bg-gray-400 text-white";
     case "no-show":
-      return "bg-red-500 text-white";
+      return "bg-yellow-500 text-white";
     case "rescheduled":
-      return "bg-yellow-400 text-white";
+      return "bg-purple-500 text-white";
     default:
       return "bg-blue-500 text-white"; // scheduled
   }

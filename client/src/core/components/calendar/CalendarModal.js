@@ -46,7 +46,7 @@ function CalendarModal({ report, onClose }) {
     },
     cancelled: {
       text: "Cancelled",
-      color: "bg-red-500",
+      color: "bg-gray-400",
       icon: XCircle,
     },
     "no-show": {

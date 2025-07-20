@@ -151,28 +151,31 @@ const CalendarPage = () => {
 
   return (
     <div className="w-full p-2 box-border bg-white flex">
-      <div className="w-4/5">
-        <div className="flex justify-start items-center space-x-4">
+      <div className="w-4/5  p-2 pt-6">
+        <div className="flex items-center space-x-4">
           <button
             onClick={handleToday}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg flex items-center space-x-2"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2"
           >
             <Home size={20} />
             <span>Today</span>
           </button>
+
           <button
             onClick={handlePrevMonth}
             className="bg-gray-200 p-2 rounded-full"
           >
             <ChevronLeft size={20} />
           </button>
+
           <button
             onClick={handleNextMonth}
             className="bg-gray-200 p-2 rounded-full"
           >
             <ChevronRight size={20} />
           </button>
-          <div className="text-xl">
+
+          <div className="text-xl font-medium">
             {monthName} {year}
           </div>
         </div>
@@ -243,11 +246,21 @@ const CalendarPage = () => {
         </div>
       </div>
 
-      <div className="w-1/3 lg:w-1/4 xl:w-1/5 ml-10 mt-5">
+      {/* <div className="w-1/3 lg:w-1/4 xl:w-1/5 ml-5 mt-5"> */}
+      <div className="p-2 pt-6">
         <CalendarPatientList
           title="Upcoming Appointments"
-          patients={Object.values(appointments).flat().slice(0, 5)}
-          statusColor="bg-blue-500"
+          patients={Object.values(appointments)
+            .flat()
+            .filter((appt) => {
+              const apptDate = new Date(appt.date);
+              apptDate.setHours(0, 0, 0, 0);
+              const todayStart = new Date();
+              todayStart.setHours(0, 0, 0, 0);
+              return apptDate >= todayStart;
+            })
+            .sort((a, b) => new Date(a.date) - new Date(b.date)) // sort by upcoming
+            .slice(0, 5)} // show top 5
           handleOpenModal={handleOpenModal}
         />
       </div>

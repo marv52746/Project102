@@ -26,8 +26,9 @@ export const appointmentFormFields = [
     name: "appointment_no",
     label: "Appointment No.",
     type: "text",
-    showOn: "edit",
+    showOn: "all",
   },
+  { type: "half-spacer", showOn: "all" },
   {
     name: "patient",
     label: "Patient",
@@ -61,7 +62,7 @@ export const appointmentFormFields = [
     label: "Status",
     type: "select",
     options: appointmentStatusOptions,
-    showOn: "edit",
+    showOn: "all",
   },
   {
     name: "reason",

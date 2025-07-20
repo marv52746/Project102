@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ExportLinks from "./ExportLinks";
 import { getAvatarUrl } from "../utils/avatarURL";
+import { getStatusClass } from "../utils/calendarUtils";
 
 // Helper to get nested value like "patient.name"
 const getNestedValue = (obj, path) => {
@@ -23,7 +24,7 @@ const getNestedValue = (obj, path) => {
   return value;
 };
 
-const TableList = ({ label, data, columns }) => {
+const TableList = ({ data, columns }) => {
   const [search, setSearch] = useState("");
   const [entries, setEntries] = useState(10); // Number of entries per page
   const [currentPage, setCurrentPage] = useState(1); // Current page
@@ -33,9 +34,12 @@ const TableList = ({ label, data, columns }) => {
 
   // Filter data based on the search query
   const filteredData = data.filter((item) =>
-    Object.values(item).some((value) =>
-      String(value).toLowerCase().includes(search.toLowerCase())
-    )
+    columns.some((col) => {
+      const value = getNestedValue(item, col.name);
+      return String(value || "")
+        .toLowerCase()
+        .includes(search.toLowerCase());
+    })
   );
 
   // Get the start and end index of data for current page
@@ -150,13 +154,16 @@ const TableList = ({ label, data, columns }) => {
                       {
                         col.name === "status" ? (
                           <span
-                            className={`badge px-2 py-1 rounded-full text-white text-xs ${
-                              item.status === "Completed"
-                                ? "bg-green-500"
-                                : item.status === "Pending"
-                                ? "bg-yellow-500"
-                                : "bg-red-500"
-                            }`}
+                            className={`badge px-2 py-1 rounded-full text-xs ${getStatusClass(
+                              item.status?.toLowerCase()
+                            )}`}
+                            // className={`badge px-2 py-1 rounded-full text-white text-xs ${
+                            //   item.status === "Completed"
+                            //     ? "bg-green-500"
+                            //     : item.status === "Pending"
+                            //     ? "bg-yellow-500"
+                            //     : "bg-red-500"
+                            // }`}
                           >
                             {value}
                           </span>

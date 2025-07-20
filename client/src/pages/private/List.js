@@ -30,7 +30,7 @@ const listConfigMap = {
   },
   appointments: {
     apiURL: "appointments",
-    fieldData: getAppointmentFields(),
+    fieldData: getAppointmentFields("list"),
     title: "Appointments",
   },
   //   "birth-reports": {
