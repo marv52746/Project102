@@ -1,18 +1,16 @@
 import React, { useState } from "react";
-// import ExportLinks from "./ExportLinks";
 import TableMini from "../TableMini";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { listConfigMap } from "../../constants/FieldConfigMap";
 
 function AppointmentsTable({ appointments }) {
   const [isTableVisible, setIsTableVisible] = useState(true); // State to track table visibility
-  const columns = [
-    { field: "id", title: "Appointment ID" },
-    { field: "doctor_name", title: "Doctor Name" },
-    { field: "appointment_type", title: "Appointment Type" },
-    { field: "appointment_date", title: "Appointment Date" },
-    { field: "notes", title: "Notes" },
-    { field: "status", title: "Status" },
-  ];
+
+  const config = listConfigMap["appointments"];
+  const columns = config.fieldData;
+  // Generate today's date in YYYY-MM-DD format
+  const today = new Date();
+  const filterDate = today.toISOString().split("T")[0];
 
   const toggleTable = () => {
     setIsTableVisible(!isTableVisible); // Toggle the table visibility
@@ -33,7 +31,9 @@ function AppointmentsTable({ appointments }) {
       </div>
 
       {/* Show or hide the table based on state */}
-      {isTableVisible && <TableMini columns={columns} data={appointments} />}
+      {isTableVisible && (
+        <TableMini columns={columns} data={appointments} filter={filterDate} />
+      )}
     </div>
   );
 }

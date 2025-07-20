@@ -5,6 +5,7 @@ export const all_routes = {
   login: "/login",
   signup: "/signup",
   portal: "/portal",
+  create_appointment: "/create_appointment",
 
   // internal
   dashboard: "/",

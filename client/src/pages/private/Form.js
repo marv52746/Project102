@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { internalRoles } from "../../core/constants/rolePresets";
 import FormNew from "../../core/components/FormNew";
-import { listConfigMap } from "../../core/constants/listConfigMap";
+import { formConfigMap } from "../../core/constants/FieldConfigMap";
 import FormFormat from "../../core/components/FormFormat";
 import apiService from "../../core/services/apiService";
 
@@ -42,7 +42,7 @@ function Form() {
   if (view !== "create" && !data)
     return <div className="p-4">Record not found.</div>;
 
-  const config = listConfigMap[tablename];
+  const config = formConfigMap[tablename];
   if (!config) return <div>Invalid route or parameters.</div>;
 
   const fields = config.getFields(view);

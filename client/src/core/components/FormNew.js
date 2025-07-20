@@ -4,6 +4,7 @@ import { Edit } from "lucide-react";
 import apiService from "../services/apiService";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../services/slices/notificationSlice";
+import { shouldShowField } from "../utils/fieldUtils";
 
 const FormNew = ({ fields }) => {
   const { tablename } = useParams();
@@ -69,6 +70,7 @@ const FormNew = ({ fields }) => {
         <form>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {fields.map((field, index) => {
+              if (!shouldShowField(field, "create")) return null;
               // Spacer for new row
               if (field.type === "spacer") {
                 return (
@@ -97,6 +99,7 @@ const FormNew = ({ fields }) => {
               }
 
               if (!field.name) return null;
+              const isRequired = !!field.required;
 
               return (
                 <div key={index} className="mb-0">
@@ -114,6 +117,7 @@ const FormNew = ({ fields }) => {
                       value={inputData[field.name] || ""}
                       onChange={handleChange}
                       disabled={field.disabled}
+                      required={isRequired}
                       className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
                     >
                       <option value="" disabled>
@@ -138,6 +142,7 @@ const FormNew = ({ fields }) => {
                       value={inputData[field.name] || ""}
                       onChange={handleChange}
                       disabled={field.disabled}
+                      required={isRequired}
                       className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
                       rows={4}
                     />
@@ -149,6 +154,7 @@ const FormNew = ({ fields }) => {
                       value={inputData[field.name] || ""}
                       onChange={handleChange}
                       disabled={field.disabled}
+                      required={isRequired}
                       className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
                     />
                   )}

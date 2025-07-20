@@ -1,5 +1,3 @@
-// appointmentPresets.js
-
 // Table columns for Appointment list view
 export const appointmentTableColumns = [
   { name: "appointment_no", label: "Appointment No." },
@@ -26,9 +24,10 @@ export const appointmentFormFields = [
     name: "appointment_no",
     label: "Appointment No.",
     type: "text",
-    showOn: "all",
+    showOn: "edit,view",
+    disabled: true,
   },
-  { type: "half-spacer", showOn: "all" },
+  { type: "half-spacer", showOn: "edit,view" },
   {
     name: "patient",
     label: "Patient",
@@ -77,19 +76,3 @@ export const appointmentFormFields = [
     showOn: "all",
   },
 ];
-
-/**
- * Get appointment fields depending on format and mode
- * @param {'form' | 'list'} format
- * @param {'create' | 'edit' | 'view' | 'all'} show
- * @returns {Array}
- */
-export const getAppointmentFields = (format = "form", show = "all") => {
-  if (format === "list") {
-    return appointmentTableColumns;
-  }
-
-  return appointmentFormFields.filter(
-    (field) => field.showOn === "all" || field.showOn === show
-  );
-};

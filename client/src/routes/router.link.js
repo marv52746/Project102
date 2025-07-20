@@ -34,6 +34,11 @@ export const publicRoutesArray = [
     name: "portal",
     element: <Portal />,
   },
+  {
+    path: routes.create_appointment,
+    name: "create_appointment",
+    element: <Portal />,
+  },
 ];
 
 const routesArray = [

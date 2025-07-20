@@ -5,6 +5,8 @@ import apiService from "../services/apiService";
 import { useDispatch, useSelector } from "react-redux";
 import { showNotification } from "../services/slices/notificationSlice";
 import { getAvatarUrl } from "../utils/avatarURL";
+import { adminOnlyRoles } from "../constants/rolePresets";
+import { shouldShowField } from "../utils/fieldUtils";
 
 const FormFormat = ({ data, fields }) => {
   const { tablename, id, view } = useParams();
@@ -12,9 +14,8 @@ const FormFormat = ({ data, fields }) => {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.userInfo);
 
-  const allowedRoles = ["admin", "owner", "manager"];
   const hasUpdateDeletePermission =
-    currentUser && allowedRoles.includes(currentUser.role);
+    currentUser && adminOnlyRoles.includes(currentUser.role);
 
   const isViewing = id && view === "view";
   const isCreating = !id && view === "create";
@@ -58,45 +59,6 @@ const FormFormat = ({ data, fields }) => {
   const handleEdit = () => {
     navigate(`/form/${tablename}/edit/${id}`);
   };
-
-  // const handleSubmit = async () => {
-  //   try {
-  //     const formData = new FormData();
-
-  //     // Add fields to FormData
-  //     for (const key in inputData) {
-  //       if (key !== "avatar") {
-  //         formData.append(key, inputData[key]);
-  //       }
-  //     }
-
-  //     if (fileData) {
-  //       formData.append("avatar", fileData);
-  //     }
-
-  //     if (isEditing) {
-  //       await apiService.put(dispatch, tablename, id, formData, true);
-  //       dispatch(
-  //         showNotification({
-  //           message: "Record updated successfully!",
-  //           type: "success",
-  //         })
-  //       );
-  //     } else {
-  //       await apiService.post(dispatch, tablename, formData, true);
-  //       dispatch(
-  //         showNotification({
-  //           message: "Record created successfully!",
-  //           type: "success",
-  //         })
-  //       );
-  //     }
-
-  //     navigate(`/list/${tablename}`);
-  //   } catch (error) {
-  //     console.error("Submit Error:", error);
-  //   }
-  // };
 
   const handleSubmit = async () => {
     try {
@@ -210,131 +172,11 @@ const FormFormat = ({ data, fields }) => {
   return (
     <div className="flex flex-col p-6 rounded-lg shadow-lg bg-white w-full">
       <div className="mb-6">
-        {/* <form encType="multipart/form-data">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {Array.isArray(fields) &&
-              fields
-                .filter((field) => field)
-                .map((field, index) => {
-                  // Spacer for new row
-                  if (field.type === "spacer") {
-                    return (
-                      <div
-                        key={index}
-                        className="col-span-2 h-0 sm:h-4"
-                        aria-hidden="true"
-                      />
-                    );
-                  }
-
-                  // Half-column spacer (skips one column)
-                  if (field.type === "half-spacer") {
-                    return <div key={index} className="col-span-1" />;
-                  }
-
-                  // Section label
-                  if (field.type === "label") {
-                    return (
-                      <div key={index} className="col-span-2">
-                        <h3 className="text-md font-semibold text-gray-600 mt-4 mb-2">
-                          {field.label}
-                        </h3>
-                      </div>
-                    );
-                  }
-
-                  if (!field.name) return null;
-
-                  return (
-                    <div key={index} className="col-span-1">
-                      <label
-                        htmlFor={field.name}
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        {field.label}
-                      </label>
-
-                      {field.type === "select" ? (
-                        <select
-                          id={field.name}
-                          name={field.name}
-                          value={inputData[field.name] || ""}
-                          onChange={handleChange}
-                          disabled={field.disabled || isReadOnly}
-                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
-                        >
-                          <option value="" disabled>
-                            Select {field.label}
-                          </option>
-                          {Array.isArray(field.options) &&
-                            field.options.map((option, idx) => (
-                              <option
-                                key={idx}
-                                value={option.value || option.id}
-                              >
-                                {option.label || option.name || option}
-                              </option>
-                            ))}
-                        </select>
-                      ) : field.type === "textarea" ? (
-                        <textarea
-                          id={field.name}
-                          name={field.name}
-                          value={inputData[field.name] || ""}
-                          onChange={handleChange}
-                          disabled={field.disabled || isReadOnly}
-                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
-                          rows={4}
-                        />
-                      ) : field.type === "file" ? (
-                        <div>
-                          <input
-                            id={field.name}
-                            name={field.name}
-                            type="file"
-                            accept="image/*"
-                            onChange={handleChange}
-                            disabled={field.disabled || isReadOnly}
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
-                          />
-                          {fileData && (
-                            <img
-                              src={URL.createObjectURL(fileData)}
-                              alt="Preview"
-                              className="mt-2 w-24 h-24 object-cover rounded-full"
-                            />
-                          )}
-                          {!fileData &&
-                            inputData[field.name] &&
-                            typeof inputData[field.name] === "string" && (
-                              <img
-                                src={`${process.env.REACT_APP_BASE_URL_IMAGE}${
-                                  inputData[field.name]
-                                }`}
-                                alt="Avatar"
-                                className="mt-2 w-24 h-24 object-cover rounded-full"
-                              />
-                            )}
-                        </div>
-                      ) : (
-                        <input
-                          id={field.name}
-                          name={field.name}
-                          type={field.type}
-                          value={inputData[field.name] || ""}
-                          onChange={handleChange}
-                          disabled={field.disabled || isReadOnly}
-                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
-                        />
-                      )}
-                    </div>
-                  );
-                })}
-          </div>
-        </form> */}
         <form encType="multipart/form-data">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {fields.map((field, index) => {
+              if (!shouldShowField(field, view)) return null;
+
               // Spacer for new row
               if (field.type === "spacer") {
                 return (
@@ -363,6 +205,7 @@ const FormFormat = ({ data, fields }) => {
               }
 
               if (!field.name) return null;
+              const isRequired = !!field.required;
 
               return (
                 <div key={index} className="mb-0">
@@ -380,6 +223,7 @@ const FormFormat = ({ data, fields }) => {
                       value={inputData[field.name] || ""}
                       onChange={handleChange}
                       disabled={field.disabled || isReadOnly}
+                      required={isRequired}
                       className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
                     >
                       <option value="" disabled>
@@ -404,6 +248,7 @@ const FormFormat = ({ data, fields }) => {
                       value={inputData[field.name] || ""}
                       onChange={handleChange}
                       disabled={field.disabled || isReadOnly}
+                      required={isRequired}
                       className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
                       rows={4}
                     />
@@ -416,6 +261,7 @@ const FormFormat = ({ data, fields }) => {
                         accept="image/*"
                         onChange={handleChange}
                         disabled={field.disabled || isReadOnly}
+                        required={isRequired}
                         className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
                       />
                       {fileData && (
@@ -452,6 +298,7 @@ const FormFormat = ({ data, fields }) => {
                       value={getInputValue(field)}
                       onChange={handleChange}
                       disabled={field.disabled || isReadOnly}
+                      required={isRequired}
                       className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
                     />
                   )}

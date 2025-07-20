@@ -31,7 +31,7 @@ const useComboData = (appointments, currentYear) => {
 
       // Loop through each appointment and process the data
       appointments.forEach((appointment) => {
-        const appointmentDate = new Date(appointment.appointment_date);
+        const appointmentDate = new Date(appointment.date);
         const appointmentYear = appointmentDate.getFullYear(); // Get the year of the appointment
         const monthIndex = appointmentDate.getMonth(); // Get the month index (0-11)
 
@@ -49,7 +49,7 @@ const useComboData = (appointments, currentYear) => {
         monthlyData[monthIndex].appointments += 1;
 
         // Track unique patients for each month using a Set
-        monthlyData[monthIndex].patients.add(appointment.patient_id);
+        monthlyData[monthIndex].patients.add(appointment.patient);
       });
 
       // Convert patients Set to the number of distinct patients

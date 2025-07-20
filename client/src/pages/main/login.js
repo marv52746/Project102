@@ -124,6 +124,12 @@ const Login = () => {
     } catch (err) {
       console.error("Login failed", err);
       // Error is already handled in apiService with showNotification
+      dispatch(
+        showNotification({
+          message: "Login failed",
+          type: "error",
+        })
+      );
     }
   };
 

@@ -23,14 +23,14 @@ export const userFormFields = [
     label: "Status",
     type: "select",
     options: statusOptions,
-    showOn: "all",
+    showOn: "edit,view",
   },
   {
     name: "role",
     label: "Role",
     type: "select",
     options: roleOptions,
-    showOn: "all",
+    showOn: "edit,view",
   },
   {
     name: "gender",
