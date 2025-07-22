@@ -47,7 +47,7 @@ const InternalLayout = () => {
         <Routes>
           {authRoute.map((route) => (
             <Route
-              exact={route.exact}
+              // exact={route.exact}
               path={route.path}
               element={route.element}
               key={route.id}
@@ -65,7 +65,7 @@ const PublicLayout = () => {
       <Routes>
         {publicRoutes.map((route) => (
           <Route
-            exact={route.exact}
+            // exact={route.exact}
             path={route.path}
             element={route.element}
             key={route.id}
