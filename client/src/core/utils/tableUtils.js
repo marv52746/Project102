@@ -16,3 +16,22 @@ export const getNestedValue = (obj, path) => {
   }
   return value;
 };
+
+/**
+ * Formats a date string into "Month Day, Year" (e.g., January 20, 2025).
+ *
+ * @param {string|Date} dateInput - The input date as a string or Date object.
+ * @returns {string} Formatted date string.
+ */
+export const formatFullDate = (dateInput) => {
+  if (!dateInput) return "-";
+
+  const date = new Date(dateInput);
+  if (isNaN(date)) return "-";
+
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(date);
+};

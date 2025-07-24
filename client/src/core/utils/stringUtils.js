@@ -89,3 +89,29 @@ export const generateRandomData = (num) => {
     status: statuses[Math.floor(Math.random() * statuses.length)],
   }));
 };
+
+/**
+ * Capitalizes a string.
+ *
+ * @param {string} text - The text to capitalize.
+ * @param {boolean} [eachWord=false] - If true, capitalizes the first letter of each word. If false, only capitalizes the first character of the string.
+ * @returns {string} The capitalized string.
+ *
+ * @example
+ * capitalizeText("hello world"); // "Hello world"
+ * capitalizeText("hello world", true); // "Hello World"
+ * capitalizeText("hELLO wORLD", true); // "Hello World"
+ */
+export const capitalizeText = (text, eachWord = false) => {
+  if (!text || typeof text !== "string") return "";
+
+  if (eachWord) {
+    return text
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+};

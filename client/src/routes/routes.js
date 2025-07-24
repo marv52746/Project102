@@ -9,11 +9,13 @@ import { getParmsFromPath } from "../core/utils/stringUtils";
 import { internalRoles } from "../core/constants/rolePresets";
 import Notification from "../core/components/Notification";
 import { iconMapping } from "./sidebarMenu";
+
 const theme = "light";
 
 const InternalLayout = () => {
   const location = useLocation(); // Get the current location (URL)
   const parms = getParmsFromPath(location);
+  // const { expanded } = useContext(SidebarContext);
 
   // Function to determine the active item based on the current route
   const getActiveSidebarItem = (route) => {
@@ -23,18 +25,33 @@ const InternalLayout = () => {
   return (
     <div className={`flex h-screen ${theme}`}>
       {/* Sidebar for internal users */}
-      <Sidebar className="w-10 bg-side-active/30">
-        {iconMapping.map((item) => (
-          <SidebarItem
-            key={item.text}
-            icon={item.icon} // Dynamically set the icon based on the text
-            text={item.iconText}
-            alert={item.alert} // Display alert if true
-            active={getActiveSidebarItem(item.table)} // Update active state based on route
-            to={item.to}
-          />
-        ))}
-        {/* <hr className="my-3" /> */}
+      <Sidebar>
+        {(expanded) => (
+          <>
+            {iconMapping.map((group, idx) => (
+              <div key={idx} className="mb-8">
+                {expanded && (
+                  <div className="text-xs font-semibold text-muted px-3 mb-1">
+                    {group.section}
+                  </div>
+                )}
+                <div className={expanded ? "pl-3" : ""}>
+                  {group.items.map((item) => (
+                    <SidebarItem
+                      key={item.text}
+                      icon={item.icon}
+                      text={item.iconText}
+                      alert={item.alert}
+                      active={getActiveSidebarItem(item.table)}
+                      to={item.to}
+                      expanded={expanded}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </>
+        )}
       </Sidebar>
 
       {/* Main content for internal users */}

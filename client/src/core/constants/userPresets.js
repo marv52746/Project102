@@ -6,16 +6,28 @@ export const userTableColumns = [
   { name: "name", label: "Name" },
   { name: "email", label: "Email" },
   { name: "phone_number", label: "Phone" },
-  { name: "gender", label: "Gender" },
-  { name: "address", label: "Address" },
+  // { name: "gender", label: "Gender" },
+  // { name: "address", label: "Address" },
   { name: "role", label: "Role" },
+  { name: "created_on", label: "Created" },
+];
+
+export const userSettings = [
+  { label: "First Name", name: "first_name" },
+  { label: "Last Name", name: "last_name" },
+  { label: "Phone Number", name: "phone_number" },
+  { label: "Email Address", name: "email", type: "email" },
+  { label: "Date of Birth", name: "date_of_birth", type: "date" },
+  // { label: "Password", name: "password", type: "password" },
 ];
 
 // Form field definitions with conditional visibility
 // showOn: 'create' | 'edit' | 'view' | 'all'
 export const userFormFields = [
-  { name: "name", label: "Name", type: "text", showOn: "all" },
-  { type: "half-spacer", showOn: "create" },
+  // { name: "name", label: "Name", type: "text", showOn: "all" },
+  { name: "first_name", label: "First Name", showOn: "all" },
+  { name: "last_name", label: "Last Name", showOn: "all" },
+  // { type: "half-spacer", showOn: "create" },
   { name: "email", label: "Email", type: "email", showOn: "all" },
   { name: "password", label: "Password", type: "password", showOn: "create" },
   {

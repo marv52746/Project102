@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const { ObjectId } = mongoose.Schema;
 
-// Employee Schema
+// User Schema
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -19,7 +19,6 @@ const userSchema = new mongoose.Schema({
   },
   username: {
     type: String,
-    // unique: true,
   },
   address: {
     type: String,
@@ -28,16 +27,9 @@ const userSchema = new mongoose.Schema({
     type: String,
   },
   avatar: {
-    type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
-    ref: "uploads.files", // Optional: for populating file info if needed
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "uploads.files",
   },
-  // avatar: {
-  //   type: String,
-  // },
-  // avatar: {
-  //   data: Buffer,
-  //   contentType: String,
-  // },
   avatarID: {
     type: String,
   },
@@ -79,54 +71,66 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  created_by: {
-    _id: {
-      type: ObjectId,
-      ref: "user",
-    },
-    fullname: {
-      type: String,
-    },
-    email: {
-      type: String,
-    },
-  },
+  created_by: { type: ObjectId, ref: "user" },
   updated_on: {
     type: Date,
   },
-  updated_by: {
-    _id: {
-      type: ObjectId,
-      ref: "user",
-    },
-    fullname: {
-      type: String,
-    },
-    email: {
-      type: String,
-    },
-  },
+  updated_by: { type: ObjectId, ref: "user" },
   hire_date: {
     type: Date,
   },
-
   status: {
     type: String,
   },
-  name: { type: String },
-  googleId: { type: String },
-  picture: { type: String },
+  name: {
+    type: String,
+  },
+  googleId: {
+    type: String,
+  },
+  picture: {
+    type: String,
+  },
 });
 
-// Password hash on save
+// // 🔐 Hash password before saving
 // userSchema.pre("save", async function (next) {
-//   if (!this.isModified("password")) return next();
-//   const salt = await bcrypt.genSalt(10);
-//   this.password = await bcrypt.hash(this.password, salt);
+//   if (this.isModified("password")) {
+//     const salt = await bcrypt.genSalt(10);
+//     this.password = await bcrypt.hash(this.password, salt);
+//   }
+
+//   // Combine first_name and last_name into name
+//   if (this.isModified("first_name") || this.isModified("last_name")) {
+//     const first = this.first_name?.trim() || "";
+//     const last = this.last_name?.trim() || "";
+//     this.name = `${first} ${last}`.trim();
+//   }
+
 //   next();
 // });
 
-// Models
-const UserDb = mongoose.model("user", userSchema);
+// // 🔁 Hash password & combine name during update
+// userSchema.pre("findOneAndUpdate", async function (next) {
+//   const update = this.getUpdate();
 
+//   // Combine first_name + last_name -> name
+//   if (update.first_name || update.last_name) {
+//     const first = update.first_name?.trim() || "";
+//     const last = update.last_name?.trim() || "";
+//     update.name = `${first} ${last}`.trim();
+//   }
+
+//   // Hash password if included in update
+//   if (update.password) {
+//     const salt = await bcrypt.genSalt(10);
+//     update.password = await bcrypt.hash(update.password, salt);
+//   }
+
+//   this.setUpdate(update);
+//   next();
+// });
+
+// Model Export
+const UserDb = mongoose.model("user", userSchema);
 module.exports = { UserDb };

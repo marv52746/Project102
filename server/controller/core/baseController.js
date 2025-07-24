@@ -48,7 +48,7 @@ class BaseController {
   create = async (req, res) => {
     try {
       const newItem = new this.model(req.body);
-      console.log(newItem);
+
       const savedItem = await newItem.save();
       res.status(201).json(savedItem);
     } catch (error) {

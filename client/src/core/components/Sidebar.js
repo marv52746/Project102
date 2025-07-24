@@ -6,13 +6,11 @@ import {
   HelpCircle,
   LogOut,
 } from "lucide-react";
-import { useContext, createContext, useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../services/slices/userSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { getAvatarUrl } from "../utils/avatarURL";
-
-const SidebarContext = createContext();
 
 export default function Sidebar({ children }) {
   const dispatch = useDispatch();
@@ -78,7 +76,7 @@ export default function Sidebar({ children }) {
   return (
     <aside className="h-screen">
       <nav className="h-full inline-flex flex-col bg-background border-r shadow-sm">
-        <div className="p-4 pb-2 flex justify-between items-center">
+        <div className="p-4 pb-4 flex justify-between items-center border-b ">
           <img
             src={process.env.PUBLIC_URL + "/assets/images/logo.svg"}
             className={`overflow-hidden transition-all ${
@@ -95,9 +93,14 @@ export default function Sidebar({ children }) {
           </button>
         </div>
 
-        <SidebarContext.Provider value={{ expanded }}>
+        {/* <SidebarContext.Provider value={{ expanded }}>
           <ul className="flex-1 px-3">{children}</ul>
-        </SidebarContext.Provider>
+        </SidebarContext.Provider> */}
+
+        {/* Sidebar content via render prop */}
+        <ul className="flex-1 px-3 pt-4">
+          {typeof children === "function" ? children(expanded) : children}
+        </ul>
 
         <div className="border-t flex p-3 relative">
           <img
@@ -134,7 +137,13 @@ export default function Sidebar({ children }) {
               ref={dropdownRef}
               className="dropdown-menu absolute right-1 bottom-[60px] w-64 bg-background shadow-md mt-2 rounded-md border"
             >
-              <button className="w-full dropdown-item flex items-center px-4 py-2 hover:bg-side-active/30">
+              <button
+                onClick={() => {
+                  handleDropdownToggle();
+                  navigate("/settings");
+                }}
+                className="w-full dropdown-item flex items-center px-4 py-2 hover:bg-side-active/30"
+              >
                 <Settings size={20} className="mr-2" /> Settings
               </button>
               <button className="w-full dropdown-item flex items-center px-4 py-2 hover:bg-side-active/30">
@@ -154,14 +163,12 @@ export default function Sidebar({ children }) {
   );
 }
 
-export function SidebarItem({ icon, text, active, alert, to }) {
-  const { expanded } = useContext(SidebarContext);
-
+export function SidebarItem({ icon, text, active, alert, to, expanded }) {
   return (
     <Link to={to} className="flex items-center w-full">
       <li
         className={`
-        relative flex items-center py-2 px-3 my-1
+        relative flex items-center py-2 px-3
         font-medium rounded-md cursor-pointer
         transition-colors group
         ${

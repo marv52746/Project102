@@ -10,6 +10,7 @@ import Login from "../pages/main/login";
 import SignUp from "../pages/main/signup";
 import Portal from "../pages/public/Portal";
 import CalendarPage from "../pages/private/Calendar/CalendarPage";
+import SettingsPage from "../pages/private/Settings/Settings";
 
 const routes = all_routes;
 
@@ -59,6 +60,11 @@ const routesArray = [
     path: routes.calendar,
     name: "calendar",
     element: <CalendarPage />,
+  },
+  {
+    path: routes.settings,
+    name: "settings",
+    element: <SettingsPage />,
   },
   // {
   //   path: routes.testPage,

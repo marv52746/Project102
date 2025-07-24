@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import ExportLinks from "./ExportLinks";
 import { getAvatarUrl } from "../utils/avatarURL";
 import { getStatusClass } from "../utils/calendarUtils";
-import { getNestedValue } from "../utils/tableUtils";
+import { formatFullDate, getNestedValue } from "../utils/tableUtils";
+import { capitalizeText } from "../utils/stringUtils";
 
 const TableList = ({ data, columns }) => {
   const [search, setSearch] = useState("");
@@ -131,38 +132,41 @@ const TableList = ({ data, columns }) => {
                   const value = getNestedValue(item, col.name);
                   // if (col.name == "avatar") console.log(value);
                   return (
-                    <td key={col.name} className="p-3">
+                    <td
+                      key={col.name}
+                      className="p-3 max-w-[200px] truncate text-ellipsis whitespace-nowrap"
+                    >
                       {
-                        col.name === "status" ? (
+                        col.name === "status" || col.name === "role" ? (
                           <span
-                            className={`badge px-2 py-1 rounded-full text-xs ${getStatusClass(
-                              item.status?.toLowerCase()
+                            className={`badge px-2 py-1 rounded-md text-xs ${getStatusClass(
+                              col.name === "status"
+                                ? item.status?.toLowerCase()
+                                : item.role?.toLowerCase()
                             )}`}
-                            // className={`badge px-2 py-1 rounded-full text-white text-xs ${
-                            //   item.status === "Completed"
-                            //     ? "bg-green-500"
-                            //     : item.status === "Pending"
-                            //     ? "bg-yellow-500"
-                            //     : "bg-red-500"
-                            // }`}
                           >
-                            {value}
+                            {capitalizeText(value, true)}
                           </span>
                         ) : col.name === "avatar" || col.name === "image" ? (
                           // If the column name is "avatar", render a rounded avatar
                           <img
                             src={getAvatarUrl(value)}
-                            // src={
-                            //   value
-                            //     ? `${
-                            //         process.env.REACT_APP_BASE_URL_IMAGE + value
-                            //       }?t=${new Date().getTime()}`
-                            //     : process.env.PUBLIC_URL +
-                            //       "/assets/images/default-male.jpg"
-                            // } // Assuming the avatar URL is in the item name
                             alt="Avatar"
                             className="w-10 h-10 rounded-full" // Adjust size and rounded styling
                           />
+                        ) : col.name === "doctor.name" ? (
+                          <div className="flex items-center space-x-3">
+                            <img
+                              src={getAvatarUrl(item.doctor?.avatar)}
+                              alt="Doctor Avatar"
+                              className="w-8 h-8 rounded-full"
+                            />
+                            <span className="truncate">
+                              {item.doctor?.name || "-"}
+                            </span>
+                          </div>
+                        ) : col.name.toLowerCase().includes("date") ? (
+                          formatFullDate(value)
                         ) : (
                           value || "-"
                         ) // Render the data for other names

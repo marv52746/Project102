@@ -1,12 +1,12 @@
 // Table columns for Appointment list view
 export const appointmentTableColumns = [
-  { name: "appointment_no", label: "Appointment No." },
-  { name: "patient.name", label: "Patient" },
-  { name: "doctor.name", label: "Doctor" },
-  { name: "date", label: "Date" },
+  { name: "appointment_no", label: "No." },
+  { name: "patient.name", label: "Patient Name" },
+  { name: "reason", label: "Notes" },
+  { name: "doctor.name", label: "Doctor Name" },
+  { name: "date", label: "Appointment Date" },
   { name: "time", label: "Time" },
   { name: "status", label: "Status" },
-  { name: "reason", label: "Reason" },
 ];
 
 // Appointment status dropdown options (you can customize the labels)

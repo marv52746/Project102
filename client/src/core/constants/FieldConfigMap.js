@@ -5,6 +5,7 @@ import {
 } from "./appointmentPresets";
 import { propertyAllFields } from "./propertiesPresets";
 import { getFields } from "../utils/fieldUtils";
+import { patientFormFields, patientTableColumns } from "./patientPresets";
 
 export const formConfigMap = {
   //   patients: {
@@ -21,6 +22,11 @@ export const formConfigMap = {
     apiURL: "users",
     getFields: () => getFields(null, userFormFields),
     title: "Users",
+  },
+  patients: {
+    apiURL: "patients",
+    getFields: () => getFields(null, patientFormFields),
+    title: "Patients",
   },
   properties: {
     apiURL: "properties",
@@ -70,15 +76,20 @@ export const listConfigMap = {
     fieldData: getFields(userTableColumns),
     title: "Users",
   },
-  properties: {
-    apiURL: "properties",
-    fieldData: getFields(propertyAllFields),
-    title: "System Properties",
+  patients: {
+    apiURL: "patients",
+    fieldData: getFields(patientTableColumns),
+    title: "Patients",
   },
   appointments: {
     apiURL: "appointments",
     fieldData: getFields(appointmentTableColumns),
     title: "Appointments",
+  },
+  properties: {
+    apiURL: "properties",
+    fieldData: getFields(propertyAllFields),
+    title: "System Properties",
   },
   //   "birth-reports": {
   //     apiURL: "birth-reports",

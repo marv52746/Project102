@@ -23,7 +23,7 @@ class UserController extends BaseController {
   // CREATE USER
   createUser = async (req, res) => {
     try {
-      const { password, email, ...userData } = req.body;
+      const { password, email, first_name, last_name, ...userData } = req.body;
 
       if (!email || !password) {
         return res
@@ -34,9 +34,14 @@ class UserController extends BaseController {
       // 1. Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
+      const fullName = `${first_name || ""} ${last_name || ""}`.trim();
+
       // 2. Create user without avatar first
       const user = new UserDb({
         ...userData,
+        first_name,
+        last_name,
+        name: fullName,
         email,
         username: email,
         password: hashedPassword,
@@ -82,12 +87,20 @@ class UserController extends BaseController {
   updateUser = async (req, res) => {
     try {
       const userId = req.params.id;
-      const { email, ...updates } = req.body;
+      const { email, first_name, last_name, ...updates } = req.body;
 
       if (email) {
         updates.email = email;
         updates.username = email;
       }
+
+      if (first_name !== undefined) updates.first_name = first_name;
+      if (last_name !== undefined) updates.last_name = last_name;
+
+      // Set combined name field
+      const newFirst = first_name ?? user.first_name ?? "";
+      const newLast = last_name ?? user.last_name ?? "";
+      updates.name = `${newFirst} ${newLast}`.trim();
 
       const user = await UserDb.findById(userId);
       if (!user) {
