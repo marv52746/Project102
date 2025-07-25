@@ -13,10 +13,10 @@ export const userTableColumns = [
 ];
 
 export const userSettings = [
-  { label: "First Name", name: "first_name" },
-  { label: "Last Name", name: "last_name" },
-  { label: "Phone Number", name: "phone_number" },
-  { label: "Email Address", name: "email", type: "email" },
+  { label: "First Name", name: "first_name", required: true },
+  { label: "Last Name", name: "last_name", required: true },
+  { label: "Phone Number", name: "phone_number", required: true },
+  { label: "Email Address", name: "email", type: "email", required: true },
   { label: "Date of Birth", name: "date_of_birth", type: "date" },
   // { label: "Password", name: "password", type: "password" },
 ];
@@ -25,18 +25,30 @@ export const userSettings = [
 // showOn: 'create' | 'edit' | 'view' | 'all'
 export const userFormFields = [
   // { name: "name", label: "Name", type: "text", showOn: "all" },
-  { name: "first_name", label: "First Name", showOn: "all" },
-  { name: "last_name", label: "Last Name", showOn: "all" },
+  { name: "first_name", label: "First Name", showOn: "all", required: true },
+  { name: "last_name", label: "Last Name", showOn: "all", required: true },
   // { type: "half-spacer", showOn: "create" },
-  { name: "email", label: "Email", type: "email", showOn: "all" },
-  { name: "password", label: "Password", type: "password", showOn: "create" },
   {
-    name: "status",
-    label: "Status",
-    type: "select",
-    options: statusOptions,
-    showOn: "edit,view",
+    name: "email",
+    label: "Email",
+    type: "email",
+    showOn: "all",
+    required: true,
   },
+  {
+    name: "password",
+    label: "Password",
+    type: "password",
+    showOn: "create",
+    required: true,
+  },
+  // {
+  //   name: "status",
+  //   label: "Status",
+  //   type: "select",
+  //   options: statusOptions,
+  //   showOn: "edit,view",
+  // },
   {
     name: "role",
     label: "Role",
@@ -44,6 +56,8 @@ export const userFormFields = [
     options: roleOptions,
     showOn: "edit,view",
   },
+
+  { name: "phone_number", label: "Phone", type: "tel", showOn: "all" },
   {
     name: "gender",
     label: "Gender",
@@ -51,10 +65,9 @@ export const userFormFields = [
     options: genderOptions,
     showOn: "all",
   },
-  { name: "phone_number", label: "Phone", type: "tel", showOn: "all" },
+  { name: "avatar", label: "Avatar", type: "file", showOn: "all" },
   { name: "address", label: "Address", type: "textarea", showOn: "all" },
   { type: "half-spacer", showOn: "all" },
-  { name: "avatar", label: "Avatar", type: "file", showOn: "all" },
 ];
 
 /**

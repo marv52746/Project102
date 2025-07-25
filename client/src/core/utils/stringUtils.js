@@ -12,6 +12,11 @@ export const formatPath = (path) => {
 // Utility function to get a formatted view title based on table name and view type
 const getFormattedView = (tablename, view) => {
   const viewTitles = {
+    users: {
+      view: "User Details",
+      edit: "Edit User",
+      create: "Create User",
+    },
     patients: {
       view: "Patient Details",
       edit: "Edit Patient",

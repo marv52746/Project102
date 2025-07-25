@@ -6,6 +6,8 @@ import { getAvatarUrl } from "../../../core/utils/avatarURL";
 import { userSettings } from "../../../core/constants/userPresets";
 import { getInputValue } from "../../../core/utils/fieldUtils";
 import { handleFormSubmit } from "../../../core/utils/formActions/formSubmit";
+import { handleFormDelete } from "../../../core/utils/formActions/formHandlers";
+import ConfirmDeleteModal from "../../../core/components/modal/ConfirmDeleteModal";
 
 export default function SettingsPage() {
   const dispatch = useDispatch();
@@ -14,6 +16,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [fileData, setFileData] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const userInfo = useSelector((state) => state.user.userInfo);
   const hasValidRole = userInfo && internalRoles.includes(userInfo.role);
@@ -47,6 +50,16 @@ export default function SettingsPage() {
     });
   };
 
+  const handleDeleteConfirm = () => {
+    handleFormDelete({
+      dispatch,
+      tablename: "users",
+      id: userInfo.id,
+      // navigate,
+    });
+    setShowDeleteModal(false);
+  };
+
   if (!hasValidRole) return <div>Access denied</div>;
   if (loading || !data) return <div className="p-4">Loading...</div>;
 
@@ -55,6 +68,7 @@ export default function SettingsPage() {
       <div className="max-w-6xl mx-auto flex rounded-lg border shadow-sm">
         {/* Sidebar */}
         <div className="w-64 border-r p-4">
+          <h2 className="text-xl font-semibold mb-4">Settings</h2>
           <nav className="space-y-2">
             {[
               "General",
@@ -92,12 +106,12 @@ export default function SettingsPage() {
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold">Account</h3>
             <div className="space-x-2">
-              <button
+              {/* <button
                 type="button"
                 className="px-4 py-2 rounded-md border text-gray-600 hover:bg-gray-100"
               >
                 Cancel
-              </button>
+              </button> */}
               <button
                 type="submit"
                 className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
@@ -175,6 +189,7 @@ export default function SettingsPage() {
             </p>
             <div className="space-x-2">
               <button
+                onClick={() => setShowDeleteModal(true)}
                 type="button"
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
@@ -190,6 +205,12 @@ export default function SettingsPage() {
           </div>
         </form>
       </div>
+      {/* Modal */}
+      <ConfirmDeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }

@@ -88,7 +88,7 @@ const FormFormat = ({ data, fields }) => {
   const isReadOnly = isViewing || (!hasUpdateDeletePermission && !isCreating);
 
   return (
-    <>
+    <div className="p-4">
       <form
         onSubmit={(e) => {
           e.preventDefault(); // Stop real page reload
@@ -288,7 +288,7 @@ const FormFormat = ({ data, fields }) => {
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDeleteConfirm}
       />
-    </>
+    </div>
   );
 };
 

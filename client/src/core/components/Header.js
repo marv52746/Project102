@@ -14,6 +14,9 @@ function Header({ parms }) {
 
   const showHeader = false;
 
+  // console.log(parms);
+  // console.log(formatPath(parms.tablename));
+
   return (
     <>
       {showHeader && (
@@ -107,7 +110,7 @@ function Header({ parms }) {
       )}
 
       {/* Quick Statistics Section */}
-      <div className="flex justify-between items-center py-4 px-6 w-full bg-background-head">
+      <div className="flex justify-between items-center py-2 px-6 w-full ">
         <div className="w-1/2">
           <h3 className="text-2xl font-semibold text-sidetext-active">
             {parms.view ? parms.view : formatPath(parms.tablename)}

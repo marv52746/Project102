@@ -60,7 +60,9 @@ const InternalLayout = () => {
           parms.tablename === "calendar" ? "overflow-hidden" : "overflow-auto"
         }`}
       >
-        {parms.tablename !== "calendar" && <Header parms={parms} />}
+        {parms.tablename !== "calendar" && parms.tablename !== "settings" && (
+          <Header parms={parms} />
+        )}
         <Routes>
           {authRoute.map((route) => (
             <Route

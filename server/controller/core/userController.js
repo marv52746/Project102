@@ -94,6 +94,11 @@ class UserController extends BaseController {
         updates.username = email;
       }
 
+      const user = await UserDb.findById(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
       if (first_name !== undefined) updates.first_name = first_name;
       if (last_name !== undefined) updates.last_name = last_name;
 
@@ -101,11 +106,6 @@ class UserController extends BaseController {
       const newFirst = first_name ?? user.first_name ?? "";
       const newLast = last_name ?? user.last_name ?? "";
       updates.name = `${newFirst} ${newLast}`.trim();
-
-      const user = await UserDb.findById(userId);
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
 
       // ✅ If new avatar is uploaded
       if (req.file && req.file.buffer) {
