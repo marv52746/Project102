@@ -18,6 +18,7 @@ export const patientFormFields = [
     label: "Patient",
     type: "reference",
     ref: "users",
+    query: { role: "patient" }, // 👈 Add this to filter by role
     showOn: "all",
     required: true,
   },

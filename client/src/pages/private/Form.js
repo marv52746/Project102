@@ -9,6 +9,7 @@ import FormNew from "../../core/components/FormNew";
 import { formConfigMap } from "../../core/constants/FieldConfigMap";
 import FormFormat from "../../core/components/FormFormat";
 import apiService from "../../core/services/apiService";
+import UserDashboardPage from "./FormDetails/Index";
 
 function Form() {
   const { tablename, view, id } = useParams();
@@ -47,14 +48,16 @@ function Form() {
 
   const fields = config.getFields(view);
 
-  const component =
-    view === "create" ? (
-      <FormNew fields={fields} />
-    ) : (
-      <FormFormat fields={fields} data={data} />
-    );
+  // ✅ Conditional component rendering
+  if (view === "view" && tablename === "patients") {
+    return <UserDashboardPage data={data} />;
+  }
 
-  return component;
+  return view === "create" ? (
+    <FormNew fields={fields} />
+  ) : (
+    <FormFormat fields={fields} data={data} />
+  );
 }
 
 export default Form;

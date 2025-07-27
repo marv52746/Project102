@@ -23,7 +23,7 @@ export const handleFormSubmit = async ({
 }) => {
   try {
     const formData = new FormData();
-
+    // console.log(data);
     for (const field of fields) {
       const key = field.name;
       if (!key) continue;

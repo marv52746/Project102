@@ -36,6 +36,13 @@ export const userFormFields = [
     required: true,
   },
   {
+    name: "date_of_birth",
+    label: "Date of Birth",
+    type: "date",
+    showOn: "all",
+    required: true,
+  },
+  {
     name: "password",
     label: "Password",
     type: "password",
@@ -49,6 +56,8 @@ export const userFormFields = [
   //   options: statusOptions,
   //   showOn: "edit,view",
   // },
+
+  { name: "phone_number", label: "Phone", type: "tel", showOn: "all" },
   {
     name: "role",
     label: "Role",
@@ -56,8 +65,6 @@ export const userFormFields = [
     options: roleOptions,
     showOn: "edit,view",
   },
-
-  { name: "phone_number", label: "Phone", type: "tel", showOn: "all" },
   {
     name: "gender",
     label: "Gender",
@@ -65,9 +72,9 @@ export const userFormFields = [
     options: genderOptions,
     showOn: "all",
   },
-  { name: "avatar", label: "Avatar", type: "file", showOn: "all" },
-  { name: "address", label: "Address", type: "textarea", showOn: "all" },
   { type: "half-spacer", showOn: "all" },
+  { name: "address", label: "Address", type: "textarea", showOn: "all" },
+  { name: "avatar", label: "Avatar", type: "file", showOn: "all" },
 ];
 
 /**

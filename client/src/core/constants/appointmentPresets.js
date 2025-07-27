@@ -2,7 +2,7 @@
 export const appointmentTableColumns = [
   { name: "appointment_no", label: "No." },
   { name: "patient.name", label: "Patient Name" },
-  { name: "reason", label: "Notes" },
+  { name: "reason", label: "Reason" },
   { name: "doctor.name", label: "Doctor Name" },
   { name: "date", label: "Appointment Date" },
   { name: "time", label: "Time" },

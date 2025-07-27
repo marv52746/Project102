@@ -11,7 +11,7 @@ import SignUp from "../pages/main/signup";
 import Portal from "../pages/public/Portal";
 import CalendarPage from "../pages/private/Calendar/CalendarPage";
 import SettingsPage from "../pages/private/Settings/Settings";
-import PatientDashboardPage from "../pages/private/FormDetails/UserDetails";
+import UserDashboardPage from "../pages/private/FormDetails/Index";
 
 const routes = all_routes;
 
@@ -70,7 +70,7 @@ const routesArray = [
   {
     path: routes.testPage,
     name: "testPage",
-    element: <PatientDashboardPage />,
+    element: <UserDashboardPage />,
   },
 ];
 

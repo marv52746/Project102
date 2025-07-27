@@ -1,10 +1,10 @@
-const { VitalDb } = require("../../model/Vital");
+const { VitalsDb } = require("../../model/medical/Vitals");
 const BaseController = require("../core/baseController");
 
 class VitalController extends BaseController {
   constructor() {
-    super(VitalDb);
-    this.populateFields = ["patient", "recorded_by"];
+    super(VitalsDb);
+    this.populateFields = ["patient"];
   }
 
   // Add vital-specific methods here

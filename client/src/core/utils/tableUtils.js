@@ -35,3 +35,14 @@ export const formatFullDate = (dateInput) => {
     day: "numeric",
   }).format(date);
 };
+
+// Optional utility to calculate age
+export const getAge = (birthDate) => {
+  if (!birthDate) return null;
+  const dob = new Date(birthDate);
+  if (isNaN(dob)) return null;
+
+  const diff = Date.now() - dob.getTime();
+  const ageDt = new Date(diff);
+  return Math.abs(ageDt.getUTCFullYear() - 1970);
+};

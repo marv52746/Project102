@@ -14,6 +14,7 @@ import { thunk } from "redux-thunk"; // Import Redux Thunk
 
 import userReducer from "./slices/userSlice";
 import notificationReducer from "./slices/notificationSlice";
+import utilsReducer from "./reducers/utilsReducer";
 // import orderListSlice from "./slices/orderListSlice";
 // import saleListSlice from "./slices/saleListSlice";
 // import customerSlice from "./slices/customerSlice";
@@ -39,6 +40,7 @@ const store = configureStore({
     // customerList: createPersistedReducer(customerSlice),
     // productList: createPersistedReducer(productListSlice),
     notification: notificationReducer,
+    utils: utilsReducer,
     // theme: themeSlice,
   },
   middleware: (getDefaultMiddleware) =>

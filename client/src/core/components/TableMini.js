@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import { getAvatarUrl } from "../utils/avatarURL";
 import { getStatusClass } from "../utils/calendarUtils";
 import { getNestedValue } from "../utils/tableUtils";
@@ -9,22 +8,25 @@ const TableMini = ({ data, columns, filter }) => {
   const [entries, setEntries] = useState(10); // Number of entries per page
   const [currentPage, setCurrentPage] = useState(1); // Current page
 
-  const { tablename } = useParams();
-  const navigate = useNavigate();
-
   useEffect(() => {
     setSearch(filter);
   }, [filter]);
 
   // Filter data based on the search query
-  const filteredData = data.filter((item) =>
-    columns.some((col) => {
-      const value = getNestedValue(item, col.name);
-      return String(value || "")
-        .toLowerCase()
-        .includes(search.toLowerCase());
-    })
-  );
+  const filteredData = data
+    .filter((item) =>
+      columns.some((col) => {
+        const value = getNestedValue(item, col.name);
+        return String(value || "")
+          .toLowerCase()
+          .includes(search.toLowerCase());
+      })
+    )
+    .sort((a, b) => {
+      const dateA = new Date(getNestedValue(a, "date"));
+      const dateB = new Date(getNestedValue(b, "date"));
+      return dateB - dateA; // Most recent first
+    });
 
   // Get the start and end index of data for current page
   const startIndex = (currentPage - 1) * entries;
