@@ -63,7 +63,7 @@ export default function UserDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-slate-700">
+    <div className="min-h-screen text-slate-700">
       <main className="flex-1 p-4 md:p-6 space-y-6">
         {/* Patient Header */}
         <UserHeader data={data} />

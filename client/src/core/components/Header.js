@@ -117,21 +117,21 @@ function Header({ parms }) {
           </h3>
         </div>
         <div className="w-1/2 ml-auto text-right">
-          <ol className="inline-flex items-center space-x-2 text-sidetext-active justify-end bg-side-active px-5 py-2.5 rounded-2xl ">
+          <ol className="inline-flex items-center space-x-2 text-sm text-sidetext-active justify-end bg-side-active px-5 py-2.5 rounded-2xl ">
             <li>
               <Link to="/" className="flex items-center">
-                <Home size={20} className="text-xl mr-2" />
+                <Home size={16} className="text-xl mr-1" />
               </Link>
             </li>
 
             {parms.tablename && (
-              <li className="before:content-['/'] before:mr-2">
+              <li className="before:content-['/'] before:mr-1">
                 <Link to={parms.tableLink}>{formatPath(parms.tablename)}</Link>
               </li>
             )}
 
             {parms.view && (
-              <li className="before:content-['/'] before:mr-2">
+              <li className="before:content-['/'] before:mr-1">
                 {formatPath(parms.view)}
               </li>
             )}
