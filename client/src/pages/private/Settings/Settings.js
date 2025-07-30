@@ -5,8 +5,8 @@ import apiService from "../../../core/services/apiService";
 import { getAvatarUrl } from "../../../core/utils/avatarURL";
 import { userSettings } from "../../../core/constants/userPresets";
 import { getInputValue } from "../../../core/utils/fieldUtils";
-import { handleFormSubmit } from "../../../core/utils/formActions/formSubmit";
-import { handleFormDelete } from "../../../core/utils/formActions/formHandlers";
+import { handleFormSubmit } from "../../../core/components/formActions/formSubmit";
+import { handleFormDelete } from "../../../core/components/formActions/formHandlers";
 import ConfirmDeleteModal from "../../../core/components/modal/ConfirmDeleteModal";
 
 export default function SettingsPage() {

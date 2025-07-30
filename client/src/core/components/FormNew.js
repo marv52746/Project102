@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Edit } from "lucide-react";
-import apiService from "../services/apiService";
+import { Edit, ChevronDown, ChevronUp } from "lucide-react";
 import { useDispatch } from "react-redux";
+import apiService from "../services/apiService";
 import { showNotification } from "../services/slices/notificationSlice";
 import { getInputValue, shouldShowField } from "../utils/fieldUtils";
+import { renderSpacer } from "./Form Inputs/LabelSpacerInput";
+import ReferenceInput from "./Form Inputs/ReferenceInput";
+import SelectInput from "./Form Inputs/SelectInput";
+import TextareaInput from "./Form Inputs/TextareaInput";
+import TextInput from "./Form Inputs/TextInput";
 
 const FormNew = ({ fields }) => {
   const { tablename } = useParams();
@@ -12,33 +17,8 @@ const FormNew = ({ fields }) => {
   const dispatch = useDispatch();
 
   const [inputData, setInputData] = useState({});
-  const [refOptions, setRefOptions] = useState({}); // store fetched reference options
   const [fileData, setFileData] = useState(null);
-
-  useEffect(() => {
-    const fetchReferenceData = async () => {
-      const refsToFetch = fields.filter((f) => f.type === "reference");
-
-      for (const refField of refsToFetch) {
-        try {
-          const records = await apiService.get(
-            dispatch,
-            refField.ref,
-            refField.query || {} // 👈 Pass query as parameter
-          );
-
-          setRefOptions((prev) => ({
-            ...prev,
-            [refField.name]: records,
-          }));
-        } catch (err) {
-          console.error(`Error fetching ${refField.ref}`, err);
-        }
-      }
-    };
-
-    fetchReferenceData();
-  }, [fields, dispatch]);
+  const [showPatientSection, setShowPatientSection] = useState(false);
 
   const handleSubmit = async () => {
     try {
@@ -54,31 +34,29 @@ const FormNew = ({ fields }) => {
         }
 
         let value = inputData[key];
-
-        // 👉 If input is empty, fallback to default value
-        const isEmpty = value === undefined || value === null || value === "";
-        if (isEmpty && field.default !== undefined) {
+        if (
+          (value === undefined || value === "") &&
+          field.default !== undefined
+        ) {
           value =
             typeof field.default === "function"
-              ? field.default() // allow dynamic default like () => new Date()
+              ? field.default()
               : field.default;
         }
 
-        // 👉 Convert default dates to proper formats if needed
         if (field.type === "date") {
-          value = new Date(value).toISOString().split("T")[0]; // YYYY-MM-DD
+          value = new Date(value).toISOString().split("T")[0];
         } else if (field.type === "datetime-local") {
-          value = new Date(value).toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+          value = new Date(value).toISOString().slice(0, 16);
         } else if (field.type === "time") {
           value =
             typeof value === "string"
               ? value
-              : new Date(value).toTimeString().slice(0, 5); // HH:MM
+              : new Date(value).toTimeString().slice(0, 5);
         }
 
-        // If reference type, extract ID
         if (field.type === "reference" && value && typeof value === "object") {
-          value = value._id || value.id || "";
+          value = value._id || value.id || value.value || "";
         }
 
         if (value !== undefined && value !== null) {
@@ -108,14 +86,40 @@ const FormNew = ({ fields }) => {
       parsedValue = files[0];
     } else if (type === "checkbox") {
       parsedValue = checked;
-    } else if (name.includes("_id")) {
-      parsedValue = parseInt(value);
     }
 
-    setInputData((prevData) => ({
-      ...prevData,
-      [name]: parsedValue,
-    }));
+    setInputData((prev) => ({ ...prev, [name]: parsedValue }));
+  };
+
+  // const handleReferenceChange = (name, value) => {
+  //   setInputData((prev) => ({ ...prev, [name]: value }));
+  // };
+  const handleReferenceChange = (name, value) => {
+    if (name === "patient_section_data") {
+      const patientFields = fields.filter((f) => f.section === "patient");
+
+      if (value) {
+        // Fill patient fields with selected reference value
+        const newValues = {};
+        patientFields.forEach((field) => {
+          if (value[field.name] !== undefined) {
+            newValues[field.name] = value[field.name];
+          }
+        });
+        setInputData((prev) => ({ ...prev, ...newValues }));
+      } else {
+        // Clear patient fields if reference is cleared
+        const clearedValues = {};
+        patientFields.forEach((field) => {
+          clearedValues[field.name] = "";
+        });
+        setInputData((prev) => ({ ...prev, ...clearedValues }));
+      }
+
+      return;
+    }
+
+    setInputData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -123,108 +127,129 @@ const FormNew = ({ fields }) => {
       encType="multipart/form-data"
       className="flex flex-col p-6 rounded-lg shadow-lg bg-white w-full"
       onSubmit={(e) => {
-        e.preventDefault(); // Stop real page reload
-        handleSubmit(); // Call your function
+        e.preventDefault();
+        handleSubmit();
       }}
     >
-      <div className="mb-6">
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {fields.map((field, index) => {
-              if (!shouldShowField(field, "create")) return null;
-              // Spacer for new row
-              if (field.type === "spacer") {
-                return (
-                  <div
-                    key={index}
-                    className="col-span-2 h-0 sm:h-4"
-                    aria-hidden="true"
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {fields
+          .filter((field) => !field.section || field.section !== "patient")
+          .map((field, index) => {
+            if (!shouldShowField(field, "create")) return null;
+            if (["spacer", "half-spacer", "label"].includes(field.type)) {
+              return renderSpacer(field, index);
+            }
+
+            const value = getInputValue(inputData, field);
+
+            return (
+              <div key={index}>
+                <label
+                  htmlFor={field.name}
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  {field.label}
+                </label>
+
+                {field.type === "reference" ? (
+                  <ReferenceInput
+                    field={field}
+                    value={value}
+                    onChange={handleReferenceChange}
+                    dispatch={dispatch}
                   />
-                );
-              }
+                ) : field.type === "select" ? (
+                  <SelectInput
+                    field={field}
+                    value={value}
+                    onChange={handleChange}
+                  />
+                ) : field.type === "textarea" ? (
+                  <TextareaInput
+                    field={field}
+                    value={value}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  <TextInput
+                    field={field}
+                    value={value}
+                    onChange={handleChange}
+                  />
+                )}
+              </div>
+            );
+          })}
+      </div>
 
-              // Half-column spacer (skips one column)
-              if (field.type === "half-spacer") {
-                return <div key={index} className="col-span-1" />;
-              }
+      {/* TOGGLE PATIENT RECORD SECTION */}
 
-              // Section label
-              if (field.type === "label") {
-                return (
-                  <div key={index} className="col-span-2">
-                    <h3 className="text-md font-semibold text-gray-600 mt-4 mb-2">
-                      {field.label}
-                    </h3>
-                  </div>
-                );
-              }
+      <div className="mt-6">
+        <button
+          type="button"
+          onClick={() => setShowPatientSection(!showPatientSection)}
+          className="flex items-center text-blue-600 hover:underline text-sm"
+        >
+          {showPatientSection ? (
+            <ChevronUp className="w-4 h-4 mr-1" />
+          ) : (
+            <ChevronDown className="w-4 h-4 mr-1" />
+          )}
+          {showPatientSection ? "Hide" : "Show"} User Record Section
+        </button>
+      </div>
 
-              if (!field.name) return null;
-              const isRequired = !!field.required;
+      {showPatientSection && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 border-t pt-4">
+          {fields
+            .filter((field) => field.section === "patient")
+            .map((field, index) => {
+              if (!shouldShowField(field, "create")) return null;
+              if (["spacer", "half-spacer", "label"].includes(field.type)) {
+                return renderSpacer(field, index);
+              }
+              const value = getInputValue(inputData, field);
 
               return (
-                <div key={index} className="mb-0">
+                <div key={`patient-${index}`}>
                   <label
-                    htmlFor={field.label}
+                    htmlFor={field.name}
                     className="block text-sm font-medium text-gray-700"
                   >
                     {field.label}
                   </label>
 
-                  {field.type === "select" || field.type === "reference" ? (
-                    <select
-                      id={field.name}
-                      name={field.name}
-                      value={getInputValue(inputData, field)}
+                  {field.type === "reference" ? (
+                    <ReferenceInput
+                      field={field}
+                      value={value}
+                      onChange={handleReferenceChange}
+                      dispatch={dispatch}
+                    />
+                  ) : field.type === "select" ? (
+                    <SelectInput
+                      field={field}
+                      value={value}
                       onChange={handleChange}
-                      disabled={field.disabled}
-                      required={isRequired}
-                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="" disabled>
-                        Select {field.label}
-                      </option>
-                      {(field.type === "select"
-                        ? field.options
-                        : refOptions[field.name] || []
-                      ).map((option, idx) => (
-                        <option
-                          key={idx}
-                          value={option._id || option.id || option.value}
-                        >
-                          {option.name || option.label || option.email}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   ) : field.type === "textarea" ? (
-                    <textarea
-                      id={field.name}
-                      name={field.name}
-                      value={getInputValue(inputData, field)}
+                    <TextareaInput
+                      field={field}
+                      value={value}
                       onChange={handleChange}
-                      disabled={field.disabled}
-                      required={isRequired}
-                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
-                      rows={4}
                     />
                   ) : (
-                    <input
-                      id={field.name}
-                      name={field.name}
-                      type={field.type}
-                      value={getInputValue(inputData, field)}
+                    <TextInput
+                      field={field}
+                      value={value}
                       onChange={handleChange}
-                      disabled={field.disabled}
-                      required={isRequired}
-                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
                     />
                   )}
                 </div>
               );
             })}
-          </div>
-        </>
-      </div>
+        </div>
+      )}
 
       <div className="flex space-x-4 mt-6">
         <button

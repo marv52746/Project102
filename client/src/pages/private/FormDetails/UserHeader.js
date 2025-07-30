@@ -7,14 +7,19 @@ import {
   Video,
   Plus,
   X,
+  Edit,
+  Trash2,
 } from "lucide-react";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { internalRoles } from "../../../core/constants/rolePresets";
 import { formatFullDate, getAge } from "../../../core/utils/tableUtils";
 import { getAvatarUrl } from "../../../core/utils/avatarURL";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ClinicalFormModal from "./ClinicalFormModal";
+import { useNavigate, useParams } from "react-router-dom";
+import { handleFormDelete } from "../../../core/components/formActions/formHandlers";
+import ConfirmDeleteModal from "../../../core/components/modal/ConfirmDeleteModal";
 
 export default function UserHeader({ data }) {
   const userInfo = useSelector((state) => state.user.userInfo);
@@ -22,10 +27,26 @@ export default function UserHeader({ data }) {
 
   const [patientData, setPatientData] = useState();
   const [showModal, setShowModal] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const dropdownRef = useRef(null);
+  const { tablename, id } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setPatientData(data);
   }, [data]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const patient = patientData?.patient;
   const age = getAge(patient?.date_of_birth);
@@ -33,6 +54,17 @@ export default function UserHeader({ data }) {
 
   if (!hasValidRole) return <div>Access denied</div>;
   if (!data || !patient) return <div className="p-4">Patient not found.</div>;
+
+  const handleEdit = () => {
+    setShowDropdown(false);
+    alert("Edit clicked"); // Replace with actual edit logic
+  };
+
+  const handleDeleteConfirm = () => {
+    setShowDropdown(false);
+    handleFormDelete({ dispatch, tablename, id, navigate });
+    setShowDeleteModal(false);
+  };
 
   return (
     <section className="bg-white border rounded-lg p-4 flex flex-wrap items-center gap-4 relative">
@@ -68,16 +100,41 @@ export default function UserHeader({ data }) {
         <Stethoscope className="h-4 w-4" /> Mary Ryan DNP
       </div>
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-2 relative">
         <button
           onClick={() => setShowModal(true)}
           className="text-blue-600 text-sm hover:underline flex items-center gap-1"
         >
           <Plus className="w-4 h-4" /> Add Clinical Record
         </button>
-        <button className="p-2 hover:bg-gray-100 rounded-md">
-          <MoreHorizontal className="h-4 w-4" />
-        </button>
+
+        {/* More button and dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            className="p-2 hover:bg-gray-100 rounded-md"
+            onClick={() => setShowDropdown((prev) => !prev)}
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
+
+          {showDropdown && (
+            <div className="absolute right-0 mt-2 w-30 bg-white border rounded shadow z-10">
+              <button
+                onClick={handleEdit}
+                className="flex items-center gap-2 px-4 py-2 w-full hover:bg-gray-100 text-sm text-left text-blue-600"
+              >
+                <Edit className="w-4 h-4" /> Edit
+              </button>
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="flex items-center gap-2 px-4 py-2 w-full hover:bg-gray-100 text-sm text-left text-red-600"
+              >
+                <Trash2 className="w-4 h-4" /> Delete
+              </button>
+            </div>
+          )}
+        </div>
+
         <button className="p-2 hover:bg-gray-100 rounded-md">
           <Video className="h-4 w-4" />
         </button>
@@ -97,6 +154,12 @@ export default function UserHeader({ data }) {
           </div>
         </div>
       )}
+      {/* Modal */}
+      <ConfirmDeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteConfirm}
+      />
     </section>
   );
 }

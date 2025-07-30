@@ -9,29 +9,71 @@ class PatientController extends BaseController {
   }
 
   // Custom create method linking Patient to a User
-  // createLinkedToUser = async (req, res) => {
-  //   try {
-  //     const { userId, medical_notes } = req.body;
+  createPatient = async (req, res) => {
+    try {
+      const { patient, ...patientData } = req.body;
 
-  //     // Validate user exists
-  //     const user = await UserDb.findById(userId);
-  //     if (!user) {
-  //       return res.status(404).json({ message: "User not found" });
-  //     }
+      let user = await UserDb.findById(patient);
 
-  //     // Create the patient record
-  //     const patient = new PatientDb({
-  //       user: user._id,
-  //       medical_notes,
-  //       // add other fields as needed
-  //     });
+      // 1. If user doesn't exist, create one
+      if (!user) {
+        user = new UserDb({
+          _id: patient, // optional: only if you're passing a specific ObjectId
+          name: patientData.name || "New Patient",
+          email: patientData.email || `user${Date.now()}@example.com`,
+          role: "patient",
+        });
 
-  //     const savedPatient = await patient.save();
-  //     res.status(201).json(savedPatient);
-  //   } catch (error) {
-  //     res.status(500).json({ error: error.message });
-  //   }
-  // };
+        await user.save();
+      } else {
+        // 2. If user exists, ensure role is 'patient'
+        await UserDb.findByIdAndUpdate(
+          patient,
+          { role: "patient" },
+          { new: true, runValidators: true }
+        );
+      }
+
+      // 3. Create patient record linked to user
+      const newPatient = new PatientDb({
+        ...patientData,
+        patient: user._id, // assumes PatientDb schema has `patient` as user ref
+      });
+
+      const savedPatient = await newPatient.save();
+      res.status(201).json(savedPatient);
+    } catch (error) {
+      console.error("Create Patient Error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+  deletePatient = async (req, res) => {
+    try {
+      const patientId = req.params.id;
+
+      // 1. Find the Patient record first
+      const patientRecord = await PatientDb.findById(patientId);
+      if (!patientRecord) {
+        return res.status(404).json({ message: "Patient not found" });
+      }
+
+      // 2. Update associated user's role to "guest"
+      await UserDb.findByIdAndUpdate(
+        patientRecord.patient, // assumes your schema has 'patient' as user reference
+        { role: "guest" },
+        { new: true, runValidators: true }
+      );
+
+      // 3. Delete the patient record
+      const deletedItem = await PatientDb.findByIdAndDelete(patientId);
+
+      res.json({ message: "Patient deleted successfully", deletedItem });
+    } catch (error) {
+      console.error("Delete Patient Error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };
 
   // getAllPatient = async (req, res) => {
   //   try {

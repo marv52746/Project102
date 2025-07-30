@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema({
     type: String,
   },
   phone_number: {
-    required: true,
+    // required: true,
     type: String,
   },
   emergency_contact: {

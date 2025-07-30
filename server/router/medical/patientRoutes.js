@@ -17,10 +17,10 @@ const checkRole = require("../../middleware/checkRole");
 // router.put("/:id", upload.none(), patientController.update);
 // router.delete("/:id", patientController.delete);
 
-router.post("/", upload.none(), patientController.create);
+router.post("/", upload.none(), patientController.createPatient);
 router.get("/", patientController.getAll);
 router.get("/:id", patientController.getById);
 router.put("/:id", upload.none(), patientController.update);
-router.delete("/:id", patientController.delete);
+router.delete("/:id", patientController.deletePatient);
 
 module.exports = router;

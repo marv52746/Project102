@@ -6,13 +6,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAvatarUrl } from "../utils/avatarURL";
 import { adminOnlyRoles } from "../constants/rolePresets";
 import { getInputValue, shouldShowField } from "../utils/fieldUtils";
-import { handleFormSubmit } from "../utils/formActions/formSubmit";
+
+import ConfirmDeleteModal from "./modal/ConfirmDeleteModal";
+import { handleFormSubmit } from "./formActions/formSubmit";
 import {
   handleEdit,
   handleFormDelete,
   handleInputChange,
-} from "../utils/formActions/formHandlers";
-import ConfirmDeleteModal from "./modal/ConfirmDeleteModal";
+} from "./formActions/formHandlers";
 
 const FormFormat = ({ data, fields }) => {
   const { tablename, id, view } = useParams();

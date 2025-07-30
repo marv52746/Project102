@@ -60,7 +60,7 @@ const Login = () => {
       if (allowedRoles.includes(userObject.role)) {
         navigate("/dashboard");
       } else {
-        navigate("/portal");
+        navigate("/");
       }
     } catch (err) {
       console.error("Google login failed", err);

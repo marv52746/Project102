@@ -54,10 +54,10 @@ const googleLogin = async (req, res) => {
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
-
+    // console.log(ticket);
     const payload = ticket.getPayload();
 
-    const { sub, email, name, picture } = payload;
+    const { sub, email, given_name, family_name, name } = payload;
 
     // Check if user already exists
     let user = await UserDb.findOne({ email });
@@ -66,10 +66,12 @@ const googleLogin = async (req, res) => {
       // Create new user (default role: guest/patient)
       user = new UserDb({
         email,
-        name,
+        first_name: given_name,
+        last_name: family_name,
         username: email,
         googleId: sub,
-        avatar: picture,
+        name: name,
+        // avatar: picture,
       });
       await user.save();
     }

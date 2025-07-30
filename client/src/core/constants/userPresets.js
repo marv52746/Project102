@@ -57,7 +57,13 @@ export const userFormFields = [
   //   showOn: "edit,view",
   // },
 
-  { name: "phone_number", label: "Phone", type: "tel", showOn: "all" },
+  {
+    name: "phone_number",
+    label: "Phone",
+    type: "tel",
+    showOn: "all",
+    required: true,
+  },
   {
     name: "role",
     label: "Role",
@@ -71,9 +77,16 @@ export const userFormFields = [
     type: "select",
     options: genderOptions,
     showOn: "all",
+    required: true,
   },
   { type: "half-spacer", showOn: "all" },
-  { name: "address", label: "Address", type: "textarea", showOn: "all" },
+  {
+    name: "address",
+    label: "Address",
+    type: "textarea",
+    showOn: "all",
+    required: true,
+  },
   { name: "avatar", label: "Avatar", type: "file", showOn: "all" },
 ];
 
