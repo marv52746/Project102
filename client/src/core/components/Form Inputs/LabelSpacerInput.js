@@ -3,7 +3,7 @@ import React from "react";
 export const renderSpacer = (field, index) => {
   if (field.type === "spacer") {
     return (
-      <div key={index} className="col-span-2 h-0 sm:h-4" aria-hidden="true" />
+      <div key={index} className="col-span-2 h-0 sm:h-0" aria-hidden="true" />
     );
   }
   if (field.type === "half-spacer") {

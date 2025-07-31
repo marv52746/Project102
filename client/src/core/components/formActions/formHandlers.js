@@ -57,3 +57,36 @@ export const handleEdit = ({ tablename, id, navigate }) => {
     navigate(`/form/${tablename}/edit/${id}`);
   }
 };
+
+export const handleReferenceChange = ({
+  name,
+  value,
+  fields,
+  setInputData,
+}) => {
+  if (name === "patient_section_data") {
+    const patientFields = fields.filter((f) => f.section === "patient");
+
+    if (value) {
+      // Fill patient fields with selected reference value
+      const newValues = {};
+      patientFields.forEach((field) => {
+        if (value[field.name] !== undefined) {
+          newValues[field.name] = value[field.name];
+        }
+      });
+      setInputData((prev) => ({ ...prev, ...newValues }));
+    } else {
+      // Clear patient fields if reference is cleared
+      const clearedValues = {};
+      patientFields.forEach((field) => {
+        clearedValues[field.name] = "";
+      });
+      setInputData((prev) => ({ ...prev, ...clearedValues }));
+    }
+
+    return;
+  }
+
+  setInputData((prev) => ({ ...prev, [name]: value }));
+};

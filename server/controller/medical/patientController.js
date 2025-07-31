@@ -11,7 +11,7 @@ class PatientController extends BaseController {
   // Custom create method linking Patient to a User
   createPatient = async (req, res) => {
     try {
-      const { patient, ...patientData } = req.body;
+      const { patient, first_name, last_name, ...patientData } = req.body;
 
       let user = await UserDb.findById(patient);
 
@@ -19,9 +19,11 @@ class PatientController extends BaseController {
       if (!user) {
         user = new UserDb({
           _id: patient, // optional: only if you're passing a specific ObjectId
-          name: patientData.name || "New Patient",
-          email: patientData.email || `user${Date.now()}@example.com`,
           role: "patient",
+          first_name,
+          last_name,
+          name: `${first_name} ${last_name}`.trim(),
+          ...patientData,
         });
 
         await user.save();

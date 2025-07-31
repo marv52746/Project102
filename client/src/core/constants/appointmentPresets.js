@@ -59,7 +59,7 @@ export const appointmentFormFields = [
     label: "Time",
     type: "time",
     showOn: "all",
-    default: new Date(),
+    default: new Date().toTimeString().slice(0, 5),
     required: true,
   },
 

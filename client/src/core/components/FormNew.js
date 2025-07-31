@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Edit, ChevronDown, ChevronUp } from "lucide-react";
 import { useDispatch } from "react-redux";
@@ -10,6 +10,13 @@ import ReferenceInput from "./Form Inputs/ReferenceInput";
 import SelectInput from "./Form Inputs/SelectInput";
 import TextareaInput from "./Form Inputs/TextareaInput";
 import TextInput from "./Form Inputs/TextInput";
+import PasswordInput from "./Form Inputs/PasswordInput";
+import AttachmentInput from "./Form Inputs/AttachmentInput";
+import {
+  handleInputChange,
+  handleReferenceChange,
+} from "./formActions/formHandlers";
+import { handleFormSubmit } from "./formActions/formSubmit";
 
 const FormNew = ({ fields }) => {
   const { tablename } = useParams();
@@ -18,108 +25,42 @@ const FormNew = ({ fields }) => {
 
   const [inputData, setInputData] = useState({});
   const [fileData, setFileData] = useState(null);
-  const [showPatientSection, setShowPatientSection] = useState(false);
+  const [showPatientSection, setShowPatientSection] = useState(true);
 
-  const handleSubmit = async () => {
-    try {
-      const formData = new FormData();
+  useEffect(() => {
+    setInputData((prev) => {
+      let changed = false;
+      const newData = { ...prev };
 
-      for (const field of fields) {
-        const key = field.name;
-        if (!key) continue;
-
-        if (key === "avatar" && fileData) {
-          formData.append("avatar", fileData);
-          continue;
-        }
-
-        let value = inputData[key];
-        if (
-          (value === undefined || value === "") &&
-          field.default !== undefined
-        ) {
-          value =
+      fields.forEach((field) => {
+        const hasValue =
+          newData[field.name] !== undefined && newData[field.name] !== null;
+        if (!hasValue && field.default !== undefined) {
+          newData[field.name] =
             typeof field.default === "function"
               ? field.default()
               : field.default;
+          changed = true;
         }
+      });
 
-        if (field.type === "date") {
-          value = new Date(value).toISOString().split("T")[0];
-        } else if (field.type === "datetime-local") {
-          value = new Date(value).toISOString().slice(0, 16);
-        } else if (field.type === "time") {
-          value =
-            typeof value === "string"
-              ? value
-              : new Date(value).toTimeString().slice(0, 5);
-        }
+      return changed ? newData : prev; // ⛔ prevent setState loop
+    });
+  }, []); // ✅ only run once on mount
 
-        if (field.type === "reference" && value && typeof value === "object") {
-          value = value._id || value.id || value.value || "";
-        }
-
-        if (value !== undefined && value !== null) {
-          formData.append(key, value);
-        }
-      }
-
-      await apiService.post(dispatch, tablename, formData);
-      dispatch(
-        showNotification({
-          message: "Record created successfully!",
-          type: "success",
-        })
-      );
-      navigate(`/list/${tablename}`);
-    } catch (error) {
-      console.error("Submit Error:", error);
-    }
+  const handleSubmit = async () => {
+    handleFormSubmit({
+      dispatch,
+      tablename,
+      data: inputData,
+      fields,
+      fileData,
+      navigate,
+    });
   };
 
   const handleChange = (e) => {
-    const { name, value, type, files, checked } = e.target;
-    let parsedValue = value;
-
-    if (type === "file") {
-      setFileData(files[0]);
-      parsedValue = files[0];
-    } else if (type === "checkbox") {
-      parsedValue = checked;
-    }
-
-    setInputData((prev) => ({ ...prev, [name]: parsedValue }));
-  };
-
-  // const handleReferenceChange = (name, value) => {
-  //   setInputData((prev) => ({ ...prev, [name]: value }));
-  // };
-  const handleReferenceChange = (name, value) => {
-    if (name === "patient_section_data") {
-      const patientFields = fields.filter((f) => f.section === "patient");
-
-      if (value) {
-        // Fill patient fields with selected reference value
-        const newValues = {};
-        patientFields.forEach((field) => {
-          if (value[field.name] !== undefined) {
-            newValues[field.name] = value[field.name];
-          }
-        });
-        setInputData((prev) => ({ ...prev, ...newValues }));
-      } else {
-        // Clear patient fields if reference is cleared
-        const clearedValues = {};
-        patientFields.forEach((field) => {
-          clearedValues[field.name] = "";
-        });
-        setInputData((prev) => ({ ...prev, ...clearedValues }));
-      }
-
-      return;
-    }
-
-    setInputData((prev) => ({ ...prev, [name]: value }));
+    handleInputChange({ e, setInputData, setFileData });
   };
 
   return (
@@ -155,7 +96,14 @@ const FormNew = ({ fields }) => {
                   <ReferenceInput
                     field={field}
                     value={value}
-                    onChange={handleReferenceChange}
+                    onChange={(name, value) =>
+                      handleReferenceChange({
+                        name,
+                        value,
+                        fields,
+                        setInputData,
+                      })
+                    }
                     dispatch={dispatch}
                   />
                 ) : field.type === "select" ? (
@@ -168,6 +116,19 @@ const FormNew = ({ fields }) => {
                   <TextareaInput
                     field={field}
                     value={value}
+                    onChange={handleChange}
+                  />
+                ) : field.type === "password" ? (
+                  <PasswordInput
+                    field={field}
+                    value={value}
+                    onChange={handleChange}
+                  />
+                ) : field.type === "file" ? (
+                  <AttachmentInput
+                    field={field}
+                    value={inputData[field.name]}
+                    fileData={fileData}
                     onChange={handleChange}
                   />
                 ) : (
@@ -184,71 +145,99 @@ const FormNew = ({ fields }) => {
 
       {/* TOGGLE PATIENT RECORD SECTION */}
 
-      <div className="mt-6">
-        <button
-          type="button"
-          onClick={() => setShowPatientSection(!showPatientSection)}
-          className="flex items-center text-blue-600 hover:underline text-sm"
-        >
-          {showPatientSection ? (
-            <ChevronUp className="w-4 h-4 mr-1" />
-          ) : (
-            <ChevronDown className="w-4 h-4 mr-1" />
+      {tablename === "patients" && (
+        <>
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={() => setShowPatientSection(!showPatientSection)}
+              className="flex items-center text-blue-600 hover:underline text-sm"
+            >
+              {showPatientSection ? (
+                <ChevronUp className="w-4 h-4 mr-1" />
+              ) : (
+                <ChevronDown className="w-4 h-4 mr-1" />
+              )}
+              {showPatientSection ? "Hide" : "Show"} User Record Section
+            </button>
+          </div>
+
+          {showPatientSection && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 border-t pt-4">
+              {fields
+                .filter((field) => field.section === "patient")
+                .map((field, index) => {
+                  if (!shouldShowField(field, "create")) return null;
+                  if (["spacer", "half-spacer", "label"].includes(field.type)) {
+                    return renderSpacer(field, index);
+                  }
+                  // Skip password if user exist
+                  if (field.type === "password" && inputData["patient"])
+                    return null;
+
+                  const value = getInputValue(inputData, field);
+
+                  return (
+                    <div key={`patient-${index}`}>
+                      <label
+                        htmlFor={field.name}
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        {field.label}
+                      </label>
+
+                      {field.type === "reference" ? (
+                        <ReferenceInput
+                          field={field}
+                          value={value}
+                          onChange={(name, value) =>
+                            handleReferenceChange({
+                              name,
+                              value,
+                              fields,
+                              setInputData,
+                            })
+                          }
+                          dispatch={dispatch}
+                        />
+                      ) : field.type === "select" ? (
+                        <SelectInput
+                          field={field}
+                          value={value}
+                          onChange={handleChange}
+                        />
+                      ) : field.type === "textarea" ? (
+                        <TextareaInput
+                          field={field}
+                          value={value}
+                          onChange={handleChange}
+                        />
+                      ) : field.type === "password" ? (
+                        <PasswordInput
+                          field={field}
+                          value={value}
+                          onChange={handleChange}
+                        />
+                      ) : field.type === "file" ? (
+                        <AttachmentInput
+                          field={field}
+                          value={inputData[field.name]}
+                          fileData={fileData}
+                          onChange={handleChange}
+                        />
+                      ) : (
+                        <TextInput
+                          field={field}
+                          value={value}
+                          onChange={handleChange}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
           )}
-          {showPatientSection ? "Hide" : "Show"} User Record Section
-        </button>
-      </div>
-
-      {showPatientSection && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 border-t pt-4">
-          {fields
-            .filter((field) => field.section === "patient")
-            .map((field, index) => {
-              if (!shouldShowField(field, "create")) return null;
-              if (["spacer", "half-spacer", "label"].includes(field.type)) {
-                return renderSpacer(field, index);
-              }
-              const value = getInputValue(inputData, field);
-
-              return (
-                <div key={`patient-${index}`}>
-                  <label
-                    htmlFor={field.name}
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    {field.label}
-                  </label>
-
-                  {field.type === "reference" ? (
-                    <ReferenceInput
-                      field={field}
-                      value={value}
-                      onChange={handleReferenceChange}
-                      dispatch={dispatch}
-                    />
-                  ) : field.type === "select" ? (
-                    <SelectInput
-                      field={field}
-                      value={value}
-                      onChange={handleChange}
-                    />
-                  ) : field.type === "textarea" ? (
-                    <TextareaInput
-                      field={field}
-                      value={value}
-                      onChange={handleChange}
-                    />
-                  ) : (
-                    <TextInput
-                      field={field}
-                      value={value}
-                      onChange={handleChange}
-                    />
-                  )}
-                </div>
-              );
-            })}
-        </div>
+        </>
       )}
 
       <div className="flex space-x-4 mt-6">

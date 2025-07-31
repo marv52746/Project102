@@ -13,7 +13,14 @@ import {
   handleEdit,
   handleFormDelete,
   handleInputChange,
+  handleReferenceChange,
 } from "./formActions/formHandlers";
+import TextInput from "./Form Inputs/TextInput";
+import TextareaInput from "./Form Inputs/TextareaInput";
+import SelectInput from "./Form Inputs/SelectInput";
+import ReferenceInput from "./Form Inputs/ReferenceInput";
+import AttachmentInput from "./Form Inputs/AttachmentInput";
+import { renderSpacer } from "./Form Inputs/LabelSpacerInput";
 
 const FormFormat = ({ data, fields }) => {
   const { tablename, id, view } = useParams();
@@ -61,7 +68,7 @@ const FormFormat = ({ data, fields }) => {
   }, [fields, dispatch]);
 
   useEffect(() => {
-    // console.log(data);
+    console.log(data);
     setInputData(data || {});
   }, [data]);
 
@@ -103,21 +110,8 @@ const FormFormat = ({ data, fields }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {fields.map((field, index) => {
                 if (!shouldShowField(field, view)) return null;
-
-                // Spacer for new row
-                if (field.type === "spacer") {
-                  return (
-                    <div
-                      key={index}
-                      className="col-span-2 h-0 sm:h-4"
-                      aria-hidden="true"
-                    />
-                  );
-                }
-
-                // Half-column spacer (skips one column)
-                if (field.type === "half-spacer") {
-                  return <div key={index} className="col-span-1" />;
+                if (["spacer", "half-spacer", "label"].includes(field.type)) {
+                  return renderSpacer(field, index);
                 }
 
                 // Section label
@@ -130,9 +124,9 @@ const FormFormat = ({ data, fields }) => {
                     </div>
                   );
                 }
-
                 if (!field.name) return null;
-                const isRequired = !!field.required;
+
+                const value = getInputValue(inputData, field);
 
                 return (
                   <div key={index} className="mb-0">
@@ -143,85 +137,49 @@ const FormFormat = ({ data, fields }) => {
                       {field.label}
                     </label>
 
-                    {field.type === "select" || field.type === "reference" ? (
-                      <select
-                        id={field.name}
-                        name={field.name}
-                        value={
-                          field.type === "reference"
-                            ? inputData[field.name]?._id
-                            : getInputValue(inputData, field)
+                    {field.type === "reference" ? (
+                      <ReferenceInput
+                        field={field}
+                        value={value}
+                        onChange={(name, value) =>
+                          handleReferenceChange({
+                            name,
+                            value,
+                            fields,
+                            setInputData,
+                          })
                         }
+                        dispatch={dispatch}
+                        isReadOnly={isReadOnly}
+                      />
+                    ) : field.type === "select" ? (
+                      <SelectInput
+                        field={field}
+                        value={value}
+                        isReadOnly={isReadOnly}
                         onChange={handleChange}
-                        disabled={field.disabled || isReadOnly}
-                        required={isRequired}
-                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
-                      >
-                        <option value="" disabled>
-                          Select {field.label}
-                        </option>
-                        {(field.type === "select"
-                          ? field.options
-                          : refOptions[field.name] || []
-                        ).map((option, idx) => (
-                          <option
-                            key={idx}
-                            value={option._id || option.id || option.value}
-                          >
-                            {option.name || option.label || option.email}
-                          </option>
-                        ))}
-                      </select>
+                      />
                     ) : field.type === "textarea" ? (
-                      <textarea
-                        id={field.name}
-                        name={field.name}
-                        value={getInputValue(inputData, field)}
+                      <TextareaInput
+                        field={field}
+                        value={value}
                         onChange={handleChange}
-                        disabled={field.disabled || isReadOnly}
-                        required={isRequired}
-                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
-                        rows={4}
+                        isReadOnly={isReadOnly}
                       />
                     ) : field.type === "file" ? (
-                      <div>
-                        <input
-                          id={field.name}
-                          name={field.name}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleChange}
-                          disabled={field.disabled || isReadOnly}
-                          required={isRequired}
-                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
-                        />
-                        {fileData && (
-                          <img
-                            src={URL.createObjectURL(fileData)}
-                            alt="Preview"
-                            className="mt-2 w-24 h-24 object-cover rounded-full"
-                          />
-                        )}
-                        {!fileData &&
-                          inputData[field.name] &&
-                          typeof inputData[field.name] === "string" && (
-                            <img
-                              src={getAvatarUrl(inputData[field.name])}
-                              alt="Avatar"
-                              className="mt-2 w-24 h-24 object-cover rounded-full"
-                            />
-                          )}
-                      </div>
-                    ) : (
-                      <input
-                        id={field.name}
-                        name={field.name}
-                        type={field.type}
-                        value={getInputValue(inputData, field)}
+                      <AttachmentInput
+                        field={field}
+                        value={inputData[field.name]}
+                        fileData={fileData}
                         onChange={handleChange}
-                        disabled={field.disabled || isReadOnly}
-                        required={isRequired}
-                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
+                        isReadOnly={isReadOnly}
+                      />
+                    ) : (
+                      <TextInput
+                        field={field}
+                        value={value}
+                        isReadOnly={isReadOnly}
+                        onChange={handleChange}
                       />
                     )}
                   </div>

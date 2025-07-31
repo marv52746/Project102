@@ -184,6 +184,38 @@ class UserController extends BaseController {
       res.status(500).json({ error: error.message });
     }
   };
+
+  // DELETE USER
+  deleteUser = async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+      // 1. Delete linked patient if exists
+      await PatientDb.deleteOne({ patient: userId });
+
+      // 2. Delete user avatar in GridFS (if exists)
+      const user = await UserDb.findById(userId);
+      if (user?.avatar) {
+        try {
+          await gfs.delete(new mongoose.Types.ObjectId(user.avatar));
+        } catch (err) {
+          console.warn("Failed to delete avatar from GridFS:", err.message);
+        }
+      }
+
+      // 3. Delete user
+      const result = await UserDb.findByIdAndDelete(userId);
+
+      if (!result) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.status(200).json({ message: "User and linked patient deleted." });
+    } catch (error) {
+      console.error("Delete User Error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };
 }
 
 module.exports = new UserController();

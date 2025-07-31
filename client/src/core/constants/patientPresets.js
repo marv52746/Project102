@@ -6,7 +6,7 @@ export const patientTableColumns = [
   { name: "patient.gender", label: "Gender" },
   { name: "patient.date_of_birth", label: "Date of Birth" },
   // { name: "emergency_contact", label: "Emergency Contact" },
-  { name: "patient.address", label: "Address" },
+  // { name: "patient.address", label: "Address" },
   { name: "patient.phone_number", label: "Phone Number" },
   { name: "blood_type", label: "Blood Type" },
   // { name: "registration_date", label: "Registration Date" },
@@ -20,37 +20,10 @@ export const patientFormFields = [
     type: "reference",
     ref: "users",
     query: { role: "guest" }, // 👈 Add this to filter by role
-    showOn: "all",
+    showOn: "create",
     required: true,
     section: "main",
   },
-  // { type: "half-spacer", showOn: "all" },
-  // {
-  //   name: "emergency_contact",
-  //   label: "Emergency Contact",
-  //   type: "text",
-  //   showOn: "all",
-  // },
-  // {
-  //   name: "blood_type",
-  //   label: "Blood Type",
-  //   options: bloodTypeOptions,
-  //   type: "select",
-  //   showOn: "all",
-  // },
-  // {
-  //   name: "medical_notes",
-  //   label: "Medical Notes",
-  //   type: "textarea",
-  //   showOn: "all",
-  // },
-  // {
-  //   name: "registration_date",
-  //   label: "Registration Date",
-  //   type: "date",
-  //   showOn: "edit,view",
-  //   default: new Date(),
-  // },
   {
     name: "first_name",
     label: "First Name",
@@ -115,7 +88,16 @@ export const patientFormFields = [
     required: true,
     section: "patient", // 👈 to make it toggleable
   },
-  { type: "half-spacer", showOn: "all", section: "patient" },
+  {
+    name: "blood_type",
+    label: "Blood Type",
+    options: bloodTypeOptions,
+    type: "select",
+    showOn: "all",
+    required: true,
+    section: "patient", // 👈 to make it toggleable
+  },
+  { type: "spacer", showOn: "all", section: "patient" },
   {
     name: "address",
     label: "Address",

@@ -1,13 +1,13 @@
 import React from "react";
 
-const SelectInput = ({ field, value, onChange }) => {
+const SelectInput = ({ field, value, onChange, isReadOnly }) => {
   return (
     <select
       id={field.name}
       name={field.name}
       value={value}
       onChange={onChange}
-      disabled={field.disabled}
+      disabled={field.disabled || isReadOnly}
       required={field.required}
       className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
     >

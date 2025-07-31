@@ -15,6 +15,6 @@ router.post(
 router.get("/", userController.getAll); // GET /user
 router.get("/:id", userController.getById); // GET /user/:id
 router.put("/:id", upload.single("avatar"), userController.updateUser); // PUT /user/:id
-router.delete("/:id", userController.delete); // DELETE /user/:id
+router.delete("/:id", userController.deleteUser); // DELETE /user/:id
 
 module.exports = router;

@@ -1,3 +1,4 @@
+import { bloodTypeOptions } from "./choices";
 import { genderOptions, roleOptions, statusOptions } from "./formFieldPresets";
 
 // Columns used in the table list
@@ -79,7 +80,15 @@ export const userFormFields = [
     showOn: "all",
     required: true,
   },
-  { type: "half-spacer", showOn: "all" },
+  {
+    name: "blood_type",
+    label: "Blood Type",
+    options: bloodTypeOptions,
+    type: "select",
+    showOn: "all",
+    required: true,
+  },
+
   {
     name: "address",
     label: "Address",
@@ -87,6 +96,7 @@ export const userFormFields = [
     showOn: "all",
     required: true,
   },
+  { type: "spacer", showOn: "all" },
   { name: "avatar", label: "Avatar", type: "file", showOn: "all" },
 ];
 

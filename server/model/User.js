@@ -85,6 +85,9 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
   },
+  blood_type: {
+    type: String,
+  },
   googleId: {
     type: String,
   },

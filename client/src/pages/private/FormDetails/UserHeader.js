@@ -18,7 +18,10 @@ import { getAvatarUrl } from "../../../core/utils/avatarURL";
 import { useEffect, useState, useRef } from "react";
 import ClinicalFormModal from "./ClinicalFormModal";
 import { useNavigate, useParams } from "react-router-dom";
-import { handleFormDelete } from "../../../core/components/formActions/formHandlers";
+import {
+  handleEdit,
+  handleFormDelete,
+} from "../../../core/components/formActions/formHandlers";
 import ConfirmDeleteModal from "../../../core/components/modal/ConfirmDeleteModal";
 
 export default function UserHeader({ data }) {
@@ -55,10 +58,10 @@ export default function UserHeader({ data }) {
   if (!hasValidRole) return <div>Access denied</div>;
   if (!data || !patient) return <div className="p-4">Patient not found.</div>;
 
-  const handleEdit = () => {
-    setShowDropdown(false);
-    alert("Edit clicked"); // Replace with actual edit logic
-  };
+  // const handleEdit = () => {
+  //   setShowDropdown(false);
+  //   alert("Edit clicked"); // Replace with actual edit logic
+  // };
 
   const handleDeleteConfirm = () => {
     setShowDropdown(false);
@@ -120,7 +123,7 @@ export default function UserHeader({ data }) {
           {showDropdown && (
             <div className="absolute right-0 mt-2 w-30 bg-white border rounded shadow z-10">
               <button
-                onClick={handleEdit}
+                onClick={() => handleEdit({ tablename, id, navigate })}
                 className="flex items-center gap-2 px-4 py-2 w-full hover:bg-gray-100 text-sm text-left text-blue-600"
               >
                 <Edit className="w-4 h-4" /> Edit
