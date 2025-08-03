@@ -12,6 +12,7 @@ import Portal from "../pages/public/Portal";
 import CalendarPage from "../pages/private/Calendar/CalendarPage";
 import SettingsPage from "../pages/private/Settings/Settings";
 import UserDashboardPage from "../pages/private/FormDetails/Index";
+import DoctorDetailsPage from "../pages/private/DoctorDetails/DoctorDetailsPage";
 
 const routes = all_routes;
 
@@ -70,7 +71,7 @@ const routesArray = [
   {
     path: routes.testPage,
     name: "testPage",
-    element: <UserDashboardPage />,
+    element: <DoctorDetailsPage />,
   },
 ];
 

@@ -39,10 +39,29 @@ export const formatFullDate = (dateInput) => {
 // Optional utility to calculate age
 export const getAge = (birthDate) => {
   if (!birthDate) return null;
+
   const dob = new Date(birthDate);
   if (isNaN(dob)) return null;
 
-  const diff = Date.now() - dob.getTime();
-  const ageDt = new Date(diff);
-  return Math.abs(ageDt.getUTCFullYear() - 1970);
+  const now = new Date();
+  const years = now.getFullYear() - dob.getFullYear();
+  const months = now.getMonth() - dob.getMonth();
+  const days = now.getDate() - dob.getDate();
+
+  let ageYears = years;
+  let ageMonths = months;
+
+  // Adjust for incomplete year/month
+  if (months < 0 || (months === 0 && days < 0)) {
+    ageYears--;
+    ageMonths = months + 12;
+  } else if (days < 0) {
+    ageMonths--;
+  }
+
+  if (ageYears >= 1) {
+    return `${ageYears} year${ageYears > 1 ? "s" : ""} old`;
+  }
+
+  return `${ageMonths} month${ageMonths !== 1 ? "s" : ""} old`;
 };

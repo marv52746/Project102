@@ -6,6 +6,7 @@ import {
 import { propertyAllFields } from "./propertiesPresets";
 import { getFields } from "../utils/fieldUtils";
 import { patientFormFields, patientTableColumns } from "./patientPresets";
+import { doctorFormFields, doctorTableColumns } from "./doctorPresets";
 
 export const formConfigMap = {
   //   patients: {
@@ -27,6 +28,11 @@ export const formConfigMap = {
     apiURL: "patients",
     getFields: () => getFields(null, patientFormFields),
     title: "Patients",
+  },
+  doctors: {
+    apiURL: "doctors",
+    getFields: () => getFields(null, doctorFormFields),
+    title: "Doctors",
   },
   properties: {
     apiURL: "properties",
@@ -80,6 +86,11 @@ export const listConfigMap = {
     apiURL: "patients",
     fieldData: getFields(patientTableColumns),
     title: "Patients",
+  },
+  doctors: {
+    apiURL: "doctors",
+    fieldData: getFields(doctorTableColumns),
+    title: "Doctors",
   },
   appointments: {
     apiURL: "appointments",

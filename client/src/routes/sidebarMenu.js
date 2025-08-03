@@ -10,6 +10,7 @@ import {
   Calendar,
   Settings,
   Accessibility,
+  Users,
 } from "lucide-react";
 import { all_routes } from "./all_routes";
 
@@ -160,8 +161,16 @@ export const iconMapping = [
     section: "Management",
     items: [
       {
+        text: "Doctors",
+        icon: <UserCircle size={20} />,
+        alert: true,
+        iconText: "Doctors",
+        to: all_routes.doctors,
+        table: "doctors",
+      },
+      {
         text: "Patients",
-        icon: <Accessibility size={20} />,
+        icon: <Users size={20} />,
         alert: true,
         iconText: "Patients",
         to: all_routes.patients,
@@ -204,14 +213,14 @@ export const iconMapping = [
         to: all_routes.settings,
         table: "settings",
       },
-      // {
-      //   text: "Test Page",
-      //   icon: <Settings size={20} />,
-      //   alert: false,
-      //   iconText: "Test",
-      //   to: all_routes.testPage,
-      //   table: "test",
-      // },
+      {
+        text: "Test Page",
+        icon: <Settings size={20} />,
+        alert: false,
+        iconText: "Test",
+        to: all_routes.testPage,
+        table: "test",
+      },
     ],
   },
 ];

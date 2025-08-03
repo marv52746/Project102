@@ -5,47 +5,154 @@ const BaseController = require("../core/baseController");
 class PatientController extends BaseController {
   constructor() {
     super(PatientDb);
-    this.populateFields = ["patient"];
+    this.populateFields = ["user"];
   }
 
   // Custom create method linking Patient to a User
+  // createPatient = async (req, res) => {
+  //   try {
+  //     const { user, ...patientData } = req.body;
+
+  //     let userId;
+  //     let userPayload = {};
+
+  //     // If user is an object, extract data
+  //     if (typeof user === "object" && user._id) {
+  //       userId = user._id;
+  //       const { first_name, last_name, ...rest } = user;
+
+  //       userPayload = {
+  //         ...rest,
+  //         first_name,
+  //         last_name,
+  //         role: "patient",
+  //         name: `${first_name || ""} ${last_name || ""}`.trim(),
+  //       };
+
+  //       // Check if user exists
+  //       const existingUser = await UserDb.findById(userId);
+
+  //       if (existingUser) {
+  //         await UserDb.findByIdAndUpdate(userId, userPayload, {
+  //           new: true,
+  //           runValidators: true,
+  //         });
+  //       } else {
+  //         const newUser = new UserDb({ _id: userId, ...userPayload });
+  //         await newUser.save();
+  //       }
+  //     } else if (typeof user === "string") {
+  //       // Handle string ID only
+  //       userId = user;
+
+  //       const existingUser = await UserDb.findById(userId);
+  //       if (!existingUser) {
+  //         return res.status(400).json({ message: "User not found" });
+  //       }
+
+  //       // Optional: you can update user here if needed
+  //     } else {
+  //       return res.status(400).json({ message: "Invalid user input" });
+  //     }
+
+  //     // Create Patient with user link
+  //     const newPatient = new PatientDb({
+  //       ...patientData,
+  //       user: userId,
+  //     });
+
+  //     const savedPatient = await newPatient.save();
+  //     res.status(201).json(savedPatient);
+  //   } catch (error) {
+  //     console.error("Create Patient Error:", error);
+  //     res.status(500).json({ error: error.message });
+  //   }
+  // };
   createPatient = async (req, res) => {
     try {
-      const { patient, first_name, last_name, ...patientData } = req.body;
+      const { user, ...patientData } = req.body;
 
-      let user = await UserDb.findById(patient);
-
-      // 1. If user doesn't exist, create one
-      if (!user) {
-        user = new UserDb({
-          _id: patient, // optional: only if you're passing a specific ObjectId
-          role: "patient",
-          first_name,
-          last_name,
-          name: `${first_name} ${last_name}`.trim(),
-          ...patientData,
-        });
-
-        await user.save();
-      } else {
-        // 2. If user exists, ensure role is 'patient'
-        await UserDb.findByIdAndUpdate(
-          patient,
-          { role: "patient" },
-          { new: true, runValidators: true }
-        );
+      if (typeof user !== "object") {
+        return res.status(400).json({ message: "Invalid user input" });
       }
 
-      // 3. Create patient record linked to user
+      const { _id, first_name, last_name, ...rest } = user;
+
+      const userPayload = {
+        ...rest,
+        first_name,
+        last_name,
+        role: "patient",
+        name: `${first_name || ""} ${last_name || ""}`.trim(),
+      };
+
+      let savedUser;
+
+      if (_id) {
+        const existingUser = await UserDb.findById(_id);
+
+        if (existingUser) {
+          savedUser = await UserDb.findByIdAndUpdate(_id, userPayload, {
+            new: true,
+            runValidators: true,
+          });
+        } else {
+          savedUser = new UserDb({ _id, ...userPayload });
+          await savedUser.save();
+        }
+      } else {
+        // If no _id, create new user
+        savedUser = new UserDb(userPayload);
+        await savedUser.save();
+      }
+
       const newPatient = new PatientDb({
         ...patientData,
-        patient: user._id, // assumes PatientDb schema has `patient` as user ref
+        user: savedUser._id,
       });
 
       const savedPatient = await newPatient.save();
       res.status(201).json(savedPatient);
     } catch (error) {
       console.error("Create Patient Error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+  update = async (req, res) => {
+    try {
+      const { user, ...patientData } = req.body;
+
+      // Update Patient data
+      const updatedPatient = await PatientDb.findByIdAndUpdate(
+        req.params.id,
+        patientData,
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedPatient) {
+        return res.status(404).json({ message: "Patient not found" });
+      }
+
+      // ✅ Update linked User record
+      if (user && typeof user === "object" && user._id) {
+        const { _id, first_name, last_name, ...userFields } = user;
+
+        await UserDb.findByIdAndUpdate(
+          _id,
+          {
+            ...userFields,
+            first_name,
+            last_name,
+            name: `${first_name || ""} ${last_name || ""}`.trim(),
+          },
+          { new: true, runValidators: true }
+        );
+      }
+
+      res.json(updatedPatient);
+    } catch (error) {
+      console.error("Update Patient Error:", error);
       res.status(500).json({ error: error.message });
     }
   };
@@ -62,7 +169,7 @@ class PatientController extends BaseController {
 
       // 2. Update associated user's role to "guest"
       await UserDb.findByIdAndUpdate(
-        patientRecord.patient, // assumes your schema has 'patient' as user reference
+        patientRecord.user, // assumes your schema has 'user' as user reference
         { role: "guest" },
         { new: true, runValidators: true }
       );

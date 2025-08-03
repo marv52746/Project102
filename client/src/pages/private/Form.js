@@ -52,11 +52,15 @@ function Form() {
   if (view === "view" && tablename === "patients") {
     return <UserDashboardPage data={data} />;
   }
+  if (view === "view" && tablename === "doctors") {
+    return <UserDashboardPage data={data} />;
+  }
 
   return view === "create" ? (
     <FormNew fields={fields} />
   ) : (
     <FormFormat fields={fields} data={data} />
+    // <FormNew fields={fields} data={data} />
   );
 }
 

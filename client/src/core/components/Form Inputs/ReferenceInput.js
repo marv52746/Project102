@@ -41,23 +41,20 @@ const ReferenceInput = ({
     const selectedValue = selected?.full || null;
     onChange(field.name, selectedValue);
 
-    if (field.name === "patient") {
+    if (field.name === "user") {
       if (selectedValue) {
         try {
           const userId =
             selectedValue._id || selectedValue.id || selectedValue.value;
-          const patientRecord = await apiService.get(
-            dispatch,
-            `users/${userId}`
-          );
-          if (patientRecord) {
-            onChange("patient_section_data", patientRecord);
+          const userRecord = await apiService.get(dispatch, `users/${userId}`);
+          if (userRecord) {
+            onChange("user_section_data", userRecord);
           }
         } catch (err) {
-          console.error("Failed to load patient details:", err);
+          console.error("Failed to load user details:", err);
         }
       } else {
-        onChange("patient_section_data", null);
+        onChange("user_section_data", null);
       }
     }
   };
@@ -72,7 +69,7 @@ const ReferenceInput = ({
       value={
         value
           ? {
-              label: value.name || value.label || value.email,
+              label: value.name || value.label,
               value: value._id || value.id,
             }
           : null

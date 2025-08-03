@@ -1,31 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Edit, ChevronDown, ChevronUp } from "lucide-react";
-import { useDispatch } from "react-redux";
-import apiService from "../services/apiService";
-import { showNotification } from "../services/slices/notificationSlice";
-import { getInputValue, shouldShowField } from "../utils/fieldUtils";
+import { useDispatch, useSelector } from "react-redux";
+
+import { shouldShowField } from "../utils/fieldUtils";
 import { renderSpacer } from "./Form Inputs/LabelSpacerInput";
-import ReferenceInput from "./Form Inputs/ReferenceInput";
-import SelectInput from "./Form Inputs/SelectInput";
-import TextareaInput from "./Form Inputs/TextareaInput";
-import TextInput from "./Form Inputs/TextInput";
-import PasswordInput from "./Form Inputs/PasswordInput";
-import AttachmentInput from "./Form Inputs/AttachmentInput";
-import {
-  handleInputChange,
-  handleReferenceChange,
-} from "./formActions/formHandlers";
+
+import { handleInputChange } from "./formActions/formHandlers";
 import { handleFormSubmit } from "./formActions/formSubmit";
+import { renderField } from "./Form Inputs/Index";
+import { adminOnlyRoles } from "../constants/rolePresets";
 
 const FormNew = ({ fields }) => {
-  const { tablename } = useParams();
+  const { tablename, view, id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [inputData, setInputData] = useState({});
   const [fileData, setFileData] = useState(null);
-  const [showPatientSection, setShowPatientSection] = useState(true);
+  const [showSection, setShowSection] = useState(true);
+
+  const currentUser = useSelector((state) => state.user.userInfo);
+
+  const hasUpdateDeletePermission =
+    currentUser && adminOnlyRoles.includes(currentUser.role);
+
+  const isViewing = id && view === "view";
+  const isCreating = !id && view === "create";
+  const isReadOnly = isViewing || (!hasUpdateDeletePermission && !isCreating);
 
   useEffect(() => {
     setInputData((prev) => {
@@ -48,6 +50,39 @@ const FormNew = ({ fields }) => {
     });
   }, []); // ✅ only run once on mount
 
+  // Clear all user.* fields if user_does_not_exist is true
+  useEffect(() => {
+    if (inputData.user_does_not_exist) {
+      setInputData((prev) => {
+        const cleared = { ...prev };
+
+        // Clear "user" reference field
+        if (cleared.user && typeof cleared.user === "string") {
+          cleared.user = "";
+        } else if (typeof cleared.user === "object") {
+          cleared.user = {};
+        }
+
+        // Clear all user.* fields
+        fields.forEach((field) => {
+          if (
+            typeof field.name === "string" &&
+            field.name.startsWith("user.")
+          ) {
+            const parts = field.name.split(".");
+            if (parts.length === 2) {
+              if (cleared[parts[0]]) {
+                cleared[parts[0]][parts[1]] = "";
+              }
+            }
+          }
+        });
+
+        return cleared;
+      });
+    }
+  }, [inputData.user_does_not_exist, fields]);
+
   const handleSubmit = async () => {
     handleFormSubmit({
       dispatch,
@@ -64,192 +99,114 @@ const FormNew = ({ fields }) => {
   };
 
   return (
-    <form
-      encType="multipart/form-data"
-      className="flex flex-col p-6 rounded-lg shadow-lg bg-white w-full"
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleSubmit();
-      }}
-    >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {fields
-          .filter((field) => !field.section || field.section !== "patient")
-          .map((field, index) => {
-            if (!shouldShowField(field, "create")) return null;
-            if (["spacer", "half-spacer", "label"].includes(field.type)) {
-              return renderSpacer(field, index);
-            }
+    <div className="p-4">
+      <form
+        encType="multipart/form-data"
+        className="flex flex-col p-6 rounded-lg shadow-lg bg-white w-full"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {fields
+            .filter((field) => !field.section || field.section === "main")
+            .filter((field) => {
+              // ✅ Hide user.* fields if user_does_not_exist is true
+              if (inputData.user_does_not_exist && field.name === "user") {
+                return false;
+              }
+              return true;
+            })
+            .map((field, index) => {
+              if (!shouldShowField(field, "create")) return null;
+              if (["spacer", "half-spacer", "label"].includes(field.type)) {
+                return renderSpacer(field, index);
+              }
 
-            const value = getInputValue(inputData, field);
+              return renderField({
+                field,
+                index,
+                inputData,
+                handleChange,
+                setInputData,
+                fields,
+                dispatch,
+                isReadOnly,
+              });
+            })}
+        </div>
 
-            return (
-              <div key={index}>
-                <label
-                  htmlFor={field.name}
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {field.label}
-                </label>
+        {/* TOGGLE PATIENT RECORD SECTION */}
 
-                {field.type === "reference" ? (
-                  <ReferenceInput
-                    field={field}
-                    value={value}
-                    onChange={(name, value) =>
-                      handleReferenceChange({
-                        name,
-                        value,
-                        fields,
-                        setInputData,
-                      })
-                    }
-                    dispatch={dispatch}
-                  />
-                ) : field.type === "select" ? (
-                  <SelectInput
-                    field={field}
-                    value={value}
-                    onChange={handleChange}
-                  />
-                ) : field.type === "textarea" ? (
-                  <TextareaInput
-                    field={field}
-                    value={value}
-                    onChange={handleChange}
-                  />
-                ) : field.type === "password" ? (
-                  <PasswordInput
-                    field={field}
-                    value={value}
-                    onChange={handleChange}
-                  />
-                ) : field.type === "file" ? (
-                  <AttachmentInput
-                    field={field}
-                    value={inputData[field.name]}
-                    fileData={fileData}
-                    onChange={handleChange}
-                  />
+        {(tablename === "patients" || tablename === "doctors") && (
+          <>
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={() => setShowSection(!showSection)}
+                className="flex items-center text-blue-600 hover:underline text-sm"
+              >
+                {showSection ? (
+                  <ChevronUp className="w-6 h-6 mr-1" />
                 ) : (
-                  <TextInput
-                    field={field}
-                    value={value}
-                    onChange={handleChange}
-                  />
+                  <ChevronDown className="w-6 h-6 mr-1" />
                 )}
-              </div>
-            );
-          })}
-      </div>
-
-      {/* TOGGLE PATIENT RECORD SECTION */}
-
-      {tablename === "patients" && (
-        <>
-          <div className="mt-6">
-            <button
-              type="button"
-              onClick={() => setShowPatientSection(!showPatientSection)}
-              className="flex items-center text-blue-600 hover:underline text-sm"
-            >
-              {showPatientSection ? (
-                <ChevronUp className="w-4 h-4 mr-1" />
-              ) : (
-                <ChevronDown className="w-4 h-4 mr-1" />
-              )}
-              {showPatientSection ? "Hide" : "Show"} User Record Section
-            </button>
-          </div>
-
-          {showPatientSection && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 border-t pt-4">
-              {fields
-                .filter((field) => field.section === "patient")
-                .map((field, index) => {
-                  if (!shouldShowField(field, "create")) return null;
-                  if (["spacer", "half-spacer", "label"].includes(field.type)) {
-                    return renderSpacer(field, index);
-                  }
-                  // Skip password if user exist
-                  if (field.type === "password" && inputData["patient"])
-                    return null;
-
-                  const value = getInputValue(inputData, field);
-
-                  return (
-                    <div key={`patient-${index}`}>
-                      <label
-                        htmlFor={field.name}
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        {field.label}
-                      </label>
-
-                      {field.type === "reference" ? (
-                        <ReferenceInput
-                          field={field}
-                          value={value}
-                          onChange={(name, value) =>
-                            handleReferenceChange({
-                              name,
-                              value,
-                              fields,
-                              setInputData,
-                            })
-                          }
-                          dispatch={dispatch}
-                        />
-                      ) : field.type === "select" ? (
-                        <SelectInput
-                          field={field}
-                          value={value}
-                          onChange={handleChange}
-                        />
-                      ) : field.type === "textarea" ? (
-                        <TextareaInput
-                          field={field}
-                          value={value}
-                          onChange={handleChange}
-                        />
-                      ) : field.type === "password" ? (
-                        <PasswordInput
-                          field={field}
-                          value={value}
-                          onChange={handleChange}
-                        />
-                      ) : field.type === "file" ? (
-                        <AttachmentInput
-                          field={field}
-                          value={inputData[field.name]}
-                          fileData={fileData}
-                          onChange={handleChange}
-                        />
-                      ) : (
-                        <TextInput
-                          field={field}
-                          value={value}
-                          onChange={handleChange}
-                        />
-                      )}
-                    </div>
-                  );
-                })}
+              </button>
             </div>
-          )}
-        </>
-      )}
 
-      <div className="flex space-x-4 mt-6">
-        <button
-          type="submit"
-          className="flex items-center px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg"
-        >
-          <Edit className="mr-2" />
-          Submit
-        </button>
-      </div>
-    </form>
+            {showSection && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 border-t pt-4">
+                {fields
+                  .filter((field) => field.section === "user")
+                  .map((field, index) => {
+                    if (!shouldShowField(field, "create")) return null;
+                    if (
+                      ["spacer", "half-spacer", "label"].includes(field.type)
+                    ) {
+                      return renderSpacer(field, index);
+                    }
+                    // ⛔ Skip password if user exists
+                    if (
+                      field.type === "password" &&
+                      !inputData.user_does_not_exist
+                    )
+                      return null;
+
+                    // ✅ Force read-only if field.name starts with 'user.' and user_does_not_exist is true
+                    const isUserField =
+                      typeof field.name === "string" &&
+                      field.name.startsWith("user.");
+                    const forceReadOnly =
+                      isUserField && !inputData.user_does_not_exist;
+
+                    return renderField({
+                      field,
+                      index,
+                      inputData,
+                      handleChange,
+                      setInputData,
+                      fields,
+                      dispatch,
+                      isReadOnly: forceReadOnly || isReadOnly,
+                    });
+                  })}
+              </div>
+            )}
+          </>
+        )}
+
+        <div className="flex space-x-4 mt-6">
+          <button
+            type="submit"
+            className="flex items-center px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg"
+          >
+            <Edit className="mr-2" />
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

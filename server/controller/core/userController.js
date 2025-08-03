@@ -6,6 +6,7 @@ const path = require("path");
 const bcrypt = require("bcryptjs");
 const { UserDb } = require("../../model/User");
 const { PatientDb } = require("../../model/Patient");
+const { DoctorDb } = require("../../model/Doctor");
 const BaseController = require("./baseController");
 
 const conn = mongoose.connection;
@@ -190,12 +191,23 @@ class UserController extends BaseController {
     const userId = req.params.id;
 
     try {
-      // 1. Delete linked patient if exists
-      await PatientDb.deleteOne({ patient: userId });
-
-      // 2. Delete user avatar in GridFS (if exists)
       const user = await UserDb.findById(userId);
-      if (user?.avatar) {
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // 1. Delete linked patient if user is a patient
+      if (user.role === "patient") {
+        await PatientDb.deleteOne({ user: userId });
+      }
+
+      // 2. Delete linked doctor if user is a doctor
+      if (user.role === "doctor") {
+        await DoctorDb.deleteOne({ user: userId });
+      }
+
+      // 3. Delete user avatar in GridFS (if exists)
+      if (user.avatar) {
         try {
           await gfs.delete(new mongoose.Types.ObjectId(user.avatar));
         } catch (err) {
@@ -203,14 +215,10 @@ class UserController extends BaseController {
         }
       }
 
-      // 3. Delete user
-      const result = await UserDb.findByIdAndDelete(userId);
+      // 4. Delete user
+      await UserDb.findByIdAndDelete(userId);
 
-      if (!result) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      res.status(200).json({ message: "User and linked patient deleted." });
+      res.status(200).json({ message: "User and related records deleted." });
     } catch (error) {
       console.error("Delete User Error:", error);
       res.status(500).json({ error: error.message });

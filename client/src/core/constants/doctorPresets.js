@@ -1,19 +1,19 @@
-import { bloodTypeOptions } from "./choices";
+import { bloodTypeOptions, doctorSpecializationOptions } from "./choices";
 import { genderOptions, roleOptions } from "./formFieldPresets";
 
-export const patientTableColumns = [
+export const doctorTableColumns = [
   { name: "user.name", label: "Name" },
   { name: "user.gender", label: "Gender" },
   { name: "user.date_of_birth", label: "Date of Birth" },
   // { name: "emergency_contact", label: "Emergency Contact" },
-  // { name: "user.address", label: "Address" },
+  // { name: "patient.address", label: "Address" },
   { name: "user.phone_number", label: "Phone Number" },
-  { name: "blood_type", label: "Blood Type" },
+  // { name: "blood_type", label: "Blood Type" },
   // { name: "registration_date", label: "Registration Date" },
 ];
 
 // Form fields with conditional visibility
-export const patientFormFields = [
+export const doctorFormFields = [
   {
     name: "user_does_not_exist",
     label: "User does not exist?",
@@ -23,6 +23,7 @@ export const patientFormFields = [
     default: false,
   },
   { type: "spacer", showOn: "all", section: "main" },
+
   {
     name: "user",
     label: "User",
@@ -33,6 +34,17 @@ export const patientFormFields = [
     required: true,
     section: "main",
   },
+  { type: "spacer", showOn: "all", section: "main" },
+  {
+    name: "specialization",
+    label: "Specialization",
+    options: doctorSpecializationOptions,
+    type: "multiselect",
+    showOn: "all",
+    required: true,
+    section: "main", // 👈 to make it toggleable
+  },
+  { type: "spacer", showOn: "all", section: "main" },
   {
     name: "user.first_name",
     label: "First Name",
@@ -107,6 +119,7 @@ export const patientFormFields = [
     required: true,
     section: "user", // 👈 to make it toggleable
   },
+
   { type: "spacer", showOn: "all", section: "user" },
   {
     name: "user.address",
@@ -117,10 +130,10 @@ export const patientFormFields = [
     section: "user", // 👈 to make it toggleable
   },
   // {
-  //   name: "avatar",
+  //   name: "user.avatar",
   //   label: "Avatar",
   //   type: "file",
   //   showOn: "all",
-  //   section: "patient",
+  //   section: "user",
   // },
 ];

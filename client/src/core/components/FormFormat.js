@@ -3,9 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Edit, PlusCircle, Save, Trash } from "lucide-react";
 import apiService from "../services/apiService";
 import { useDispatch, useSelector } from "react-redux";
-import { getAvatarUrl } from "../utils/avatarURL";
 import { adminOnlyRoles } from "../constants/rolePresets";
-import { getInputValue, shouldShowField } from "../utils/fieldUtils";
+import { shouldShowField } from "../utils/fieldUtils";
 
 import ConfirmDeleteModal from "./modal/ConfirmDeleteModal";
 import { handleFormSubmit } from "./formActions/formSubmit";
@@ -13,14 +12,10 @@ import {
   handleEdit,
   handleFormDelete,
   handleInputChange,
-  handleReferenceChange,
 } from "./formActions/formHandlers";
-import TextInput from "./Form Inputs/TextInput";
-import TextareaInput from "./Form Inputs/TextareaInput";
-import SelectInput from "./Form Inputs/SelectInput";
-import ReferenceInput from "./Form Inputs/ReferenceInput";
-import AttachmentInput from "./Form Inputs/AttachmentInput";
+
 import { renderSpacer } from "./Form Inputs/LabelSpacerInput";
+import { renderField } from "./Form Inputs/Index";
 
 const FormFormat = ({ data, fields }) => {
   const { tablename, id, view } = useParams();
@@ -42,35 +37,56 @@ const FormFormat = ({ data, fields }) => {
   const [refOptions, setRefOptions] = useState({}); // store fetched reference options
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  // useEffect(() => {
+  //   const fetchReferenceData = async () => {
+  //     const refsToFetch = fields.filter((f) => f.type === "reference");
+
+  //     for (const refField of refsToFetch) {
+  //       try {
+  //         const records = await apiService.get(
+  //           dispatch,
+  //           refField.ref,
+  //           refField.query || {} // 👈 Pass query as parameter
+  //         );
+
+  //         setRefOptions((prev) => ({
+  //           ...prev,
+  //           [refField.name]: records,
+  //         }));
+  //       } catch (err) {
+  //         console.error(`Error fetching ${refField.ref}`, err);
+  //       }
+  //     }
+  //   };
+
+  //   fetchReferenceData();
+  // }, [fields, dispatch]);
+
+  // useEffect(() => {
+  //   console.log(data);
+  //   setInputData(data || {});
+  // }, [data]);
+
   useEffect(() => {
-    const fetchReferenceData = async () => {
-      const refsToFetch = fields.filter((f) => f.type === "reference");
+    setInputData((prev) => {
+      let changed = false;
+      const newData = { ...prev };
 
-      for (const refField of refsToFetch) {
-        try {
-          const records = await apiService.get(
-            dispatch,
-            refField.ref,
-            refField.query || {} // 👈 Pass query as parameter
-          );
-
-          setRefOptions((prev) => ({
-            ...prev,
-            [refField.name]: records,
-          }));
-        } catch (err) {
-          console.error(`Error fetching ${refField.ref}`, err);
+      fields.forEach((field) => {
+        const hasValue =
+          newData[field.name] !== undefined && newData[field.name] !== null;
+        if (!hasValue && field.default !== undefined) {
+          newData[field.name] =
+            typeof field.default === "function"
+              ? field.default()
+              : field.default;
+          changed = true;
         }
-      }
-    };
+      });
 
-    fetchReferenceData();
-  }, [fields, dispatch]);
-
-  useEffect(() => {
-    console.log(data);
-    setInputData(data || {});
-  }, [data]);
+      return changed ? newData : prev; // ⛔ prevent setState loop
+    });
+  }, []); // ✅ only run once on mount
 
   const handleSubmit = async () => {
     handleFormSubmit({
@@ -126,64 +142,16 @@ const FormFormat = ({ data, fields }) => {
                 }
                 if (!field.name) return null;
 
-                const value = getInputValue(inputData, field);
-
-                return (
-                  <div key={index} className="mb-0">
-                    <label
-                      htmlFor={field.label}
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      {field.label}
-                    </label>
-
-                    {field.type === "reference" ? (
-                      <ReferenceInput
-                        field={field}
-                        value={value}
-                        onChange={(name, value) =>
-                          handleReferenceChange({
-                            name,
-                            value,
-                            fields,
-                            setInputData,
-                          })
-                        }
-                        dispatch={dispatch}
-                        isReadOnly={isReadOnly}
-                      />
-                    ) : field.type === "select" ? (
-                      <SelectInput
-                        field={field}
-                        value={value}
-                        isReadOnly={isReadOnly}
-                        onChange={handleChange}
-                      />
-                    ) : field.type === "textarea" ? (
-                      <TextareaInput
-                        field={field}
-                        value={value}
-                        onChange={handleChange}
-                        isReadOnly={isReadOnly}
-                      />
-                    ) : field.type === "file" ? (
-                      <AttachmentInput
-                        field={field}
-                        value={inputData[field.name]}
-                        fileData={fileData}
-                        onChange={handleChange}
-                        isReadOnly={isReadOnly}
-                      />
-                    ) : (
-                      <TextInput
-                        field={field}
-                        value={value}
-                        isReadOnly={isReadOnly}
-                        onChange={handleChange}
-                      />
-                    )}
-                  </div>
-                );
+                return renderField({
+                  field,
+                  index,
+                  inputData,
+                  handleChange,
+                  setInputData,
+                  fields,
+                  dispatch,
+                  isReadOnly,
+                });
               })}
             </div>
           </>

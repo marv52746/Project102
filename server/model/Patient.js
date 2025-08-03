@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Schema;
 
 const patientSchema = new mongoose.Schema({
-  patient: { type: ObjectId, ref: "user" }, // if linked to user login
+  user: { type: ObjectId, ref: "user" }, // if linked to user login
   blood_type: String,
   emergency_contact: String,
   medical_notes: String,

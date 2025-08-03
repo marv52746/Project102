@@ -8,6 +8,7 @@ const propertyRoutes = require("./core/propertyRoutes");
 
 // Medical domain routes
 const patientRoutes = require("./medical/patientRoutes");
+const doctorRoutes = require("./medical/doctorRoutes");
 const vitalRoutes = require("./medical/vitalRoutes");
 const appointmentRoutes = require("./medical/appointmentRoutes");
 const calendarRoute = require("./medical/calendarRoute");
@@ -32,6 +33,7 @@ router.use("/calendar", calendarRoute);
 
 // Medical Routes
 router.use("/patients", patientRoutes);
+router.use("/doctors", doctorRoutes);
 router.use("/conditions", conditionRoutes);
 router.use("/vitals", vitalRoutes);
 router.use("/medications", medicationRoutes); // ✅

@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import apiService from "../../../core/services/apiService";
 import UserHeader from "./UserHeader";
 import DashboardTab from "./DashboardTab";
 import AppointmentsTab from "./AppointmentsTab";
+import OverviewTab from "../DoctorDetails/OverviewTab";
+import ScheduleTab from "../DoctorDetails/ScheduleTab";
+import PatientsTab from "../DoctorDetails/PatientsTab";
+import ReviewsTab from "../DoctorDetails/ReviewsTab";
 
 export default function UserDashboardPage() {
   const { tablename, id } = useParams();
   const dispatch = useDispatch();
+  const { refreshKey } = useSelector((state) => state.utils);
 
   const [data, setData] = useState(null);
-  const [mainTab, setMainTab] = useState("dashboard");
+  const [mainTab, setMainTab] = useState(null); // <== will be set dynamically
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,6 +24,16 @@ export default function UserDashboardPage() {
       try {
         const record = await apiService.get(dispatch, `${tablename}/${id}`);
         setData(record);
+
+        // Dynamically set default tab based on role
+        const role = record?.user?.role;
+        if (role === "doctor") {
+          setMainTab("overview");
+        } else if (role === "patient") {
+          setMainTab("dashboard");
+        } else {
+          setMainTab("dashboard");
+        }
       } catch (error) {
         console.error(`Error fetching ${tablename} details:`, error);
       } finally {
@@ -27,26 +42,55 @@ export default function UserDashboardPage() {
     };
 
     fetchDetails();
-  }, [tablename, id, dispatch]);
+  }, [tablename, id, dispatch, refreshKey]);
 
-  const tabItems = [
-    { key: "dashboard", label: "Dashboard" },
-    { key: "appointments", label: "Appointments" },
-    // You can add more here: { key: "vitals", label: "Vitals" }
-  ];
+  const getTabItemsForRole = (role) => {
+    switch (role) {
+      case "doctor":
+        return [
+          { key: "overview", label: "Overview" },
+          { key: "schedule", label: "Schedule" },
+          { key: "patients", label: "Patients" },
+          { key: "reviews", label: "Reviews" },
+        ];
+      case "patient":
+        return [
+          { key: "dashboard", label: "Dashboard" },
+          { key: "appointments", label: "Appointments" },
+        ];
+      default:
+        return [{ key: "dashboard", label: "Dashboard" }];
+    }
+  };
+
+  const tabItems = data?.user ? getTabItemsForRole(data.user.role) : [];
 
   const renderTabContent = () => {
-    if (!data || !data.patient) {
+    if (!data || !data.user || !mainTab) {
       return (
-        <div className="text-center text-gray-500">No patient data found.</div>
+        <div className="text-center text-gray-500">No user data found.</div>
       );
     }
 
+    const userId = data.user._id;
+
     switch (mainTab) {
+      // patient
       case "dashboard":
-        return <DashboardTab data={data} patientId={data.patient._id} />;
+        return <DashboardTab data={data} patientId={userId} />;
       case "appointments":
-        return <AppointmentsTab id={data.patient._id} />;
+        return <AppointmentsTab id={userId} />;
+
+      // doctor
+      case "overview":
+        return <OverviewTab data={data} />;
+      case "schedule":
+        return <ScheduleTab data={data} />;
+      case "patients":
+        return <PatientsTab data={data} />;
+      case "reviews":
+        return <ReviewsTab data={data} />;
+
       default:
         return (
           <div className="text-center text-gray-500">Unknown tab selected.</div>
@@ -54,18 +98,16 @@ export default function UserDashboardPage() {
     }
   };
 
-  if (loading) {
+  if (loading || !mainTab) {
     return (
-      <div className="p-6 text-center text-gray-500">
-        Loading patient data...
-      </div>
+      <div className="p-6 text-center text-gray-500">Loading user data...</div>
     );
   }
 
   return (
     <div className="min-h-screen text-slate-700">
       <main className="flex-1 p-4 md:p-6 space-y-6">
-        {/* Patient Header */}
+        {/* Header */}
         <UserHeader data={data} />
 
         {/* Tabs */}

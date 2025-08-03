@@ -20,7 +20,11 @@ export const shouldShowField = (field, view) => {
 };
 
 export const getInputValue = (inputData, field) => {
-  let val = inputData[field.name];
+  if (!field?.name) return "";
+
+  // ✅ Support dot notation for nested fields (e.g., user.first_name)
+  const keys = field.name.split(".");
+  let val = keys.reduce((acc, key) => (acc ? acc[key] : undefined), inputData);
 
   const isEmpty = val === undefined || val === null || val === "";
 
@@ -33,6 +37,7 @@ export const getInputValue = (inputData, field) => {
     }
   }
 
+  // ✅ Date handling remains the same
   if (field.type === "date") {
     return new Date(val).toISOString().split("T")[0]; // "YYYY-MM-DD"
   }

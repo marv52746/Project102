@@ -1,6 +1,7 @@
 // formHandlers.js
 import apiService from "../../services/apiService";
 import { showNotification } from "../../services/slices/notificationSlice";
+import { setNestedValue } from "../../utils/setNestedValue";
 
 // Delete handler
 export const handleFormDelete = async ({
@@ -46,10 +47,10 @@ export const handleInputChange = ({ e, setInputData, setFileData }) => {
     parsedValue = parseInt(value);
   }
 
-  setInputData((prev) => ({
-    ...prev,
-    [name]: parsedValue,
-  }));
+  setInputData((prev) => {
+    const updated = { ...prev };
+    return setNestedValue(updated, name, parsedValue);
+  });
 };
 
 export const handleEdit = ({ tablename, id, navigate }) => {
@@ -64,13 +65,13 @@ export const handleReferenceChange = ({
   fields,
   setInputData,
 }) => {
-  if (name === "patient_section_data") {
-    const patientFields = fields.filter((f) => f.section === "patient");
+  if (name === "user_section_data") {
+    const userFields = fields.filter((f) => f.section === "user");
 
     if (value) {
       // Fill patient fields with selected reference value
       const newValues = {};
-      patientFields.forEach((field) => {
+      userFields.forEach((field) => {
         if (value[field.name] !== undefined) {
           newValues[field.name] = value[field.name];
         }
@@ -79,7 +80,7 @@ export const handleReferenceChange = ({
     } else {
       // Clear patient fields if reference is cleared
       const clearedValues = {};
-      patientFields.forEach((field) => {
+      userFields.forEach((field) => {
         clearedValues[field.name] = "";
       });
       setInputData((prev) => ({ ...prev, ...clearedValues }));
