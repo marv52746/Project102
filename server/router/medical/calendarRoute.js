@@ -4,18 +4,29 @@ const { AppointmentDb } = require("../../model/Appointment");
 
 router.get("/", async (req, res) => {
   try {
-    const { month, year } = req.query;
+    const { month, year, doctor, patient } = req.query;
 
     if (!month || !year) {
       return res.status(400).json({ error: "Month and year are required" });
     }
 
-    const startDate = new Date(year, month - 1, 1); // JS months are 0-based
+    const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59);
 
-    const appointments = await AppointmentDb.find({
+    // Build dynamic filters
+    const filter = {
       date: { $gte: startDate, $lte: endDate },
-    })
+    };
+
+    if (doctor) {
+      filter.doctor = doctor;
+    }
+
+    if (patient) {
+      filter.patient = patient;
+    }
+
+    const appointments = await AppointmentDb.find(filter)
       .populate("patient", "name")
       .populate("doctor", "name")
       .sort({ date: 1, time: 1 });

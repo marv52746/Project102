@@ -1,0 +1,80 @@
+export const formatDate_OLD = (date) => {
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  const year = date.getFullYear();
+  return `${year}-${month}-${day}`;
+};
+
+export const generateDaysInMonth_OLD = (date, appointments) => {
+  const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+  const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  const days = [];
+
+  const startDay = startOfMonth.getDay();
+
+  for (let i = startDay - 1; i >= 0; i--) {
+    const day = new Date(date.getFullYear(), date.getMonth(), -i);
+    days.push({ day: day.getDate(), prevMonth: true, date: day });
+  }
+
+  for (let i = 1; i <= endOfMonth.getDate(); i++) {
+    const currentDay = new Date(date.getFullYear(), date.getMonth(), i);
+    const formattedDate = formatDate(currentDay);
+    days.push({
+      day: i,
+      prevMonth: false,
+      date: currentDay,
+      appointments: appointments[formattedDate] || [],
+    });
+  }
+
+  const nextMonthStartDay = (startDay + endOfMonth.getDate()) % 7;
+  for (let i = 0; nextMonthStartDay + i < 6; i++) {
+    const day = new Date(date.getFullYear(), date.getMonth() + 1, i + 1);
+    days.push({ day: day.getDate(), prevMonth: true, date: day });
+  }
+
+  return days;
+};
+
+export const generateDaysInMonth = (date, appointments, holidays) => {
+  const start = new Date(date.getFullYear(), date.getMonth(), 1);
+  const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  const days = [];
+
+  const startDay = start.getDay();
+  for (let i = 0; i < startDay; i++) {
+    const d = new Date(start);
+    d.setDate(d.getDate() - (startDay - i));
+    days.push({ day: d.getDate(), date: d, prevMonth: true });
+  }
+
+  for (let i = 1; i <= end.getDate(); i++) {
+    const current = new Date(date.getFullYear(), date.getMonth(), i);
+    const key = formatDate(current);
+    days.push({
+      day: i,
+      date: current,
+      appointments: appointments[key] || [],
+      isHoliday: holidays.includes(key),
+    });
+  }
+
+  const remainder = 42 - days.length;
+  for (let i = 1; i <= remainder; i++) {
+    const d = new Date(date.getFullYear(), date.getMonth() + 1, i);
+    days.push({ day: d.getDate(), date: d, prevMonth: true });
+  }
+
+  return days;
+};
+
+export const formatDate = (date) => {
+  try {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "Invalid Date";
+    return d.toISOString().split("T")[0]; // returns "YYYY-MM-DD"
+  } catch {
+    return "Invalid Date";
+  }
+};

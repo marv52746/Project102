@@ -9,6 +9,7 @@ import OverviewTab from "../DoctorDetails/OverviewTab";
 import ScheduleTab from "../DoctorDetails/ScheduleTab";
 import PatientsTab from "../DoctorDetails/PatientsTab";
 import ReviewsTab from "../DoctorDetails/ReviewsTab";
+import CalendarTab from "../DoctorDetails/CalendarTab";
 
 export default function UserDashboardPage() {
   const { tablename, id } = useParams();
@@ -50,13 +51,15 @@ export default function UserDashboardPage() {
         return [
           { key: "overview", label: "Overview" },
           { key: "schedule", label: "Schedule" },
+          { key: "calendar", label: "Calendar" },
           { key: "patients", label: "Patients" },
           { key: "reviews", label: "Reviews" },
         ];
       case "patient":
         return [
           { key: "dashboard", label: "Dashboard" },
-          { key: "appointments", label: "Appointments" },
+          // { key: "appointments", label: "Appointments" },
+          { key: "patientCalendar", label: "Calendar" },
         ];
       default:
         return [{ key: "dashboard", label: "Dashboard" }];
@@ -78,8 +81,10 @@ export default function UserDashboardPage() {
       // patient
       case "dashboard":
         return <DashboardTab data={data} patientId={userId} />;
-      case "appointments":
-        return <AppointmentsTab id={userId} />;
+      // case "appointments":
+      //   return <AppointmentsTab id={userId} />;
+      case "patientCalendar":
+        return <CalendarTab id={userId} tablename={tablename} />;
 
       // doctor
       case "overview":
@@ -87,7 +92,9 @@ export default function UserDashboardPage() {
       case "schedule":
         return <ScheduleTab data={data} />;
       case "patients":
-        return <PatientsTab data={data} />;
+        return <PatientsTab data={data} doctorID={userId} />;
+      case "calendar":
+        return <CalendarTab id={userId} tablename={tablename} />;
       case "reviews":
         return <ReviewsTab data={data} />;
 

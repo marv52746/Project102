@@ -11,8 +11,6 @@ import SignUp from "../pages/main/signup";
 import Portal from "../pages/public/Portal";
 import CalendarPage from "../pages/private/Calendar/CalendarPage";
 import SettingsPage from "../pages/private/Settings/Settings";
-import UserDashboardPage from "../pages/private/FormDetails/Index";
-import DoctorDetailsPage from "../pages/private/DoctorDetails/DoctorDetailsPage";
 
 const routes = all_routes;
 
@@ -68,11 +66,11 @@ const routesArray = [
     name: "settings",
     element: <SettingsPage />,
   },
-  {
-    path: routes.testPage,
-    name: "testPage",
-    element: <DoctorDetailsPage />,
-  },
+  // {
+  //   path: routes.testPage,
+  //   name: "testPage",
+  //   element: <DoctorDetailsPage />,
+  // },
 ];
 
 export const authRoute = routesArray.map((route, index) => ({

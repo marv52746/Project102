@@ -12,45 +12,7 @@ import apiService from "../../../core/services/apiService";
 import { getStatusClass } from "../../../core/utils/calendarUtils";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../../core/services/slices/notificationSlice";
-
-const formatDate = (date) => {
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const day = date.getDate().toString().padStart(2, "0");
-  const year = date.getFullYear();
-  return `${year}-${month}-${day}`;
-};
-
-const generateDaysInMonth = (date, appointments) => {
-  const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-  const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-  const days = [];
-
-  const startDay = startOfMonth.getDay();
-
-  for (let i = startDay - 1; i >= 0; i--) {
-    const day = new Date(date.getFullYear(), date.getMonth(), -i);
-    days.push({ day: day.getDate(), prevMonth: true, date: day });
-  }
-
-  for (let i = 1; i <= endOfMonth.getDate(); i++) {
-    const currentDay = new Date(date.getFullYear(), date.getMonth(), i);
-    const formattedDate = formatDate(currentDay);
-    days.push({
-      day: i,
-      prevMonth: false,
-      date: currentDay,
-      appointments: appointments[formattedDate] || [],
-    });
-  }
-
-  const nextMonthStartDay = (startDay + endOfMonth.getDate()) % 7;
-  for (let i = 0; nextMonthStartDay + i < 6; i++) {
-    const day = new Date(date.getFullYear(), date.getMonth() + 1, i + 1);
-    days.push({ day: day.getDate(), prevMonth: true, date: day });
-  }
-
-  return days;
-};
+import { generateDaysInMonth } from "./Utils";
 
 const CalendarPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -63,6 +25,7 @@ const CalendarPage = () => {
   const [dropdownData, setDropdownData] = useState(null);
   const [dropdownPosition, setDropdownPosition] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [holidays, setHolidays] = useState([]);
 
   const dropdownRef = useRef(null);
   const dispatch = useDispatch();
@@ -76,6 +39,7 @@ const CalendarPage = () => {
         null,
         `calendar?month=${month}&year=${year}`
       );
+      // console.log(data);
       const map = {};
 
       data.forEach((appt) => {
@@ -85,6 +49,7 @@ const CalendarPage = () => {
       });
 
       setAppointments(map);
+      setHolidays(data.holidays || []);
     } catch (err) {
       dispatch(
         showNotification({
@@ -100,8 +65,8 @@ const CalendarPage = () => {
   }, [fetchAppointments]);
 
   useEffect(() => {
-    setDaysInMonth(generateDaysInMonth(currentDate, appointments));
-  }, [appointments, currentDate]);
+    setDaysInMonth(generateDaysInMonth(currentDate, appointments, holidays));
+  }, [appointments, currentDate, holidays]);
 
   const handleOpenModal = (report) => {
     setSelectedReport(report);

@@ -8,7 +8,7 @@ export const patientTableColumns = [
   // { name: "emergency_contact", label: "Emergency Contact" },
   // { name: "user.address", label: "Address" },
   { name: "user.phone_number", label: "Phone Number" },
-  { name: "blood_type", label: "Blood Type" },
+  { name: "user.blood_type", label: "Blood Type" },
   // { name: "registration_date", label: "Registration Date" },
 ];
 

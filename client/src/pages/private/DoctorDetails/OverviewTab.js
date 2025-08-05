@@ -5,19 +5,13 @@ import {
   Clock,
   Stethoscope,
   FileText,
+  CalendarClock,
+  CalendarCheck2,
+  CalendarX2,
 } from "lucide-react";
 
 export default function OverviewTab() {
   const doctor = {
-    name: "Dr. Jane Smith",
-    specialization: "Pediatrician",
-    location: "123 Main St, Springfield",
-    specialties: ["Cardiology", "Pediatrics", "Neurology"],
-    education: [
-      { title: "MD, Health University", year: 2008 },
-      { title: "Residency, City Hospital", year: 2012 },
-      { title: "Cardiologist, Central Med", year: "2015–Present" },
-    ],
     appointmentStats: {
       upcoming: 8,
       completed: 42,
@@ -42,52 +36,43 @@ export default function OverviewTab() {
     ],
   };
 
+  const statCards = [
+    {
+      label: "Upcoming",
+      value: doctor.appointmentStats.upcoming,
+      color: "bg-blue-100 text-blue-800",
+      icon: <CalendarClock className="w-6 h-6 text-blue-600" />,
+    },
+    {
+      label: "Completed",
+      value: doctor.appointmentStats.completed,
+      color: "bg-green-100 text-green-800",
+      icon: <CalendarCheck2 className="w-6 h-6 text-green-600" />,
+    },
+    {
+      label: "Cancelled",
+      value: doctor.appointmentStats.cancelled,
+      color: "bg-red-100 text-red-800",
+      icon: <CalendarX2 className="w-6 h-6 text-red-600" />,
+    },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Appointment Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[
-          { label: "Upcoming", value: doctor.appointmentStats.upcoming },
-          { label: "Completed", value: doctor.appointmentStats.completed },
-          { label: "Cancelled", value: doctor.appointmentStats.cancelled },
-        ].map((item, idx) => (
+        {statCards.map((card, idx) => (
           <div
             key={idx}
-            className="bg-white p-4 rounded-lg shadow text-center space-y-1"
+            className={`flex items-center gap-4 p-4 rounded-lg shadow bg-white border-l-4 ${card.color}`}
           >
-            <p className="text-sm text-gray-500">{item.label} Appointments</p>
-            <p className="text-2xl font-bold text-gray-800">{item.value}</p>
+            <div>{card.icon}</div>
+            <div>
+              <p className="text-sm">{card.label} Appointments</p>
+              <p className="text-2xl font-bold">{card.value}</p>
+            </div>
           </div>
         ))}
-      </div>
-
-      {/* Education & Experience */}
-      {/* <div className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-lg font-medium mb-2 text-gray-800">
-          Education & Experience
-        </h3>
-        <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
-          {(doctor.education || []).map((item, idx) => (
-            <li key={idx}>
-              <strong>{item.title}</strong>{" "}
-              {item.year && <span>({item.year})</span>}
-            </li>
-          ))}
-        </ul>
-      </div> */}
-
-      {/* Location */}
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-lg font-medium mb-2 text-gray-800">
-          Clinic Location
-        </h3>
-        <div className="flex items-center text-gray-600 mb-2">
-          <MapPin className="w-5 h-5 mr-2" />
-          {doctor.location || "No location provided"}
-        </div>
-        <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded">
-          <span className="text-sm text-gray-500">Map Placeholder</span>
-        </div>
       </div>
 
       {/* Activity Timeline */}
