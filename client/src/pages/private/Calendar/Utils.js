@@ -37,44 +37,107 @@ export const generateDaysInMonth_OLD = (date, appointments) => {
   return days;
 };
 
-export const generateDaysInMonth = (date, appointments, holidays) => {
-  const start = new Date(date.getFullYear(), date.getMonth(), 1);
-  const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-  const days = [];
+// export const generateDaysInMonth = (date, appointments, holidays) => {
+//   const start = new Date(date.getFullYear(), date.getMonth(), 1);
+//   const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+//   const days = [];
 
-  const startDay = start.getDay();
-  for (let i = 0; i < startDay; i++) {
-    const d = new Date(start);
-    d.setDate(d.getDate() - (startDay - i));
-    days.push({ day: d.getDate(), date: d, prevMonth: true });
-  }
+//   const startDay = start.getDay();
+//   for (let i = 0; i < startDay; i++) {
+//     const d = new Date(start);
+//     d.setDate(d.getDate() - (startDay - i));
+//     days.push({ day: d.getDate(), date: d, prevMonth: true });
+//   }
 
-  for (let i = 1; i <= end.getDate(); i++) {
-    const current = new Date(date.getFullYear(), date.getMonth(), i);
-    const key = formatDate(current);
-    days.push({
-      day: i,
-      date: current,
-      appointments: appointments[key] || [],
-      isHoliday: holidays.includes(key),
-    });
-  }
+//   for (let i = 1; i <= end.getDate(); i++) {
+//     const current = new Date(date.getFullYear(), date.getMonth(), i);
+//     const key = formatDate(current);
+//     days.push({
+//       day: i,
+//       date: current,
+//       appointments: appointments[key] || [],
+//       isHoliday: holidays.includes(key),
+//     });
+//   }
 
-  const remainder = 42 - days.length;
-  for (let i = 1; i <= remainder; i++) {
-    const d = new Date(date.getFullYear(), date.getMonth() + 1, i);
-    days.push({ day: d.getDate(), date: d, prevMonth: true });
-  }
+//   const remainder = 42 - days.length;
+//   for (let i = 1; i <= remainder; i++) {
+//     const d = new Date(date.getFullYear(), date.getMonth() + 1, i);
+//     days.push({ day: d.getDate(), date: d, prevMonth: true });
+//   }
 
-  return days;
-};
+//   return days;
+// };
+
+// export const formatDate = (date) => {
+//   try {
+//     const d = new Date(date);
+//     if (isNaN(d.getTime())) return "Invalid Date";
+//     return d.toISOString().split("T")[0]; // returns "YYYY-MM-DD"
+//   } catch {
+//     return "Invalid Date";
+//   }
+// };
 
 export const formatDate = (date) => {
   try {
     const d = new Date(date);
     if (isNaN(d.getTime())) return "Invalid Date";
-    return d.toISOString().split("T")[0]; // returns "YYYY-MM-DD"
+
+    // Timezone-safe formatting
+    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+    return local.toISOString().split("T")[0];
   } catch {
     return "Invalid Date";
   }
+};
+
+export const generateDaysInMonth = (date, appointments = {}, holidays = []) => {
+  const year = date.getFullYear();
+  const month = date.getMonth(); // 0-based
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const firstWeekday = firstDay.getDay(); // 0 (Sun) - 6 (Sat)
+
+  const days = [];
+
+  // Previous month filler
+  for (let i = firstWeekday - 1; i >= 0; i--) {
+    const d = new Date(year, month, -i);
+    days.push({
+      day: d.getDate(),
+      date: d,
+      prevMonth: true,
+      appointments: [],
+      isHoliday: false,
+    });
+  }
+
+  // Current month
+  for (let i = 1; i <= lastDay.getDate(); i++) {
+    const d = new Date(year, month, i);
+    const key = formatDate(d);
+    days.push({
+      day: i,
+      date: d,
+      prevMonth: false,
+      appointments: appointments[key] || [],
+      isHoliday: holidays.includes(key),
+    });
+  }
+
+  // Next month filler to reach 42 cells
+  const remaining = 42 - days.length;
+  for (let i = 1; i <= remaining; i++) {
+    const d = new Date(year, month + 1, i);
+    days.push({
+      day: d.getDate(),
+      date: d,
+      prevMonth: true,
+      appointments: [],
+      isHoliday: false,
+    });
+  }
+
+  return days;
 };

@@ -9,7 +9,7 @@ import OverviewTab from "../DoctorDetails/OverviewTab";
 import ScheduleTab from "../DoctorDetails/ScheduleTab";
 import PatientsTab from "../DoctorDetails/PatientsTab";
 import ReviewsTab from "../DoctorDetails/ReviewsTab";
-import CalendarTab from "../DoctorDetails/CalendarTab";
+import CalendarTab from "../Calendar/CalendarTab";
 
 export default function UserDashboardPage() {
   const { tablename, id } = useParams();

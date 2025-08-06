@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import apiService from "../../../core/services/apiService";
 import { showNotification } from "../../../core/services/slices/notificationSlice";
 import CalendarModal from "../../../core/components/calendar/CalendarModal";
-import { formatDate, generateDaysInMonth } from "../Calendar/Utils";
+import { formatDate, generateDaysInMonth } from "./Utils";
 import CalendarDayModal from "../../../core/components/calendar/CalendarDayModal";
 
 export default function CalendarTab({ id, tablename }) {

@@ -9,8 +9,8 @@ import OrganizationChart from "../pages/private/OrganizationChart";
 import Login from "../pages/main/login";
 import SignUp from "../pages/main/signup";
 import Portal from "../pages/public/Portal";
-import CalendarPage from "../pages/private/Calendar/CalendarPage";
 import SettingsPage from "../pages/private/Settings/Settings";
+import Calendar from "../pages/private/Calendar/Calendar";
 
 const routes = all_routes;
 
@@ -59,7 +59,7 @@ const routesArray = [
   {
     path: routes.calendar,
     name: "calendar",
-    element: <CalendarPage />,
+    element: <Calendar />,
   },
   {
     path: routes.settings,
