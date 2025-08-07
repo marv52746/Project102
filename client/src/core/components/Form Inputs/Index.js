@@ -11,6 +11,8 @@ import { renderSpacer } from "./LabelSpacerInput";
 import TextInput from "./TextInput";
 import { getInputValue } from "../../utils/fieldUtils";
 import CheckboxInput from "./CheckboxInput";
+import NumberInput from "./NumberInput";
+import DateTimeInput from "./DateTimeInput";
 
 export const renderInputByType = ({
   field,
@@ -87,6 +89,24 @@ export const renderInputByType = ({
     case "checkbox":
       return (
         <CheckboxInput
+          field={field}
+          value={value}
+          onChange={handleChange}
+          isReadOnly={isReadOnly}
+        />
+      );
+    case "number":
+      return (
+        <NumberInput
+          field={field}
+          value={value}
+          onChange={handleChange}
+          isReadOnly={isReadOnly}
+        />
+      );
+    case "date-time":
+      return (
+        <DateTimeInput
           field={field}
           value={value}
           onChange={handleChange}

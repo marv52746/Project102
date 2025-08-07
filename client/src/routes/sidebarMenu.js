@@ -184,6 +184,22 @@ export const iconMapping = [
         to: all_routes.appointments,
         table: "appointments",
       },
+      {
+        text: "Inventory",
+        icon: <NotebookPen size={20} />,
+        alert: false,
+        iconText: "Inventory",
+        to: all_routes.inventory,
+        table: "inventory",
+      },
+      {
+        text: "Inventory Logs",
+        icon: <NotebookPen size={20} />,
+        alert: false,
+        iconText: "Inventory Logs",
+        to: all_routes.inventoryLogs,
+        table: "inventoryLogs",
+      },
     ],
   },
   {

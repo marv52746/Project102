@@ -22,6 +22,8 @@ const medicationRoutes = require("./medical/medicationRoutes");
 const allergyRoutes = require("./medical/allergyRoutes");
 const surgicalRoutes = require("./medical/surgicalRoutes");
 const conditionRoutes = require("./medical/conditionRoutes");
+const inventoryRoutes = require("./inventory/inventoryItemRoutes");
+const inventoryLogRoutes = require("./inventory/inventoryLogRoutes");
 
 // Register routes
 router.use("/file", fileRoutes);
@@ -45,6 +47,8 @@ router.use("/appointments", appointmentRoutes);
 router.use("/birthReport", birthReportRoutes);
 router.use("/doctorActivity", doctorActivityRoutes);
 router.use("/laboratory", laboratoryRoutes);
+router.use("/inventory", inventoryRoutes);
+router.use("/inventoryLogs", inventoryLogRoutes);
 
 // Finance domain routes
 router.use("/billings", billingRoutes);

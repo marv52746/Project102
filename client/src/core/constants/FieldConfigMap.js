@@ -7,23 +7,14 @@ import { propertyAllFields } from "./propertiesPresets";
 import { getFields } from "../utils/fieldUtils";
 import { patientFormFields, patientTableColumns } from "./patientPresets";
 import { doctorFormFields, doctorTableColumns } from "./doctorPresets";
+import { inventoryFormFields, inventoryTableColumns } from "./inventoryPresets";
+import {
+  inventoryLogsFormFields,
+  inventoryLogsTableColumns,
+} from "./inventoryLogsPresets";
 
 export const formConfigMap = {
-  //   patients: {
-  //     apiURL: "patients",
-  //     fieldData: patientFields,
-  //     title: "Patients",
-  //   },
-  //   staff: {
-  //     apiURL: "staff",
-  //     fieldData: doctorFields,
-  //     title: "Staff",
-  //   },
-  users: {
-    apiURL: "users",
-    getFields: () => getFields(null, userFormFields),
-    title: "Users",
-  },
+  // Management Form
   patients: {
     apiURL: "patients",
     getFields: () => getFields(null, patientFormFields),
@@ -34,92 +25,72 @@ export const formConfigMap = {
     getFields: () => getFields(null, doctorFormFields),
     title: "Doctors",
   },
-  properties: {
-    apiURL: "properties",
-    getFields: () => getFields(null, propertyAllFields),
-    title: "System Properties",
-  },
   appointments: {
     apiURL: "appointments",
     getFields: () => getFields(null, appointmentFormFields),
     title: "Appointments",
   },
-  //   "birth-reports": {
-  //     apiURL: "birth-reports",
-  //     fieldData: birthReportFields,
-  //     title: "Birth Reports",
-  //   },
-  //   pregnancies: {
-  //     apiURL: "pregnancies",
-  //     fieldData: pregnancyFields,
-  //     title: "Pregnancies",
-  //   },
-  //   "labor-and-deliveries": {
-  //     apiURL: "labor-and-deliveries",
-  //     fieldData: laborDeliveryFields,
-  //     title: "Labor & Deliveries",
-  //   },
-  //   payments: {
-  //     apiURL: "payments",
-  //     fieldData: paymentFields,
-  //     title: "Payments",
-  //   },
+  inventory: {
+    apiURL: "inventory",
+    getFields: () => getFields(null, inventoryFormFields),
+    title: "Inventory",
+  },
+  inventoryLogs: {
+    apiURL: "inventoryLogs",
+    getFields: () => getFields(null, inventoryLogsFormFields),
+    title: "Inventory Logs",
+  },
+
+  // Settings form
+  users: {
+    apiURL: "users",
+    getFields: () => getFields(null, userFormFields),
+    title: "Users",
+  },
+  properties: {
+    apiURL: "properties",
+    getFields: () => getFields(null, propertyAllFields),
+    title: "System Properties",
+  },
 };
 
 export const listConfigMap = {
-  //   patients: {
-  //     apiURL: "patients",
-  //     fieldData: patientFields,
-  //     title: "Patients",
-  //   },
-  //   staff: {
-  //     apiURL: "staff",
-  //     fieldData: doctorFields,
-  //     title: "Staff",
-  //   },
-  users: {
-    apiURL: "users",
-    fieldData: getFields(userTableColumns),
-    title: "Users",
+  // Management List
+  doctors: {
+    apiURL: "doctors",
+    fieldData: getFields(doctorTableColumns),
+    title: "Doctors",
   },
   patients: {
     apiURL: "patients",
     fieldData: getFields(patientTableColumns),
     title: "Patients",
   },
-  doctors: {
-    apiURL: "doctors",
-    fieldData: getFields(doctorTableColumns),
-    title: "Doctors",
-  },
   appointments: {
     apiURL: "appointments",
     fieldData: getFields(appointmentTableColumns),
     title: "Appointments",
+  },
+  inventory: {
+    apiURL: "inventory",
+    fieldData: getFields(inventoryTableColumns),
+    title: "Inventory",
+  },
+  inventoryLogs: {
+    apiURL: "inventoryLogs",
+    fieldData: getFields(inventoryLogsTableColumns),
+    title: "Inventory Logs",
+  },
+
+  // Settings List
+  users: {
+    apiURL: "users",
+    fieldData: getFields(userTableColumns),
+    title: "Users",
   },
   properties: {
     apiURL: "properties",
     fieldData: getFields(propertyAllFields),
     title: "System Properties",
   },
-  //   "birth-reports": {
-  //     apiURL: "birth-reports",
-  //     fieldData: birthReportFields,
-  //     title: "Birth Reports",
-  //   },
-  //   pregnancies: {
-  //     apiURL: "pregnancies",
-  //     fieldData: pregnancyFields,
-  //     title: "Pregnancies",
-  //   },
-  //   "labor-and-deliveries": {
-  //     apiURL: "labor-and-deliveries",
-  //     fieldData: laborDeliveryFields,
-  //     title: "Labor & Deliveries",
-  //   },
-  //   payments: {
-  //     apiURL: "payments",
-  //     fieldData: paymentFields,
-  //     title: "Payments",
-  //   },
 };

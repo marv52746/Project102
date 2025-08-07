@@ -3,7 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Edit, PlusCircle, Save, Trash } from "lucide-react";
 import apiService from "../services/apiService";
 import { useDispatch, useSelector } from "react-redux";
-import { adminOnlyRoles } from "../constants/rolePresets";
+import {
+  adminOnlyRoles,
+  allowedTables,
+  internalRoles,
+  transactionTables,
+} from "../constants/rolePresets";
 import { shouldShowField } from "../utils/fieldUtils";
 
 import ConfirmDeleteModal from "./modal/ConfirmDeleteModal";
@@ -16,6 +21,7 @@ import {
 
 import { renderSpacer } from "./Form Inputs/LabelSpacerInput";
 import { renderField } from "./Form Inputs/Index";
+import { FormActionButtons } from "./formActions/FormActionButtons";
 
 const FormFormat = ({ data, fields }) => {
   const { tablename, id, view } = useParams();
@@ -157,7 +163,7 @@ const FormFormat = ({ data, fields }) => {
           </>
         </div>
 
-        <div className="flex space-x-4 mt-6">
+        {/* <div className="flex space-x-4 mt-6">
           {isViewing && hasUpdateDeletePermission && (
             <button
               type="button"
@@ -207,7 +213,21 @@ const FormFormat = ({ data, fields }) => {
               Delete
             </button>
           )}
-        </div>
+        </div> */}
+        <FormActionButtons
+          isViewing={isViewing}
+          isCreating={isCreating}
+          isEditing={isEditing}
+          canDelete={canDelete}
+          hasUpdateDeletePermission={hasUpdateDeletePermission}
+          onEdit={() => handleEdit({ tablename, id, navigate })}
+          onSubmit={handleSubmit}
+          onDelete={() => setShowDeleteModal(true)}
+          currentRole={currentUser?.role}
+          currentTable={tablename}
+          allowedRoles={internalRoles}
+          transactionTables={transactionTables}
+        />
       </form>
       {/* Modal */}
       <ConfirmDeleteModal

@@ -9,7 +9,6 @@ class DoctorController extends BaseController {
   }
 
   // CREATE DOCTOR
-  // CREATE DOCTOR
   createDoctor = async (req, res) => {
     try {
       const { user, ...doctorData } = req.body;
