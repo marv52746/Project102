@@ -11,6 +11,9 @@ import {
   Settings,
   Accessibility,
   Users,
+  CalendarDays,
+  Package,
+  ClipboardList,
 } from "lucide-react";
 import { all_routes } from "./all_routes";
 
@@ -178,7 +181,7 @@ export const iconMapping = [
       },
       {
         text: "Appointments",
-        icon: <NotebookPen size={20} />,
+        icon: <CalendarDays size={20} />,
         alert: false,
         iconText: "Appointments",
         to: all_routes.appointments,
@@ -186,7 +189,7 @@ export const iconMapping = [
       },
       {
         text: "Inventory",
-        icon: <NotebookPen size={20} />,
+        icon: <Package size={20} />,
         alert: false,
         iconText: "Inventory",
         to: all_routes.inventory,
@@ -194,7 +197,7 @@ export const iconMapping = [
       },
       {
         text: "Inventory Logs",
-        icon: <NotebookPen size={20} />,
+        icon: <ClipboardList size={20} />,
         alert: false,
         iconText: "Inventory Logs",
         to: all_routes.inventoryLogs,
