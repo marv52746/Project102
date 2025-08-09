@@ -10,6 +10,7 @@ import ScheduleTab from "../DoctorDetails/ScheduleTab";
 import PatientsTab from "../DoctorDetails/PatientsTab";
 import ReviewsTab from "../DoctorDetails/ReviewsTab";
 import CalendarTab from "../Calendar/CalendarTab";
+import ClinicalRecordTab from "./ClinicalRecordTab";
 
 export default function UserDashboardPage() {
   const { tablename, id } = useParams();
@@ -59,6 +60,7 @@ export default function UserDashboardPage() {
         return [
           { key: "dashboard", label: "Dashboard" },
           // { key: "appointments", label: "Appointments" },
+          { key: "clinical-records", label: "Clinical Records" },
           { key: "patientCalendar", label: "Calendar" },
         ];
       default:
@@ -85,6 +87,8 @@ export default function UserDashboardPage() {
       //   return <AppointmentsTab id={userId} />;
       case "patientCalendar":
         return <CalendarTab id={userId} tablename={tablename} />;
+      case "clinical-records":
+        return <ClinicalRecordTab data={data} patientId={userId} />;
 
       // doctor
       case "overview":

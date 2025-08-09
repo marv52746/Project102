@@ -54,6 +54,10 @@ class DoctorController extends BaseController {
       });
 
       const savedDoctor = await newDoctor.save();
+
+      // ✅ Log Activity
+      await this.logActivity("create", savedDoctor, req.user?._id);
+
       res.status(201).json(savedDoctor);
     } catch (error) {
       console.error("Create Doctor Error:", error);
@@ -118,6 +122,10 @@ class DoctorController extends BaseController {
       );
 
       const deletedDoctor = await DoctorDb.findByIdAndDelete(doctorId);
+
+      // ✅ Log Activity
+      await this.logActivity("delete", deletedDoctor, req.user?._id);
+
       res.json({ message: "Doctor deleted successfully", deletedDoctor });
     } catch (error) {
       console.error("Delete Doctor Error:", error);

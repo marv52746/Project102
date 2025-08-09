@@ -112,6 +112,10 @@ class PatientController extends BaseController {
       });
 
       const savedPatient = await newPatient.save();
+
+      // ✅ Log Activity
+      await this.logActivity("create", savedPatient, req.user?._id);
+
       res.status(201).json(savedPatient);
     } catch (error) {
       console.error("Create Patient Error:", error);
@@ -176,6 +180,9 @@ class PatientController extends BaseController {
 
       // 3. Delete the patient record
       const deletedItem = await PatientDb.findByIdAndDelete(patientId);
+
+      // ✅ Log Activity
+      await this.logActivity("delete", deletedItem, req.user?._id);
 
       res.json({ message: "Patient deleted successfully", deletedItem });
     } catch (error) {

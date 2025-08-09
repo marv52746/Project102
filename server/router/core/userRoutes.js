@@ -10,11 +10,11 @@ router.post(
   "/",
   // checkRole("admin", "doctor", "owner", "staff"),
   upload.single("avatar"), // handles one file upload from field named 'avatar'
-  userController.createUser
+  userController.create
 ); // POST /user
 router.get("/", userController.getAll); // GET /user
 router.get("/:id", userController.getById); // GET /user/:id
-router.put("/:id", upload.single("avatar"), userController.updateUser); // PUT /user/:id
-router.delete("/:id", userController.deleteUser); // DELETE /user/:id
+router.put("/:id", upload.single("avatar"), userController.update); // PUT /user/:id
+router.delete("/:id", userController.delete); // DELETE /user/:id
 
 module.exports = router;

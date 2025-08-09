@@ -1,6 +1,18 @@
+const { logActivity } = require("../../utils/activityLogger");
+
 class BaseController {
-  constructor(model) {
+  constructor(model, tableName) {
     this.model = model;
+    this.tableName = tableName || model.modelName; // fallback to Mongoose model name
+  }
+
+  // ✅ Centralized logging method so we don't repeat tableName
+  async logActivity(action, record, userId) {
+    try {
+      await logActivity(action, this.tableName, record, userId);
+    } catch (err) {
+      console.error("❌ Activity Log Error:", err.message);
+    }
   }
 
   getAll = async (req, res) => {
@@ -8,7 +20,6 @@ class BaseController {
       const filters = req.query;
       let query = this.model.find(filters);
 
-      // ✅ Safely check if populateFields is defined and is an array
       if (Array.isArray(this.populateFields) && this.populateFields.length) {
         this.populateFields.forEach((field) => {
           query = query.populate(field);
@@ -26,7 +37,6 @@ class BaseController {
     try {
       let query = this.model.findById(req.params.id);
 
-      // ✅ Safely check if populateFields is defined and is an array
       if (Array.isArray(this.populateFields) && this.populateFields.length) {
         this.populateFields.forEach((field) => {
           query = query.populate(field);
@@ -48,8 +58,9 @@ class BaseController {
   create = async (req, res) => {
     try {
       const newItem = new this.model(req.body);
-
       const savedItem = await newItem.save();
+
+      await this.logActivity("create", savedItem, req.user?._id);
       res.status(201).json(savedItem);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -66,6 +77,7 @@ class BaseController {
       if (!updatedItem) {
         return res.status(404).json({ message: "Item not found" });
       }
+      await this.logActivity("update", updatedItem, req.user?._id);
       res.json(updatedItem);
     } catch (error) {
       console.error("❌ Update Error:", error);
@@ -79,6 +91,7 @@ class BaseController {
       if (!deletedItem) {
         return res.status(404).json({ message: "Item not found" });
       }
+      await this.logActivity("delete", deletedItem, req.user?._id);
       res.json({ message: "Item deleted successfully", deletedItem });
     } catch (error) {
       res.status(500).json({ error: error.message });

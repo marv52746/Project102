@@ -2,6 +2,7 @@ const { InventoryItemDb } = require("../../model/inventory/InventoryItem");
 const {
   InventoryTransactionDb,
 } = require("../../model/inventory/InventoryTransaction");
+const { logActivity } = require("../../utils/activityLogger");
 const BaseController = require("../core/baseController");
 
 class InventoryTransactionController extends BaseController {
@@ -37,6 +38,9 @@ class InventoryTransactionController extends BaseController {
         performedBy,
       });
       await transaction.save();
+
+      // ✅ Log Activity
+      await this.logActivity("create", transaction, req.user?._id);
 
       res.json({ item: inventoryItem, transaction });
     } catch (error) {

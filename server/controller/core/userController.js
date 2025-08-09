@@ -22,7 +22,7 @@ class UserController extends BaseController {
   }
 
   // CREATE USER
-  createUser = async (req, res) => {
+  create = async (req, res) => {
     try {
       const { password, email, first_name, last_name, ...userData } = req.body;
 
@@ -77,6 +77,10 @@ class UserController extends BaseController {
       //     ? `${process.env.BASE_URL}/api/file/${savedUser.avatar}`
       //     : null,
       // });
+
+      // ✅ Log Activity
+      await this.logActivity("create", savedUser, req.user?._id);
+
       res.status(201).json(savedUser);
     } catch (error) {
       console.error("Create User Error:", error);
@@ -85,7 +89,7 @@ class UserController extends BaseController {
   };
 
   // UPDATE USER
-  updateUser = async (req, res) => {
+  update = async (req, res) => {
     try {
       const userId = req.params.id;
       const { email, first_name, last_name, ...updates } = req.body;
@@ -187,7 +191,7 @@ class UserController extends BaseController {
   };
 
   // DELETE USER
-  deleteUser = async (req, res) => {
+  delete = async (req, res) => {
     const userId = req.params.id;
 
     try {
@@ -217,6 +221,9 @@ class UserController extends BaseController {
 
       // 4. Delete user
       await UserDb.findByIdAndDelete(userId);
+
+      // ✅ Log Activity
+      await this.logActivity("delete", user, req.user?._id);
 
       res.status(200).json({ message: "User and related records deleted." });
     } catch (error) {

@@ -66,7 +66,7 @@ export default function UserHeader({ data }) {
     <section className="bg-white border rounded-lg p-4 md:p-6 flex flex-wrap items-center justify-between gap-4 relative">
       {/* Avatar + Info */}
       <div
-        className={`flex items-center gap-4 flex-1 min-w-[250px] ${
+        className={`flex items-center gap-4 flex-1 min-w-[250px] max-w-[305px] ${
           hasSpecialties ? "items-start" : "items-center"
         }`}
       >
