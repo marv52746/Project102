@@ -91,3 +91,28 @@ export const handleReferenceChange = ({
 
   setInputData((prev) => ({ ...prev, [name]: value }));
 };
+
+export const handleCompleteAppointment = async ({
+  dispatch,
+  tablename,
+  id,
+  data,
+}) => {
+  try {
+    await apiService.put(dispatch, tablename, id, data, true);
+
+    dispatch(
+      showNotification({
+        message: "Record updated successfully!",
+        type: "success",
+      })
+    );
+  } catch (error) {
+    dispatch(
+      showNotification({
+        message: "Failed to updated record.",
+        type: "error",
+      })
+    );
+  }
+};

@@ -7,6 +7,9 @@ import {
   Ban,
   HelpCircle,
 } from "lucide-react";
+import { handleFormSubmit } from "../formActions/formSubmit";
+import { useDispatch } from "react-redux";
+import { handleCompleteAppointment } from "../formActions/formHandlers";
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "N/A";
@@ -29,11 +32,20 @@ const formatTime = (timeStr) => {
   });
 };
 
-function CalendarModal({ report, onClose }) {
-  console.log(report);
+function CalendarModalDetails({ report, onClose }) {
+  const dispatch = useDispatch();
   if (!report) return null;
 
-  // Determine status
+  const onComplete = async () => {
+    handleCompleteAppointment({
+      dispatch,
+      tablename: "appointments",
+      id: report._id,
+      data: { status: "completed" },
+    });
+    onClose();
+  };
+
   const statusMap = {
     completed: {
       text: "Completed",
@@ -86,12 +98,12 @@ function CalendarModal({ report, onClose }) {
 
         <div className="space-y-4">
           <Detail label="Appointment No." value={report.appointment_no} />
-          <Detail label="Patient" value={report.patient_name || "N/A"} />
-          <Detail label="Doctor" value={report.doctor_name || "N/A"} />
+          <Detail label="Patient" value={report.patient?.name || "N/A"} />
+          <Detail label="Doctor" value={report.doctor?.name || "N/A"} />
           <Detail label="Date" value={formatDate(report.date)} />
           <Detail label="Time" value={formatTime(report.time)} />
           <Detail label="Reason" value={report.reason || "N/A"} />
-          <Detail label="Notes" value={report.notes || "No notes available"} />
+          {/* <Detail label="Notes" value={report.notes || "No notes available"} /> */}
 
           <div className="flex items-center">
             <strong className="text-gray-700 w-1/3">Status:</strong>
@@ -104,10 +116,19 @@ function CalendarModal({ report, onClose }) {
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end">
+        <div className="mt-6 flex justify-end gap-3">
+          {report.status !== "completed" && (
+            <button
+              onClick={() => onComplete(report._id)}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 flex items-center gap-2"
+            >
+              <CheckCircle size={18} />
+              Complete
+            </button>
+          )}
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+            className="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition duration-200"
           >
             Close
           </button>
@@ -124,4 +145,4 @@ const Detail = ({ label, value }) => (
   </div>
 );
 
-export default CalendarModal;
+export default CalendarModalDetails;

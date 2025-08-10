@@ -1,0 +1,22 @@
+const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Schema;
+
+const pregnancySchema = new mongoose.Schema({
+  patient: { type: ObjectId, ref: "user", required: true },
+
+  is_pregnant: { type: Boolean, default: false },
+  gravida: { type: Number, default: 0 }, // total pregnancies
+  para: { type: Number, default: 0 }, // total births
+  lmp: { type: Date }, // Last Menstrual Period
+  edd: { type: Date }, // Expected Due Date
+  trimester: { type: String, enum: ["First", "Second", "Third"] },
+  notes: String, // Pregnancy-related notes or risks
+
+  created_on: { type: Date, default: Date.now },
+  created_by: { type: ObjectId, ref: "user" },
+  updated_on: { type: Date, default: Date.now },
+  updated_by: { type: ObjectId, ref: "user" },
+});
+
+const PregnancyDb = mongoose.model("pregnancy", pregnancySchema);
+module.exports = { PregnancyDb };

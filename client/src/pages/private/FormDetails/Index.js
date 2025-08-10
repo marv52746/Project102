@@ -58,13 +58,13 @@ export default function UserDashboardPage() {
         ];
       case "patient":
         return [
-          { key: "dashboard", label: "Dashboard" },
+          { key: "dashboard", label: "Overview" },
           // { key: "appointments", label: "Appointments" },
           { key: "clinical-records", label: "Clinical Records" },
           { key: "patientCalendar", label: "Calendar" },
         ];
       default:
-        return [{ key: "dashboard", label: "Dashboard" }];
+        return [{ key: "dashboard", label: "Overview" }];
     }
   };
 

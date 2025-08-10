@@ -15,6 +15,11 @@ import apiService from "../../../core/services/apiService";
 import { useDispatch, useSelector } from "react-redux";
 import ClinicalFormModal from "./ClinicalFormModal";
 import ActivitiesTimeline from "./ActivitiesTimeline";
+import CalendarModal from "../../../core/components/calendar/CalendarModal";
+import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
+import { capitalizeText } from "../../../core/utils/stringUtils";
+import AppointmentModal from "./AppointmentModal";
+import { formConfigMap } from "../../../core/constants/FieldConfigMap";
 
 // Helper component to show each vital
 function VitalItem({ icon: Icon, label, value }) {
@@ -41,36 +46,24 @@ export default function DashboardTab({ patientId }) {
   const { refreshKey } = useSelector((state) => state.utils);
 
   const [vitals, setVitals] = useState(null);
-  const [conditions, setConditions] = useState([]);
-  const [medications, setMedications] = useState([]);
-  const [allergies, setAllergies] = useState([]);
-  const [surgeries, setSurgical] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
   const [openViewModal, setOpenViewModal] = useState(false);
   const [viewData, setViewData] = useState(null);
   const [viewType, setViewType] = useState(null); // "conditions", "medications", etc.
 
   const dispatch = useDispatch();
+  const fields = formConfigMap["appointments"].getFields("create");
 
   useEffect(() => {
     if (!patientId) return;
 
     const fetchData = async () => {
       try {
-        const [
-          vitalData,
-          conditionData,
-          medicationData,
-          allergyData,
-          surgicalData,
-          appointmentData,
-        ] = await Promise.all([
+        const [vitalData, appointmentData] = await Promise.all([
           apiService.get(dispatch, "vitals"),
-          apiService.get(dispatch, "conditions"),
-          apiService.get(dispatch, "medications"),
-          apiService.get(dispatch, "allergies"),
-          apiService.get(dispatch, "surgeries"),
+
           apiService.get(dispatch, "appointments"),
         ]);
 
@@ -86,13 +79,21 @@ export default function DashboardTab({ patientId }) {
         );
 
         setVitals(sortedVitals[0] || null);
-        setConditions(filterByPatient(conditionData));
-        setMedications(filterByPatient(medicationData));
-        setAllergies(filterByPatient(allergyData));
-        setSurgical(filterByPatient(surgicalData));
         setAppointments(
           filterByPatient(appointmentData)
-            .filter((app) => new Date(app.date) >= new Date())
+            // .filter((app) => new Date(app.date) >= new Date())
+            // .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .filter((app) => {
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              const appDate = new Date(app.date);
+              appDate.setHours(0, 0, 0, 0);
+
+              return (
+                appDate >= today &&
+                ["scheduled", "rescheduled"].includes(app.status)
+              );
+            })
             .sort((a, b) => new Date(a.date) - new Date(b.date))
         );
       } catch (error) {
@@ -137,29 +138,64 @@ export default function DashboardTab({ patientId }) {
         </Card>
 
         {/* Upcoming Appointments */}
-        <Card title="Upcoming Appointments">
+
+        <Card>
+          <div className="flex items-center justify-between pb-4">
+            <h2 className="text-md font-semibold text-gray-700">
+              Upcoming Appointments
+            </h2>
+            <button
+              onClick={() => setShowModal(true)}
+              className="px-3 py-1 text-sm text-blue-600 hover:text-blue-800"
+            >
+              + Schedule Appointment
+            </button>
+          </div>
           {appointments.length ? (
-            <ul className="divide-y text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {appointments.map((app) => (
-                <li
+                <div
                   key={app._id}
-                  className="py-2 cursor-pointer hover:bg-gray-100"
+                  className="p-4 rounded-lg border border-gray-200 shadow-sm bg-white hover:shadow-md transition cursor-pointer"
                   onClick={() => {
                     setViewType("appointments");
                     setViewData(app);
                     setOpenViewModal(true);
                   }}
                 >
-                  <div className="font-semibold">
+                  <div className="flex items-center justify-between">
+                    <span className="text-md font-semibold text-blue-600">
+                      {new Date(app.date).toLocaleDateString(undefined, {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </span>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        app.status === "scheduled"
+                          ? "bg-gray-100 text-gray-700"
+                          : app.status === "cancelled"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {capitalizeText(app.status) || "Scheduled"}
+                    </span>
+                  </div>
+
+                  <div className="mt-2 text-gray-700 font-medium">
                     {app.doctor?.name || "Doctor"}
                   </div>
-                  <div className="text-gray-600">
-                    {new Date(app.date).toLocaleDateString()} —{" "}
-                    {app.status || "Scheduled"}
-                  </div>
-                </li>
+
+                  {app.reason && (
+                    <div className="mt-1 text-sm text-gray-500 truncate">
+                      {app.reason}
+                    </div>
+                  )}
+                </div>
               ))}
-            </ul>
+            </div>
           ) : (
             <p className="text-gray-500 text-center">
               No upcoming appointments.
@@ -193,17 +229,30 @@ export default function DashboardTab({ patientId }) {
       </div>
 
       {openViewModal && (
-        <ClinicalFormModal
+        <CalendarModalDetails
+          report={viewData}
           onClose={() => {
             setOpenViewModal(false);
             setViewData(null);
             setViewType(null);
           }}
-          mode="view"
-          initialData={viewData}
-          type={viewType}
-          // patient={patient}
+          isOpen={true}
         />
+      )}
+
+      {/* Modals */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+          <div className="bg-white w-full max-w-lg p-6 rounded-md shadow-lg relative z-50">
+            <AppointmentModal
+              patient={patientId}
+              type={"appointments"}
+              mode={"create"}
+              onClose={() => setShowModal(false)}
+              fields={fields}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

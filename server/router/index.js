@@ -25,6 +25,7 @@ const conditionRoutes = require("./medical/conditionRoutes");
 const inventoryRoutes = require("./inventory/inventoryItemRoutes");
 const inventoryLogRoutes = require("./inventory/inventoryLogRoutes");
 const activityRoutes = require("./core/activityRoutes");
+const pregnancyRoutes = require("./medical/pregnancyRoutes");
 
 // Core routes
 router.use("/file", fileRoutes);
@@ -43,6 +44,7 @@ router.use("/vitals", vitalRoutes);
 router.use("/medications", medicationRoutes); // ✅
 router.use("/allergies", allergyRoutes); // ✅
 router.use("/surgeries", surgicalRoutes); // ✅
+router.use("/pregnancies", pregnancyRoutes); // ✅
 
 // Management Routes
 router.use("/appointments", appointmentRoutes);

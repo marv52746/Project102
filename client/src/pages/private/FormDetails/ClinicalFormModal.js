@@ -64,24 +64,27 @@ export default function ClinicalFormModal({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Record Type
-            </label>
-            <select
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-              disabled={mode === "view"}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm"
-            >
-              <option value="vitals">Vital</option>
-              <option value="conditions">Condition</option>
-              <option value="medications">Medication</option>
-              <option value="allergies">Allergy</option>
-              <option value="surgeries">Surgical History</option>
-            </select>
-          </div>
+          {type !== "appointments" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Record Type
+              </label>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+                disabled={mode === "view"}
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm"
+              >
+                <option value="vitals">Vital</option>
+                <option value="conditions">Condition</option>
+                <option value="medications">Medication</option>
+                <option value="allergies">Allergy</option>
+                <option value="surgeries">Surgical History</option>
+                <option value="pregnancies">Pregnancy</option>
+              </select>
+            </div>
+          )}
 
           {currentFields.map((field, idx) => {
             if (!field.name) return null;
@@ -131,6 +134,7 @@ export default function ClinicalFormModal({
                 placeholder={field.placeholder}
                 required={field.required}
                 disabled={mode === "view"}
+                options={field.options || []} // Pass select options if any
               />
             );
           })}
@@ -160,20 +164,84 @@ function InputField({
   type,
   required,
   disabled,
+  options = [], // for select fields
 }) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700">{label}</label>
-      <input
-        type={type}
-        name={name}
-        value={value || ""}
-        onChange={onChange}
-        placeholder={placeholder}
-        required={required}
-        disabled={disabled}
-        className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm"
-      />
+
+      {/* Checkbox */}
+      {type === "checkbox" ? (
+        <input
+          type="checkbox"
+          name={name}
+          checked={!!value}
+          onChange={(e) =>
+            onChange({
+              target: { name, value: e.target.checked },
+            })
+          }
+          required={required}
+          disabled={disabled}
+          className="mt-1"
+        />
+      ) : type === "select" ? (
+        /* Select dropdown */
+        <select
+          name={name}
+          value={value || ""}
+          onChange={onChange}
+          required={required}
+          disabled={disabled}
+          className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm"
+        >
+          <option value="">Select...</option>
+          {options.map((opt, idx) => (
+            <option key={idx} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      ) : (
+        /* Default text/number/date/etc. */
+        <input
+          type={type}
+          name={name}
+          value={value || ""}
+          onChange={onChange}
+          placeholder={placeholder}
+          required={required}
+          disabled={disabled}
+          className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm"
+        />
+      )}
     </div>
   );
 }
+
+// function InputField({
+//   label,
+//   name,
+//   value,
+//   onChange,
+//   placeholder,
+//   type,
+//   required,
+//   disabled,
+// }) {
+//   return (
+//     <div>
+//       <label className="block text-sm font-medium text-gray-700">{label}</label>
+//       <input
+//         type={type}
+//         name={name}
+//         value={value || ""}
+//         onChange={onChange}
+//         placeholder={placeholder}
+//         required={required}
+//         disabled={disabled}
+//         className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm"
+//       />
+//     </div>
+//   );
+// }

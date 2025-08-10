@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   Scissors,
   Activity,
+  Baby,
 } from "lucide-react";
 import apiService from "../../../core/services/apiService";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +22,7 @@ export default function ClinicalRecordTab({ patientId }) {
   const [medications, setMedications] = useState([]);
   const [allergies, setAllergies] = useState([]);
   const [surgeries, setSurgical] = useState([]);
+  const [pregnancies, setPregnancy] = useState([]);
 
   const [openViewModal, setOpenViewModal] = useState(false);
   const [viewData, setViewData] = useState(null);
@@ -39,25 +41,22 @@ export default function ClinicalRecordTab({ patientId }) {
           medicationData,
           allergyData,
           surgicalData,
+          prenancyData,
         ] = await Promise.all([
-          apiService.get(dispatch, "vitals"),
-          apiService.get(dispatch, "conditions"),
-          apiService.get(dispatch, "medications"),
-          apiService.get(dispatch, "allergies"),
-          apiService.get(dispatch, "surgeries"),
+          apiService.get(dispatch, "vitals", { patient: patientId }),
+          apiService.get(dispatch, "conditions", { patient: patientId }),
+          apiService.get(dispatch, "medications", { patient: patientId }),
+          apiService.get(dispatch, "allergies", { patient: patientId }),
+          apiService.get(dispatch, "surgeries", { patient: patientId }),
+          apiService.get(dispatch, "pregnancies", { patient: patientId }),
         ]);
 
-        const filterByPatient = (arr) =>
-          arr.filter(
-            (item) =>
-              item.patient === patientId || item.patient?._id === patientId
-          );
-
-        setVitals(filterByPatient(vitalData));
-        setConditions(filterByPatient(conditionData));
-        setMedications(filterByPatient(medicationData));
-        setAllergies(filterByPatient(allergyData));
-        setSurgical(filterByPatient(surgicalData));
+        setVitals(vitalData);
+        setConditions(conditionData);
+        setMedications(medicationData);
+        setAllergies(allergyData);
+        setSurgical(surgicalData);
+        setPregnancy(prenancyData);
       } catch (error) {
         console.error("Error fetching clinical data:", error);
       }
@@ -65,28 +64,31 @@ export default function ClinicalRecordTab({ patientId }) {
 
     fetchData();
   }, [dispatch, patientId, refreshKey]);
-  console.log(JSON.stringify(allergies));
 
   const tabConfig = {
     conditions: {
-      label: `Diagnosis (${conditions.length})`,
+      label: `Diagnosis(${conditions.length})`,
       icon: ShieldAlert,
     },
     medications: {
-      label: `Medications (${medications.length})`,
+      label: `Medications(${medications.length})`,
       icon: Pill,
     },
     allergies: {
-      label: `Allergies (${allergies.length})`,
+      label: `Allergies(${allergies.length})`,
       icon: AlertTriangle,
     },
     vitals: {
-      label: `Vitals Log (${vitals.length})`,
+      label: `Vitals Log(${vitals.length})`,
       icon: Activity,
     },
     surgeries: {
-      label: `Surgical History (${surgeries.length})`,
+      label: `Surgical History(${surgeries.length})`,
       icon: Scissors,
+    },
+    pregnancies: {
+      label: `Pregnancy(${pregnancies.length})`,
+      icon: Baby,
     },
   };
 
@@ -108,7 +110,7 @@ export default function ClinicalRecordTab({ patientId }) {
                         : "border-transparent text-gray-500 hover:text-gray-700"
                     }`}
                   >
-                    <Icon className="h-4 w-4" />
+                    {/* <Icon className="h-4 w-4" /> */}
                     {label}
                   </button>
                 );
@@ -116,6 +118,67 @@ export default function ClinicalRecordTab({ patientId }) {
             </div>
           }
         >
+          {/* --- PREGNANCY TAB --- */}
+          {clinicalTab === "pregnancies" && (
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 w-full">
+              {pregnancies.map((p, index) => {
+                const gestationalWeeks = p.lmp
+                  ? Math.floor(
+                      (new Date() - new Date(p.lmp)) / (1000 * 60 * 60 * 24 * 7)
+                    )
+                  : null;
+
+                return (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      setViewType(clinicalTab);
+                      setViewData(p);
+                      setOpenViewModal(true);
+                    }}
+                    className="cursor-pointer p-4 rounded-lg bg-pink-50 border border-pink-200 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <Baby className="h-6 w-6 text-pink-500" />
+                      <h4 className="text-sm font-semibold text-pink-700">
+                        {p.is_pregnant ? "Pregnant" : "Not Pregnant"}
+                      </h4>
+                    </div>
+
+                    {p.is_pregnant && (
+                      <>
+                        <div className="text-xs text-pink-800 mb-1">
+                          <strong>Gravida:</strong> {p.gravida || "0"} |{" "}
+                          <strong>Para:</strong> {p.para || "0"}
+                        </div>
+                        <div className="text-xs text-pink-800 mb-1">
+                          <strong>LMP:</strong> {formatFullDate(p.lmp) || "N/A"}
+                        </div>
+                        <div className="text-xs text-pink-800 mb-1">
+                          <strong>EDD:</strong> {formatFullDate(p.edd) || "N/A"}
+                        </div>
+                        <div className="text-xs text-pink-800 mb-1">
+                          <strong>Trimester:</strong> {p.trimester || "N/A"}
+                        </div>
+                        {gestationalWeeks !== null && (
+                          <div className="text-xs text-pink-800 mb-1">
+                            <strong>Gestational Age:</strong> {gestationalWeeks}{" "}
+                            weeks
+                          </div>
+                        )}
+                        {p.notes && (
+                          <p className="text-xs text-pink-900 mt-2">
+                            <strong>Notes:</strong> {p.notes}
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {/* CONDITIONS */}
           {clinicalTab === "conditions" && (
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 w-full">
@@ -156,47 +219,6 @@ export default function ClinicalRecordTab({ patientId }) {
             </div>
           )}
 
-          {/* MEDICATIONS */}
-          {/* {clinicalTab === "medications" && (
-            <div className="overflow-x-auto w-full">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="text-left text-gray-500">
-                    <th className="py-2 font-medium">Medication</th>
-                    <th className="py-2 font-medium">Dose</th>
-                    <th className="py-2 font-medium">Frequency</th>
-                    <th className="py-2 font-medium">Start</th>
-                    <th className="py-2 font-medium">End</th>
-                    <th className="py-2 font-medium">Notes</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {medications.map((m, index) => (
-                    <tr
-                      key={index}
-                      className="border-t hover:bg-gray-50 cursor-pointer"
-                      onClick={() => {
-                        setViewType(clinicalTab);
-                        setViewData(m);
-                        setOpenViewModal(true);
-                      }}
-                    >
-                      <td className="py-2">{m.name}</td>
-                      <td className="py-2">{m.dose}</td>
-                      <td className="py-2">{m.frequency}</td>
-                      <td className="py-2">
-                        {formatFullDate(m.start_date) || "-"}
-                      </td>
-                      <td className="py-2">
-                        {formatFullDate(m.end_date) || "-"}
-                      </td>
-                      <td className="py-2">{m.notes}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )} */}
           {/* MEDICATIONS */}
           {clinicalTab === "medications" && (
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 w-full">
