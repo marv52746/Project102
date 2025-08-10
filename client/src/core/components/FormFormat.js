@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Edit, PlusCircle, Save, Trash } from "lucide-react";
-import apiService from "../services/apiService";
+
 import { useDispatch, useSelector } from "react-redux";
 import {
   adminOnlyRoles,
-  allowedTables,
   internalRoles,
   transactionTables,
 } from "../constants/rolePresets";
@@ -40,7 +38,7 @@ const FormFormat = ({ data, fields }) => {
 
   const [inputData, setInputData] = useState(data || {});
   const [fileData, setFileData] = useState(null);
-  const [refOptions, setRefOptions] = useState({}); // store fetched reference options
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // useEffect(() => {

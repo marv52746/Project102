@@ -9,7 +9,7 @@ export default function Home() {
         <div className="container mx-auto flex justify-between items-center px-4 py-4">
           <h1 className="text-xl font-bold">Medical Clinic</h1>
           <nav className="space-x-6">
-            <a href="#" className="hover:underline">
+            <a href="/" className="hover:underline">
               Home
             </a>
             <a href="#appointments" className="hover:underline">

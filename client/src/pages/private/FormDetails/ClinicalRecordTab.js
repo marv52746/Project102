@@ -99,7 +99,7 @@ export default function ClinicalRecordTab({ patientId }) {
           title={
             <div className="flex flex-wrap items-center gap-6 text-sm">
               {Object.keys(tabConfig).map((key) => {
-                const { label, icon: Icon } = tabConfig[key];
+                const { label } = tabConfig[key];
                 return (
                   <button
                     key={key}

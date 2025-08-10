@@ -37,23 +37,6 @@ export default function PatientsTab({ doctorID }) {
     fetchDetails();
   }, [doctorID, dispatch]);
 
-  const renderAvatar = (name) => {
-    const initials =
-      name
-        ?.split(" ")
-        .map((w) => w[0])
-        .join("")
-        .toUpperCase() || "PT";
-    return (
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-semibold">
-          {initials}
-        </div>
-        <span>{name || "Unknown"}</span>
-      </div>
-    );
-  };
-
   return (
     <div className="bg-white p-4 rounded-lg shadow">
       <h3 className="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">

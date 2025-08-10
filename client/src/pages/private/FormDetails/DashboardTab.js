@@ -1,21 +1,11 @@
 import { useEffect, useState } from "react";
 import Card from "./Card";
-import {
-  FileText,
-  ShieldAlert,
-  Thermometer,
-  HeartPulse,
-  Gauge,
-  Weight,
-  Pill,
-  AlertTriangle,
-  Scissors,
-} from "lucide-react";
+import { FileText, Thermometer, HeartPulse, Gauge, Weight } from "lucide-react";
 import apiService from "../../../core/services/apiService";
 import { useDispatch, useSelector } from "react-redux";
-import ClinicalFormModal from "./ClinicalFormModal";
+
 import ActivitiesTimeline from "./ActivitiesTimeline";
-import CalendarModal from "../../../core/components/calendar/CalendarModal";
+
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
 import { capitalizeText } from "../../../core/utils/stringUtils";
 import AppointmentModal from "./AppointmentModal";

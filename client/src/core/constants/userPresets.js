@@ -1,5 +1,5 @@
 import { bloodTypeOptions } from "./choices";
-import { genderOptions, roleOptions, statusOptions } from "./formFieldPresets";
+import { genderOptions, roleOptions } from "./formFieldPresets";
 
 // Columns used in the table list
 export const userTableColumns = [

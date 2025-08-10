@@ -14,7 +14,7 @@ export default function CalendarTab({ id, tablename }) {
   const [appointments, setAppointments] = useState({});
   const [selectedDayAppointments, setSelectedDayAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [showDayModal, setShowDayModal] = useState(false);
+  // const [showDayModal, setShowDayModal] = useState(false);
 
   const month = currentDate.getMonth() + 1;
   const year = currentDate.getFullYear();
@@ -44,7 +44,7 @@ export default function CalendarTab({ id, tablename }) {
         showNotification({ message: "Failed to load calendar", type: "error" })
       );
     }
-  }, [id, month, year, dispatch]);
+  }, [id, month, year, dispatch, tablename]);
 
   useEffect(() => {
     fetchData();
@@ -56,16 +56,16 @@ export default function CalendarTab({ id, tablename }) {
 
   const openDayModal = (dayAppointments) => {
     setSelectedDayAppointments(dayAppointments);
-    setShowDayModal(true);
+    // setShowDayModal(true);
   };
 
   const handleSelectAppointment = (appt) => {
     setSelectedAppointment(appt);
-    setShowDayModal(false);
+    // setShowDayModal(false);
   };
 
   const closeModal = () => {
-    setShowDayModal(false);
+    // setShowDayModal(false);
     setSelectedDayAppointments([]);
     setSelectedAppointment(null);
   };

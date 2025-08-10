@@ -7,7 +7,6 @@ import {
   Ban,
   HelpCircle,
 } from "lucide-react";
-import { handleFormSubmit } from "../formActions/formSubmit";
 import { useDispatch } from "react-redux";
 import { handleCompleteAppointment } from "../formActions/formHandlers";
 

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { handleFormSubmit } from "../../../core/components/formActions/formSubmit";
 import { useDispatch } from "react-redux";
-import { clinicalFormFieldMap } from "../../../core/constants/medical/clinicalPresets";
+
 import { handleInputChange } from "../../../core/components/formActions/formHandlers";
 import { capitalizeText } from "../../../core/utils/stringUtils";
-import { getInputValue, shouldShowField } from "../../../core/utils/fieldUtils";
+import { shouldShowField } from "../../../core/utils/fieldUtils";
 import { renderSpacer } from "../../../core/components/Form Inputs/LabelSpacerInput";
 import { renderField } from "../../../core/components/Form Inputs/Index";
 

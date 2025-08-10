@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import apiService from "../../../core/services/apiService";
 import UserHeader from "./UserHeader";
 import DashboardTab from "./DashboardTab";
-import AppointmentsTab from "./AppointmentsTab";
 import OverviewTab from "../DoctorDetails/OverviewTab";
 import ScheduleTab from "../DoctorDetails/ScheduleTab";
 import PatientsTab from "../DoctorDetails/PatientsTab";

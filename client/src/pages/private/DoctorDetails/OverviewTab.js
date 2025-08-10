@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  MapPin,
   ClipboardList,
   Clock,
   Stethoscope,
