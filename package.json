@@ -11,7 +11,8 @@
     "server:start": "cd server && nodemon server.js",
     "electron:start": "wait-on tcp:3000 && cross-env NODE_ENV=development electron .",
     "electron:serve": "concurrently -k -n \"SERVER,REACT,ELECTRON\" -c \"yellow,cyan,blue\" \"npm run server:start\" \"npm run react:start\" \"npm run electron:start\"",
-    "electron:build": "rimraf dist && npm run build-client && electron-builder"
+    "electron:build": "rimraf dist && npm run build-client && electron-builder",
+    "copy-redirects": "copyfiles client/public/_redirects client/build"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
