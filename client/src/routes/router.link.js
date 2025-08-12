@@ -2,7 +2,7 @@ import React from "react";
 import { Route } from "react-router-dom";
 import { all_routes } from "./all_routes";
 import Home from "../pages/public/Home";
-import Dashboard from "../pages/private/Dashboard";
+import Dashboard from "../pages/private/Dashboard/Dashboard";
 import List from "../pages/private/List";
 import Form from "../pages/private/Form";
 import OrganizationChart from "../pages/private/OrganizationChart";
@@ -11,6 +11,8 @@ import SignUp from "../pages/main/signup";
 import Portal from "../pages/public/Portal";
 import SettingsPage from "../pages/private/Settings/Settings";
 import Calendar from "../pages/private/Calendar/Calendar";
+import InventoryDashboard from "../pages/private/Dashboard/InventoryDashboard";
+import MainDashboard from "../pages/private/Dashboard/MainDashboard";
 
 const routes = all_routes;
 
@@ -46,7 +48,7 @@ const routesArray = [
   {
     path: routes.dashboard,
     name: "dashboard",
-    element: <Dashboard />,
+    element: <MainDashboard />,
   },
 
   { path: routes.list, name: "list", element: <List /> },
@@ -66,11 +68,11 @@ const routesArray = [
     name: "settings",
     element: <SettingsPage />,
   },
-  // {
-  //   path: routes.testPage,
-  //   name: "testPage",
-  //   element: <DoctorDetailsPage />,
-  // },
+  {
+    path: routes.testPage,
+    name: "testPage",
+    element: <InventoryDashboard />,
+  },
 ];
 
 export const authRoute = routesArray.map((route, index) => ({

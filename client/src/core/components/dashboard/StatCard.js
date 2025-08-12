@@ -29,7 +29,7 @@ function StatCard({ icon: Icon, title, value, percentage, trend, color }) {
           >
             {percentage}
           </span>{" "}
-          {trend === "up" ? "Increased" : "Decreased"}
+          {trend && (trend === "up" ? "Increased" : "Decreased")}
         </p>
       </div>
     </div>

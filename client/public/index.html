@@ -10,6 +10,15 @@
     <title>React App</title>
   </head>
   <body>
+    <script>
+      var link = document.createElement("link");
+      link.setAttribute("rel", "stylesheet");
+      link.setAttribute(
+        "href",
+        require("path").join(__dirname, "css", "app.css")
+      );
+      document.head.appendChild(link);
+    </script>
     <div id="root"></div>
   </body>
 </html>

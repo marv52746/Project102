@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { User, BarChart, DollarSign } from "lucide-react";
-import StatCard from "../../core/components/dashboard/StatCard";
-import AppointmentsTable from "../../core/components/appoinment/AppointmentsTable";
-import ComboChart2 from "../../core/components/dashboard/ComboChart2";
-import useComboData from "../../core/hooks/useComboData";
-import apiService from "../../core/services/apiService";
+import StatCard from "../../../core/components/dashboard/StatCard";
+import AppointmentsTable from "../../../core/components/appoinment/AppointmentsTable";
+import ComboChart2 from "../../../core/components/dashboard/ComboChart2";
+import useComboData from "../../../core/hooks/useComboData";
+import apiService from "../../../core/services/apiService";
 import { useDispatch } from "react-redux";
 
 function Dashboard() {

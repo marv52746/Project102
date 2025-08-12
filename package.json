@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
+    "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "electron": "^28.1.0",
     "electron-builder": "^26.0.19",
@@ -27,10 +28,13 @@
     "appId": "com.example.myapp",
     "productName": "MyMERNApp",
     "publish": null,
+    "asarUnpack": [
+      "server/**/*"
+    ],
     "files": [
       "main.js",
       "package.json",
-      "client/build/**",
+      "client/build/**/*",
       "server/**/*",
       ".env"
     ],
@@ -46,6 +50,7 @@
     }
   },
   "dependencies": {
+    "@electron/remote": "^2.1.3",
     "electron-is-dev": "^3.0.1"
   }
 }
