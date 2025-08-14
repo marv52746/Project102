@@ -23,7 +23,7 @@ function ListFormat({ apiURL, fieldData, mode, title }) {
       fetchRecords();
     }
   }, [dispatch, apiURL]);
-  console.log(data);
+  // console.log(data);
   return (
     <div className="container mx-auto p-4">
       <TableList title={title} data={data} columns={fieldData} />

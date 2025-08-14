@@ -29,13 +29,34 @@ export default function CalendarTab({ id, tablename }) {
         ...(tablename === "patients" && { patient: id }),
       };
 
+      // 1. Fetch appointments
       const data = await apiService.get(dispatch, "calendar", params);
 
+      // 2. Fetch EDD schedules
+      const eddData = await apiService.get(dispatch, "pregnancies", {
+        patient: id,
+      });
+
+      // console.log(eddData);
+
       const grouped = {};
+      // Appointments
       data.forEach((a) => {
         const d = a.date.split("T")[0];
         if (!grouped[d]) grouped[d] = [];
         grouped[d].push(a);
+      });
+
+      // EDDs
+      eddData.forEach((e) => {
+        const d = e.edd.split("T")[0];
+        if (!grouped[d]) grouped[d] = [];
+        grouped[d].push({
+          ...e,
+          date: e.edd, // so modal knows the date
+          mode: "EDD",
+          title: "Estimated Due Date", // optional extra label for modal
+        });
       });
 
       setAppointments(grouped);
@@ -149,22 +170,27 @@ export default function CalendarTab({ id, tablename }) {
                   </span>
                 </div>
 
-                <div className="flex flex-col gap-1 text-xs mt-1">
+                <div className="flex flex-wrap gap-2 text-xs mt-1">
                   {Object.entries(typeCounts).map(([type, count], i) => {
-                    const icon =
-                      type === "video"
-                        ? "📹"
-                        : type === "in-person"
-                        ? "😷"
-                        : "📅";
+                    let icon;
+                    if (type === "video") {
+                      icon = "📹";
+                    } else if (type === "in-person") {
+                      icon = "😷";
+                    } else if (type === "EDD") {
+                      icon = "👶";
+                    } else {
+                      icon = "📅";
+                    }
+
                     return (
-                      <div
+                      <span
                         key={i}
-                        className="inline-flex items-center gap-1 bg-gray-100 rounded-full px-2 py-0.5 w-fit text-gray-700 text-xs"
+                        className="inline-flex items-center gap-1 text-gray-700 text-xs"
                       >
                         <span className="text-base">{icon}</span>
                         <span className="font-medium">{count}</span>
-                      </div>
+                      </span>
                     );
                   })}
                 </div>

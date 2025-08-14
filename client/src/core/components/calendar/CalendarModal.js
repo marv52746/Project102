@@ -6,6 +6,7 @@ import {
   RefreshCw,
   Ban,
   HelpCircle,
+  Baby,
 } from "lucide-react";
 
 const formatDate = (dateStr) => {
@@ -30,7 +31,7 @@ const formatTime = (timeStr) => {
 };
 
 function CalendarModal({ report, onClose }) {
-  console.log(report);
+  // console.log(report);
   if (!report) return null;
 
   // Determine status
@@ -79,30 +80,61 @@ function CalendarModal({ report, onClose }) {
         className="bg-white p-8 rounded-lg w-11/12 max-w-lg shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
-          <Clock size={24} className="mr-2 text-blue-600" />
-          Appointment Details
-        </h2>
+        {report.appointment_no && (
+          <>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+              <Clock size={24} className="mr-2 text-blue-600" />
+              Appointment Details
+            </h2>
 
-        <div className="space-y-4">
-          <Detail label="Appointment No." value={report.appointment_no} />
-          <Detail label="Patient" value={report.patient_name || "N/A"} />
-          <Detail label="Doctor" value={report.doctor_name || "N/A"} />
-          <Detail label="Date" value={formatDate(report.date)} />
-          <Detail label="Time" value={formatTime(report.time)} />
-          <Detail label="Reason" value={report.reason || "N/A"} />
-          <Detail label="Notes" value={report.notes || "No notes available"} />
+            <div className="space-y-4">
+              <Detail label="Appointment No." value={report.appointment_no} />
+              <Detail label="Patient" value={report.patient_name || "N/A"} />
+              <Detail label="Doctor" value={report.doctor_name || "N/A"} />
+              <Detail label="Date" value={formatDate(report.date)} />
+              <Detail label="Time" value={formatTime(report.time)} />
+              <Detail label="Reason" value={report.reason || "N/A"} />
+              <Detail
+                label="Notes"
+                value={report.notes || "No notes available"}
+              />
 
-          <div className="flex items-center">
-            <strong className="text-gray-700 w-1/3">Status:</strong>
-            <div
-              className={`flex items-center gap-2 ${statusDetails.color} text-white px-3 py-1 rounded-md`}
-            >
-              <StatusIcon size={16} />
-              <span>{statusDetails.text}</span>
+              <div className="flex items-center">
+                <strong className="text-gray-700 w-1/3">Status:</strong>
+                <div
+                  className={`flex items-center gap-2 ${statusDetails.color} text-white px-3 py-1 rounded-md`}
+                >
+                  <StatusIcon size={16} />
+                  <span>{statusDetails.text}</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </>
+        )}
+
+        {/* EDD / Pregnancy Section */}
+        {report.edd && (
+          <>
+            <h2 className="text-2xl font-semibold text-pink-600 mb-4 flex items-center">
+              <Baby size={24} className="mr-2 " />
+              Pregnancy Details
+            </h2>
+
+            <div className="mt-8 border-t pt-6 space-y-4">
+              <Detail
+                label="Expected Due Date"
+                value={formatDate(report.edd)}
+              />
+              <Detail label="Trimester" value={report.trimester || "N/A"} />
+              <Detail label="Gravida" value={report.gravida ?? "N/A"} />
+              <Detail label="Para" value={report.para ?? "N/A"} />
+              <Detail
+                label="Pregnancy Notes"
+                value={report.pregnancy_notes || "No pregnancy notes available"}
+              />
+            </div>
+          </>
+        )}
 
         <div className="mt-6 flex justify-end">
           <button

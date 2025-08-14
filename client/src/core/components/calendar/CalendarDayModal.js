@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect } from "react";
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "N/A";
@@ -66,17 +67,35 @@ export default function CalendarDayModal({
                 className="p-3 border rounded hover:shadow cursor-pointer transition"
                 onClick={() => onSelect(appt)}
               >
+                {/* Title for EDD */}
+                {appt.edd && (
+                  <span className="text-xs text-pink-600 font-medium mb-1 block">
+                    {appt.title || "EDD"}
+                  </span>
+                )}
+
+                {/* Name + Time/EDD */}
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-sm font-medium text-gray-800">
-                    {appt.patient_name}
+                    {appt.patient_name ||
+                      appt.patient?.name ||
+                      "Unknown Patient"}
                   </span>
-                  <span className="text-xs text-gray-500">
-                    {formatTime(appt.time)}
-                  </span>
+                  {appt.edd ? (
+                    <div className="text-xs text-pink-600 font-medium">
+                      {formatDate(appt.edd)}
+                    </div>
+                  ) : (
+                    <span className="text-xs text-gray-500">
+                      {formatTime(appt.time)}
+                    </span>
+                  )}
                 </div>
+
+                {/* Reason/Notes + Status */}
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-gray-600 mb-1 truncate">
-                    {appt.reason || "No reason provided"}
+                    {appt.reason || appt.notes || "No details provided"}
                   </span>
                   <span
                     className={
