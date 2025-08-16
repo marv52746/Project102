@@ -5,6 +5,7 @@ const cors = require("cors");
 const path = require("path");
 const cron = require("node-cron");
 const sendReminders = require("./jobs/appointmentReminder");
+const sendEmailReminders = require("./jobs/appointmentEmailReminder");
 
 require("dotenv").config({ path: "./.env" });
 const PORT = process.env.PORT || 8080;
@@ -16,10 +17,18 @@ const app = express();
 connect();
 
 // Run every day at 8 AM
-cron.schedule("0 8 * * *", () => {
-  console.log("Running daily SMS reminder task");
-  sendReminders();
-});
+cron.schedule(
+  // "0 8 * * *",
+  "* * * * *", // every minute
+  () => {
+    console.log("Running daily SMS reminder task");
+    sendEmailReminders();
+    // sendReminders();
+  },
+  {
+    timezone: "Asia/Manila",
+  }
+);
 
 // ✅ Middleware
 // app.use(bodyParser.json());
@@ -49,5 +58,5 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ✅ Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:4000`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
