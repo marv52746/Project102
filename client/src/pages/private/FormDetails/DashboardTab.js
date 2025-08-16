@@ -32,7 +32,7 @@ const documentsSeed = [
 ];
 
 // Main Component
-export default function DashboardTab({ patientId }) {
+export default function DashboardTab({ patientId, data }) {
   const { refreshKey } = useSelector((state) => state.utils);
 
   const [vitals, setVitals] = useState(null);
@@ -236,6 +236,7 @@ export default function DashboardTab({ patientId }) {
           <div className="bg-white w-full max-w-lg p-6 rounded-md shadow-lg relative z-50">
             <AppointmentModal
               patient={patientId}
+              patientData={data}
               type={"appointments"}
               mode={"create"}
               onClose={() => setShowModal(false)}

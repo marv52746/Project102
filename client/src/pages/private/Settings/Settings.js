@@ -46,6 +46,7 @@ export default function SettingsPage() {
       data,
       fields: userSettings,
       fileData,
+      userInfo: userInfo,
       // navigate: optional if needed
     });
   };

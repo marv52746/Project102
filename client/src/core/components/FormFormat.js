@@ -41,40 +41,12 @@ const FormFormat = ({ data, fields }) => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // useEffect(() => {
-  //   const fetchReferenceData = async () => {
-  //     const refsToFetch = fields.filter((f) => f.type === "reference");
-
-  //     for (const refField of refsToFetch) {
-  //       try {
-  //         const records = await apiService.get(
-  //           dispatch,
-  //           refField.ref,
-  //           refField.query || {} // 👈 Pass query as parameter
-  //         );
-
-  //         setRefOptions((prev) => ({
-  //           ...prev,
-  //           [refField.name]: records,
-  //         }));
-  //       } catch (err) {
-  //         console.error(`Error fetching ${refField.ref}`, err);
-  //       }
-  //     }
-  //   };
-
-  //   fetchReferenceData();
-  // }, [fields, dispatch]);
-
-  // useEffect(() => {
-  //   console.log(data);
-  //   setInputData(data || {});
-  // }, [data]);
-
   useEffect(() => {
     setInputData((prev) => {
       let changed = false;
       const newData = { ...prev };
+
+      // console.log(newData);
 
       fields.forEach((field) => {
         const hasValue =

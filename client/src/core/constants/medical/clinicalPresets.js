@@ -274,6 +274,14 @@ export const pregnancyFormFields = [
     placeholder: "Additional pregnancy-related notes or risks",
   },
 ];
+export const othersFormFields = [
+  {
+    name: "notes",
+    label: "Notes",
+    type: "textarea",
+    placeholder: "Add notes here...",
+  },
+];
 
 export const clinicalFormFieldMap = {
   vitals: vitalsFormFields,
@@ -283,4 +291,5 @@ export const clinicalFormFieldMap = {
   conditions: conditionFormFields,
   appointments: appointmentsFormFields,
   pregnancies: pregnancyFormFields,
+  others: othersFormFields,
 };

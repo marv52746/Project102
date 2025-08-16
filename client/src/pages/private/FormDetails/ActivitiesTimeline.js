@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Card from "./Card";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import apiService from "../../../core/services/apiService";
 import { formatFullDate } from "../../../core/utils/tableUtils";
 import {
@@ -11,6 +11,7 @@ import {
   ClipboardList,
   CalendarDays,
   FileText,
+  Baby,
 } from "lucide-react";
 
 // Helper functions
@@ -30,6 +31,7 @@ const iconMap = {
   vitals: <HeartPulse className="text-pink-500" size={20} />,
   condition: <ClipboardList className="text-green-500" size={20} />,
   appointment: <CalendarDays className="text-orange-500" size={20} />,
+  pregnancy: <Baby className="text-pink-500" size={20} />, // ✅ Added
   default: <FileText className="text-gray-400" size={20} />,
 };
 
@@ -76,7 +78,7 @@ const formatActivity = (log) => {
       break;
     case "vitals":
       title = `Vitals`;
-      description = `${actVerb} vitals — BP: ${
+      description = `${actVerb} vital record — BP: ${
         dataSnapshot.blood_pressure || "-"
       }, HR: ${dataSnapshot.heart_rate || "-"}, Temp: ${
         dataSnapshot.temperature || "-"
@@ -90,9 +92,17 @@ const formatActivity = (log) => {
       break;
     case "appointment":
       title = `Appointment`;
-      description = `${actVerb} appointment — Reason: ${
+      description = `${actVerb} appointment record — Reason: ${
         dataSnapshot.reason || "-"
       }, Status: ${dataSnapshot.status || "-"}.`;
+      break;
+    case "pregnancy":
+      title = `Pregnancy`;
+      description = `${actVerb} pregnancy record — LMP: ${
+        dataSnapshot.lmp ? new Date(dataSnapshot.lmp).toLocaleDateString() : "-"
+      }, EDD: ${
+        dataSnapshot.edd ? new Date(dataSnapshot.edd).toLocaleDateString() : "-"
+      }, Trimester: ${dataSnapshot.trimester || "-"}`;
       break;
     default:
       title = capitalize(table);
@@ -110,6 +120,7 @@ const formatActivity = (log) => {
 };
 
 export default function ActivitiesTimeline({ patientId }) {
+  const { refreshKey } = useSelector((state) => state.utils);
   const dispatch = useDispatch();
   const [activities, setActivities] = useState([]);
   const [visibleCount, setVisibleCount] = useState(3);
@@ -122,13 +133,14 @@ export default function ActivitiesTimeline({ patientId }) {
           patient: patientId,
         });
         const formatted = (data || []).map(formatActivity);
+        // console.log(data);
         setActivities(formatted);
       } catch (error) {
         console.error("Error fetching activities:", error);
       }
     };
     fetchActivities();
-  }, [dispatch, patientId]);
+  }, [dispatch, patientId, refreshKey]);
 
   const visibleActivities = activities.slice(0, visibleCount);
 
@@ -161,7 +173,7 @@ export default function ActivitiesTimeline({ patientId }) {
       {activities.length > visibleCount && (
         <div className="mt-2 text-center">
           <button
-            onClick={() => setVisibleCount((prev) => prev + 3)}
+            onClick={() => setVisibleCount((prev) => prev + 5)}
             className="text-blue-500 hover:underline text-xs"
           >
             Show more

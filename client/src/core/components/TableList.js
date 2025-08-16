@@ -24,10 +24,21 @@ const TableList = ({ data, columns }) => {
     })
   );
 
+  // Sort filtered data by timestamp fields (descending)
+  const sortedData = filteredData.sort((a, b) => {
+    const getTime = (item) =>
+      new Date(item.createdAt || item.created_on || item.timestamp).getTime() ||
+      0;
+
+    return getTime(b) - getTime(a); // most recent first
+  });
+
   // Get the start and end index of data for current page
   const startIndex = (currentPage - 1) * entries;
   const endIndex = startIndex + entries;
-  const paginatedData = filteredData.slice(startIndex, endIndex);
+  const paginatedData = sortedData.slice(startIndex, endIndex);
+
+  // console.log(paginatedData);
 
   const handleChangeSearch = (e) => {
     setSearch(e.target.value);

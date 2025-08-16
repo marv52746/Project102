@@ -33,7 +33,8 @@ const handleApiResponse = async (
   apiCall,
   successMessage,
   errorMessage,
-  showSuccess = true
+  showSuccess = true,
+  triggerRefresh = false // ✅ new flag
 ) => {
   try {
     const response = await apiCall();
@@ -45,6 +46,12 @@ const handleApiResponse = async (
         })
       );
     }
+
+    // Dispatch refresh key only if needed
+    if (triggerRefresh) {
+      dispatch({ type: "SET_REFRESH_KEY", payload: Date.now() });
+    }
+
     return response.data;
   } catch (error) {
     console.error(errorMessage, error);
@@ -82,7 +89,9 @@ const apiService = {
           headers: isMultipart ? { "Content-Type": "multipart/form-data" } : {},
         }),
       "Updated successfully",
-      "Error updating resource"
+      "Error updating resource",
+      true, // show success
+      true // ✅ trigger refresh key
     ),
 
   post: (dispatch, resource, data, isMultipart = false) =>
@@ -93,7 +102,9 @@ const apiService = {
           headers: isMultipart ? { "Content-Type": "multipart/form-data" } : {},
         }),
       "Created successfully",
-      "Error creating resource"
+      "Error creating resource",
+      true,
+      true // ✅ trigger refresh key
     ),
 
   delete: (dispatch, resource, id) =>
@@ -101,7 +112,9 @@ const apiService = {
       dispatch,
       () => apiClient.delete(`/${resource}/${id}`),
       "Deleted successfully",
-      "Error deleting resource"
+      "Error deleting resource",
+      true,
+      true // ✅ trigger refresh key
     ),
 };
 

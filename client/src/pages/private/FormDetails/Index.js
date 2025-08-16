@@ -17,6 +17,7 @@ export default function UserDashboardPage() {
   const { refreshKey } = useSelector((state) => state.utils);
 
   const [data, setData] = useState(null);
+  const [appointments, setAppointments] = useState(null);
   const [mainTab, setMainTab] = useState(null); // <== will be set dynamically
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +25,17 @@ export default function UserDashboardPage() {
     const fetchDetails = async () => {
       try {
         const record = await apiService.get(dispatch, `${tablename}/${id}`);
+
+        const userAppointments = await apiService.get(
+          dispatch,
+          "appointments",
+          record?.user?._id ? { doctor: record.user._id } : {}
+        );
+
+        // console.log(record);
+
         setData(record);
+        setAppointments(userAppointments);
 
         // Dynamically set default tab based on role
         const role = record?.user?.role;
@@ -91,11 +102,11 @@ export default function UserDashboardPage() {
 
       // doctor
       case "overview":
-        return <OverviewTab data={data} />;
+        return <OverviewTab appointments={appointments} />;
       case "schedule":
         return <ScheduleTab data={data} />;
       case "patients":
-        return <PatientsTab data={data} doctorID={userId} />;
+        return <PatientsTab appointments={appointments} doctorID={userId} />;
       case "calendar":
         return <CalendarTab id={userId} tablename={tablename} />;
       case "reviews":

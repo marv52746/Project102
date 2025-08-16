@@ -226,14 +226,14 @@ export const iconMapping = [
         to: all_routes.settings,
         table: "settings",
       },
-      {
-        text: "Test Page",
-        icon: <LayoutDashboard size={20} />,
-        alert: false,
-        iconText: "Test",
-        to: all_routes.testPage,
-        table: "test",
-      },
+      // {
+      //   text: "Test Page",
+      //   icon: <LayoutDashboard size={20} />,
+      //   alert: false,
+      //   iconText: "Test",
+      //   to: all_routes.testPage,
+      //   table: "test",
+      // },
     ],
   },
 ];

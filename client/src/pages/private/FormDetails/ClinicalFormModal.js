@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import { X } from "lucide-react";
+import { X, XCircle } from "lucide-react";
 import { handleFormSubmit } from "../../../core/components/formActions/formSubmit";
 import { useDispatch } from "react-redux";
 import { clinicalFormFieldMap } from "../../../core/constants/medical/clinicalPresets";
-import { handleInputChange } from "../../../core/components/formActions/formHandlers";
+import {
+  handleFormDelete,
+  handleInputChange,
+} from "../../../core/components/formActions/formHandlers";
 import { capitalizeText } from "../../../core/utils/stringUtils";
 import { getInputValue } from "../../../core/utils/fieldUtils";
+import ConfirmModal from "../../../core/components/modal/ConfirmModal";
 
 export default function ClinicalFormModal({
   onClose,
@@ -14,6 +18,8 @@ export default function ClinicalFormModal({
   initialData,
   type,
 }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalConfig, setModalConfig] = useState({});
   const [formData, setFormData] = useState({
     type: type || "vitals",
     patient: patient || initialData?.patient || "",
@@ -23,6 +29,15 @@ export default function ClinicalFormModal({
 
   const handleChange = (e) => {
     handleInputChange({ e, setInputData: setFormData });
+  };
+
+  const handleDeleteConfirm = () => {
+    handleFormDelete({
+      dispatch,
+      tablename: formData.type,
+      id: initialData._id,
+      // navigate,
+    });
   };
 
   const handleSubmit = (e) => {
@@ -40,10 +55,9 @@ export default function ClinicalFormModal({
       dispatch,
       tablename: formData.type,
       data: payload,
+      id: initialData._id || null,
       fields,
     });
-    dispatch({ type: "SET_REFRESH_KEY", payload: Date.now() });
-
     onClose();
   };
 
@@ -82,6 +96,7 @@ export default function ClinicalFormModal({
                 <option value="allergies">Allergy</option>
                 <option value="surgeries">Surgical History</option>
                 <option value="pregnancies">Pregnancy</option>
+                <option value="others">Others</option>
               </select>
             </div>
           )}
@@ -140,17 +155,44 @@ export default function ClinicalFormModal({
           })}
 
           {mode !== "view" && (
-            <div className="flex justify-end sticky bottom-0 pt-4">
+            <div className="flex justify-end sticky bottom-0 pt-4 gap-2">
+              {mode === "edit" && (
+                <button
+                  type="button"
+                  // onClick={handleDeleteConfirm} // Define your onDelete handler
+                  onClick={() => {
+                    setModalConfig({
+                      title: "Confirm Delete",
+                      description: "Are you sure you want to delete this data?",
+                      confirmText: "Delete",
+                      confirmColor: "bg-red-600",
+                      icon: <XCircle className="w-5 h-5 text-red-600" />,
+                      onConfirm: handleDeleteConfirm,
+                    }) || setIsModalOpen(true);
+                    // onClose();
+                  }}
+                  className="bg-red-600 text-white px-4 py-2 rounded-md text-sm hover:bg-red-700"
+                >
+                  Delete
+                </button>
+              )}
+
               <button
                 type="submit"
                 className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700"
               >
-                Submit
+                {mode === "edit" ? "Update" : "Submit"}
               </button>
             </div>
           )}
         </form>
       </div>
+      {/* Modal */}
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        {...modalConfig}
+      />
     </div>
   );
 }

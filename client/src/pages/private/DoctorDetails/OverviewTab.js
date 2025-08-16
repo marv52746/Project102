@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ClipboardList,
   Clock,
@@ -8,14 +8,76 @@ import {
   CalendarCheck2,
   CalendarX2,
 } from "lucide-react";
+import { useDispatch } from "react-redux";
 
-export default function OverviewTab() {
+export default function OverviewTab({ appointments }) {
+  const dispatch = useDispatch();
+  const [stats, setStats] = useState({
+    upcoming: 0,
+    completed: 0,
+    cancelled: 0,
+  });
+  const [activities, setActivities] = useState([]);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const today = new Date();
+
+        let upcomingCount = 0;
+        let completedCount = 0;
+        let cancelledCount = 0;
+
+        const recentActivities = appointments
+          .slice(-5) // last 5 appointments
+          .reverse()
+          .map((a) => {
+            let icon;
+            if (a.status === "completed") {
+              icon = <ClipboardList className="w-4 h-4 text-green-600" />;
+            } else if (a.status === "cancelled") {
+              icon = <FileText className="w-4 h-4 text-red-600" />;
+            } else {
+              icon = <ClipboardList className="w-4 h-4 text-blue-600" />;
+            }
+
+            return {
+              time: new Date(a.date).toLocaleString(),
+              action: `${a.status} appointment with ${
+                a.patient?.name || "Unknown"
+              }`,
+              icon,
+            };
+          });
+
+        appointments.forEach((a) => {
+          const appointmentDate = new Date(a.date);
+          if (
+            a.status === "scheduled" &&
+            appointmentDate >= new Date(today.setHours(0, 0, 0, 0))
+          ) {
+            upcomingCount++;
+          }
+          if (a.status === "completed") completedCount++;
+          if (a.status === "cancelled") cancelledCount++;
+        });
+
+        setStats({
+          upcoming: upcomingCount,
+          completed: completedCount,
+          cancelled: cancelledCount,
+        });
+
+        setActivities(recentActivities);
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+      }
+    };
+
+    fetchAppointments();
+  }, [dispatch, appointments]);
+
   const doctor = {
-    appointmentStats: {
-      upcoming: 8,
-      completed: 42,
-      cancelled: 3,
-    },
     recentActivities: [
       {
         time: "Today 10:00 AM",
@@ -38,19 +100,19 @@ export default function OverviewTab() {
   const statCards = [
     {
       label: "Upcoming",
-      value: doctor.appointmentStats.upcoming,
+      value: stats.upcoming,
       color: "bg-blue-100 text-blue-800",
       icon: <CalendarClock className="w-6 h-6 text-blue-600" />,
     },
     {
       label: "Completed",
-      value: doctor.appointmentStats.completed,
+      value: stats.completed,
       color: "bg-green-100 text-green-800",
       icon: <CalendarCheck2 className="w-6 h-6 text-green-600" />,
     },
     {
       label: "Cancelled",
-      value: doctor.appointmentStats.cancelled,
+      value: stats.cancelled,
       color: "bg-red-100 text-red-800",
       icon: <CalendarX2 className="w-6 h-6 text-red-600" />,
     },

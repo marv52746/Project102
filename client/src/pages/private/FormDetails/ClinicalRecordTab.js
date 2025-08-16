@@ -12,10 +12,14 @@ import apiService from "../../../core/services/apiService";
 import { useDispatch, useSelector } from "react-redux";
 import ClinicalFormModal from "./ClinicalFormModal";
 import { formatFullDate } from "../../../core/utils/tableUtils";
+import { adminOnlyRoles } from "../../../core/constants/rolePresets";
 
 export default function ClinicalRecordTab({ patientId }) {
   const [clinicalTab, setClinicalTab] = useState("conditions");
   const { refreshKey } = useSelector((state) => state.utils);
+  const currentUser = useSelector((state) => state.user.userInfo);
+  const hasPermission =
+    currentUser && adminOnlyRoles.includes(currentUser.role);
 
   const [vitals, setVitals] = useState([]);
   const [conditions, setConditions] = useState([]);
@@ -423,6 +427,7 @@ export default function ClinicalRecordTab({ patientId }) {
                         <strong>Height:</strong>{" "}
                         {v.height ? `${v.height} cm` : "-"}
                       </div>
+
                       {bmi && (
                         <div className="col-span-2">
                           <strong>BMI:</strong> {bmi}{" "}
@@ -431,6 +436,9 @@ export default function ClinicalRecordTab({ patientId }) {
                           </span>
                         </div>
                       )}
+                      <div>
+                        <strong>Notes:</strong> {v.notes ? `${v.notes}` : "-"}
+                      </div>
                     </div>
                   </li>
                 );
@@ -447,9 +455,10 @@ export default function ClinicalRecordTab({ patientId }) {
             setViewData(null);
             setViewType(null);
           }}
-          mode="view"
+          mode={hasPermission ? "edit" : "view"}
           initialData={viewData}
           type={viewType}
+          patient={patientId}
         />
       )}
     </div>

@@ -16,6 +16,7 @@ export default function AppointmentModal({
   type,
   data,
   fields,
+  patientData,
 }) {
   const [inputData, setInputData] = useState(data || {});
   const [fileData, setFileData] = useState(null);
@@ -24,7 +25,9 @@ export default function AppointmentModal({
   useEffect(() => {
     setInputData((prev) => {
       let changed = false;
-      const newData = { ...prev };
+      const newData = { patient: patientData.user, ...prev };
+
+      // console.log(newData);
 
       fields.forEach((field) => {
         const hasValue =
@@ -38,9 +41,34 @@ export default function AppointmentModal({
         }
       });
 
+      // fields.forEach((field) => {
+      //   const hasValue =
+      //     newData[field.name] !== undefined && newData[field.name] !== null;
+
+      //   // ✅ Set default from field.default or patient prop
+      //   if (!hasValue) {
+      //     if (field.name === "patient" && patientData) {
+      //       newData[field.name] = {
+      //         label: patientData.user.name,
+      //         value: patientData._id,
+      //         full: patientData,
+      //       };
+      //       changed = true;
+      //     } else if (field.default !== undefined) {
+      //       newData[field.name] =
+      //         typeof field.default === "function"
+      //           ? field.default()
+      //           : field.default;
+      //       changed = true;
+      //     }
+      //   }
+      // });
+
+      // console.log(patientData);
+
       return changed ? newData : prev; // ⛔ prevent setState loop
     });
-  }, []); // ✅ only run once on mount
+  }, [fields, patientData]); // ✅ only run once on mount
 
   const handleChange = (e) => {
     handleInputChange({ e, setInputData, setFileData });
@@ -55,7 +83,6 @@ export default function AppointmentModal({
       fields,
       fileData,
     });
-    dispatch({ type: "SET_REFRESH_KEY", payload: Date.now() });
     onClose();
   };
 

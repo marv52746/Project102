@@ -1,35 +1,10 @@
 import React from "react";
-import {
-  CheckCircle,
-  XCircle,
-  Clock,
-  RefreshCw,
-  Ban,
-  HelpCircle,
-} from "lucide-react";
+import { CheckCircle, X, User, Stethoscope } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { handleCompleteAppointment } from "../formActions/formHandlers";
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return "N/A";
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
-
-const formatTime = (timeStr) => {
-  if (!timeStr) return "N/A";
-  const [hour, minute] = timeStr.split(":");
-  const date = new Date();
-  date.setHours(hour, minute);
-  return date.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-};
+import { formatDate, formatTime } from "../../utils/dateUtils";
+import { capitalizeText } from "../../utils/stringUtils";
+import ModalFormActions from "../formActions/ModalFormActions";
 
 function CalendarModalDetails({ report, onClose }) {
   const dispatch = useDispatch();
@@ -45,102 +20,71 @@ function CalendarModalDetails({ report, onClose }) {
     onClose();
   };
 
-  const statusMap = {
-    completed: {
-      text: "Completed",
-      color: "bg-green-500",
-      icon: CheckCircle,
-    },
-    scheduled: {
-      text: "Scheduled",
-      color: "bg-blue-500",
-      icon: Clock,
-    },
-    cancelled: {
-      text: "Cancelled",
-      color: "bg-gray-400",
-      icon: XCircle,
-    },
-    "no-show": {
-      text: "No Show",
-      color: "bg-yellow-500",
-      icon: Ban,
-    },
-    rescheduled: {
-      text: "Rescheduled",
-      color: "bg-purple-500",
-      icon: RefreshCw,
-    },
-  };
-
-  const statusDetails = statusMap[report.status] || {
-    text: "Unknown",
-    color: "bg-gray-400",
-    icon: HelpCircle,
-  };
-
-  const StatusIcon = statusDetails.icon;
-
   return (
     <div
       className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50"
       onClick={onClose}
     >
       <div
-        className="bg-white p-8 rounded-lg w-11/12 max-w-lg shadow-lg"
+        className="bg-white rounded-xl w-11/12 max-w-2xl shadow-lg max-h-[80vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
-          <Clock size={24} className="mr-2 text-blue-600" />
-          Appointment Details
-        </h2>
+        {/* Header */}
+        <div className="flex justify-between items-center p-6 border-b">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Appointment #{report.appointment_no}
+            </h2>
+            <p className="text-sm text-gray-500">
+              {formatDate(report.date)} at {formatTime(report.time)}
+            </p>
+          </div>
+          <button onClick={onClose}>
+            <X className="w-5 h-5 text-gray-500 hover:text-black" />
+          </button>
+        </div>
 
-        <div className="space-y-4">
-          <Detail label="Appointment No." value={report.appointment_no} />
-          <Detail label="Patient" value={report.patient?.name || "N/A"} />
-          <Detail label="Doctor" value={report.doctor?.name || "N/A"} />
-          <Detail label="Date" value={formatDate(report.date)} />
-          <Detail label="Time" value={formatTime(report.time)} />
-          <Detail label="Reason" value={report.reason || "N/A"} />
-          {/* <Detail label="Notes" value={report.notes || "No notes available"} /> */}
-
-          <div className="flex items-center">
-            <strong className="text-gray-700 w-1/3">Status:</strong>
-            <div
-              className={`flex items-center gap-2 ${statusDetails.color} text-white px-3 py-1 rounded-md`}
-            >
-              <StatusIcon size={16} />
-              <span>{statusDetails.text}</span>
-            </div>
+        {/* Content */}
+        <div className="p-6 space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <InfoCard
+              icon={User}
+              label="Patient"
+              value={report.patient?.name || "N/A"}
+            />
+            <InfoCard
+              icon={Stethoscope}
+              label="Doctor"
+              value={report.doctor?.name || "N/A"}
+            />
+            <InfoCard label="Reason" value={report.reason || "N/A"} />
+            <InfoCard
+              label="Status"
+              value={capitalizeText(report.status) || "N/A"}
+            />
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end gap-3">
-          {report.status !== "completed" && (
-            <button
-              onClick={() => onComplete(report._id)}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 flex items-center gap-2"
-            >
-              <CheckCircle size={18} />
-              Complete
-            </button>
-          )}
-          <button
-            onClick={onClose}
-            className="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition duration-200"
-          >
-            Close
-          </button>
+        {/* Footer */}
+        <div className="flex justify-end gap-3 border-t p-4 bg-gray-50">
+          <ModalFormActions
+            report={report}
+            onClose={onClose}
+            userRole={"doctor"}
+          />
         </div>
       </div>
     </div>
   );
 }
 
-const Detail = ({ label, value }) => (
-  <div className="flex items-start">
-    <strong className="text-gray-700 w-1/3">{label}:</strong>
-    <p className="text-gray-600">{value}</p>
+const InfoCard = ({ icon: Icon, label, value }) => (
+  <div className="flex flex-col">
+    <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+      {Icon && <Icon size={14} className="text-gray-500" />}
+      {label}
+    </span>
+    <span className="text-gray-800 mt-1">{value}</span>
   </div>
 );
 

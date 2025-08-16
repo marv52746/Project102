@@ -18,8 +18,8 @@ connect();
 
 // Run every day at 8 AM
 cron.schedule(
-  // "0 8 * * *",
-  "* * * * *", // every minute
+  "0 8 * * *",
+  // "* * * * *", // every minute
   () => {
     console.log("Running daily SMS reminder task");
     sendEmailReminders();
