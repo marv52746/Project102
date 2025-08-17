@@ -29,7 +29,7 @@ async function sendEmailReminders() {
 
     const mailOptions = {
       from: `"Clinic Reminder" <${process.env.EMAIL_USER}>`,
-      to: "recipient@example.com", // can be dynamic from DB
+      to: "marv52746@gmail.com", // can be dynamic from DB
       subject: "Daily Reminder",
       text: "This is your daily appointment reminder!",
     };
