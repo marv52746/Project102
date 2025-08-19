@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../services/slices/userSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { getAvatarUrl } from "../utils/avatarURL";
+import apiService from "../services/apiService";
 
 export default function Sidebar({ children }) {
   const dispatch = useDispatch();
@@ -22,6 +23,8 @@ export default function Sidebar({ children }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null); // Ref for the dropdown
   const moreVerticalRef = useRef(null); // Ref for the MoreVertical button
+  const { refreshKey } = useSelector((state) => state.utils);
+  const [record, setRecord] = useState(null);
 
   // Check if the screen width is small and set the state accordingly
   useEffect(() => {
@@ -43,6 +46,28 @@ export default function Sidebar({ children }) {
       window.removeEventListener("resize", updateExpandedState);
     };
   }, []);
+  useEffect(() => {
+    const fetchDetails = async () => {
+      if (!userInfo) return;
+
+      // only fetch for doctors or patients
+      if (userInfo.role === "doctor" || userInfo.role === "patient") {
+        try {
+          const tablename = userInfo.role + "s";
+          const res = await apiService.get(dispatch, `${tablename}`, {
+            user: userInfo.id,
+          });
+
+          console.log(res);
+
+          setRecord(res[0]); // save the full record
+        } catch (error) {
+          console.error(`Error fetching ${userInfo.role} details:`, error);
+        }
+      }
+    };
+    fetchDetails();
+  }, [userInfo, dispatch, refreshKey]);
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -52,6 +77,33 @@ export default function Sidebar({ children }) {
   const handleDropdownToggle = () => {
     setShowDropdown((prev) => !prev); // Toggle the dropdown visibility
   };
+
+  const handleRedirect = () => {
+    if (!userInfo) return;
+
+    switch (userInfo.role) {
+      case "doctor":
+        if (record?._id) {
+          navigate(`/form/doctors/view/${record._id}`);
+        } else {
+          navigate("/list/doctors");
+        }
+        break;
+
+      case "patient":
+        if (record?._id) {
+          navigate(`/form/patients/view/${record._id}`);
+        } else {
+          navigate("/list/patients");
+        }
+        break;
+
+      default:
+        navigate(`/form/users/view/${userInfo.id}`);
+        break;
+    }
+  };
+
   // Close the dropdown when clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -115,12 +167,12 @@ export default function Sidebar({ children }) {
               overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
           `}
           >
-            <div className="leading-4">
+            <button className="leading-4" onClick={handleRedirect}>
               <h4 className="font-semibold">{userInfo.name}</h4>
               <span className="text-xs text-text-primary">
                 {userInfo.email}
               </span>
-            </div>
+            </button>
             <button
               aria-label="profileMoreBtn"
               onClick={handleDropdownToggle}
