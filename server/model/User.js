@@ -94,6 +94,11 @@ const userSchema = new mongoose.Schema({
   picture: {
     type: String,
   },
+  specialization: {
+    type: [String],
+    required: true,
+    default: [],
+  },
 });
 
 // // 🔐 Hash password before saving

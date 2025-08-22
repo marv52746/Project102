@@ -65,3 +65,17 @@ export const getAge = (birthDate) => {
 
   return `${ageMonths} month${ageMonths !== 1 ? "s" : ""} old`;
 };
+
+/**
+ * Normalize tablename for API routes.
+ * Patients and Doctors are stored under "users".
+ *
+ * @param {string} rawTablename - The raw tablename from route params
+ * @returns {string} - Normalized tablename for API calls
+ */
+export const normalizeTableName = (rawTablename) => {
+  if (rawTablename === "patients" || rawTablename === "doctors") {
+    return "users";
+  }
+  return rawTablename;
+};

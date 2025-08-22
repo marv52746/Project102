@@ -10,9 +10,10 @@ import { formConfigMap } from "../../core/constants/FieldConfigMap";
 import FormFormat from "../../core/components/FormFormat";
 import apiService from "../../core/services/apiService";
 import UserDashboardPage from "./FormDetails/Index";
+import { normalizeTableName } from "../../core/utils/tableUtils";
 
 function Form() {
-  const { tablename, view, id } = useParams();
+  const { tablename: rawTablename, view, id } = useParams();
   const dispatch = useDispatch();
 
   const [data, setData] = useState(null);
@@ -21,11 +22,14 @@ function Form() {
   const userInfo = useSelector((state) => state.user.userInfo);
   const hasValidRole = userInfo && internalRoles.includes(userInfo.role);
 
+  const tablename = normalizeTableName(rawTablename);
+
   useEffect(() => {
     if (view !== "create") {
       const fetchDetails = async () => {
         try {
           const record = await apiService.get(dispatch, `${tablename}/${id}`);
+
           setData(record);
         } catch (error) {
           console.error(`Error fetching ${tablename} details:`, error);
@@ -49,19 +53,21 @@ function Form() {
   const fields = config.getFields(view);
 
   // ✅ Conditional component rendering
-  if (view === "view" && tablename === "patients") {
-    return <UserDashboardPage data={data} />;
-  }
-  if (view === "view" && tablename === "doctors") {
+  if (
+    view === "view" &&
+    (tablename === "patients" ||
+      tablename === "doctors" ||
+      tablename === "users")
+  ) {
     return <UserDashboardPage data={data} />;
   }
 
-  return view === "create" ? (
-    <FormNew fields={fields} />
-  ) : (
-    <FormFormat fields={fields} data={data} />
-    // <FormNew fields={fields} data={data} />
-  );
+  // return view === "create" ? (
+  //   <FormNew fields={fields} />
+  // ) : (
+  //   <FormFormat fields={fields} data={data} />
+  // );
+  return <FormFormat fields={fields} data={data} />;
 }
 
 export default Form;

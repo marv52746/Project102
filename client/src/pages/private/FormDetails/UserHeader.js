@@ -10,7 +10,11 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 import { internalRoles } from "../../../core/constants/rolePresets";
-import { formatFullDate, getAge } from "../../../core/utils/tableUtils";
+import {
+  formatFullDate,
+  getAge,
+  normalizeTableName,
+} from "../../../core/utils/tableUtils";
 import { getAvatarUrl } from "../../../core/utils/avatarURL";
 import { useEffect, useState, useRef } from "react";
 import ClinicalFormModal from "./ClinicalFormModal";
@@ -25,18 +29,14 @@ export default function UserHeader({ data }) {
   const userInfo = useSelector((state) => state.user.userInfo);
   const hasValidRole = userInfo && internalRoles.includes(userInfo.role);
 
-  const [userData, setUserData] = useState();
   const [showModal, setShowModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const dropdownRef = useRef(null);
-  const { tablename, id } = useParams();
+  const { tablename: rawTablename, id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    setUserData(data);
-  }, [data]);
+  const tablename = normalizeTableName(rawTablename);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -48,7 +48,7 @@ export default function UserHeader({ data }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const user = userData?.user;
+  const user = data;
   const age = getAge(user?.date_of_birth);
   const formattedDate = formatFullDate(user?.date_of_birth);
 
@@ -60,7 +60,8 @@ export default function UserHeader({ data }) {
     handleFormDelete({ dispatch, tablename, id, navigate });
     setShowDeleteModal(false);
   };
-  const hasSpecialties = userData?.specialization?.length > 0;
+  const hasSpecialties = data?.specialization?.length > 0;
+  // console.log(data);
 
   return (
     <section className="bg-white border rounded-lg p-4 md:p-6 flex flex-wrap items-center justify-between gap-4 relative">
@@ -86,7 +87,7 @@ export default function UserHeader({ data }) {
           {/* Specialties */}
           {hasSpecialties && (
             <div className="flex flex-wrap gap-2 mt-2">
-              {userData.specialization.map((item, idx) => (
+              {data.specialization.map((item, idx) => (
                 <span
                   key={idx}
                   className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full"

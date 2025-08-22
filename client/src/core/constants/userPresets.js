@@ -1,4 +1,4 @@
-import { bloodTypeOptions } from "./choices";
+import { bloodTypeOptions, doctorSpecializationOptions } from "./choices";
 import { genderOptions, roleOptions } from "./formFieldPresets";
 
 // Columns used in the table list
@@ -50,14 +50,6 @@ export const userFormFields = [
     showOn: "create",
     required: true,
   },
-  // {
-  //   name: "status",
-  //   label: "Status",
-  //   type: "select",
-  //   options: statusOptions,
-  //   showOn: "edit,view",
-  // },
-
   {
     name: "phone_number",
     label: "Phone",
@@ -97,21 +89,15 @@ export const userFormFields = [
     required: true,
   },
   { type: "spacer", showOn: "all" },
+  {
+    name: "specialization",
+    label: "Specialization",
+    options: doctorSpecializationOptions,
+    condition: "doctor",
+    type: "multiselect",
+    showOn: "all",
+    required: true,
+  },
+  { type: "spacer", showOn: "all" },
   { name: "avatar", label: "Avatar", type: "file", showOn: "all" },
 ];
-
-/**
- * Get user fields depending on mode.
- * @param {'form' | 'list'} format - 'form' to get form fields, 'list' for table columns
- * @param {'create' | 'edit' | 'view' | 'all'} show - form mode
- * @returns {Array}
- */
-export const getUserFormFields = (format = "form", show = "all") => {
-  if (format === "list") {
-    return userTableColumns;
-  }
-
-  return userFormFields.filter(
-    (field) => field.showOn === "all" || field.showOn === show
-  );
-};

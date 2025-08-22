@@ -1,15 +1,19 @@
 import { bloodTypeOptions } from "./choices";
 import { genderOptions, roleOptions } from "./formFieldPresets";
 
+// export const patientTableColumns = [
+//   { name: "user.name", label: "Name" },
+//   { name: "user.gender", label: "Gender" },
+//   { name: "user.date_of_birth", label: "Date of Birth" },
+//   { name: "user.phone_number", label: "Phone Number" },
+//   { name: "user.blood_type", label: "Blood Type" },
+// ];
 export const patientTableColumns = [
-  { name: "user.name", label: "Name" },
-  { name: "user.gender", label: "Gender" },
-  { name: "user.date_of_birth", label: "Date of Birth" },
-  // { name: "emergency_contact", label: "Emergency Contact" },
-  // { name: "user.address", label: "Address" },
-  { name: "user.phone_number", label: "Phone Number" },
-  { name: "user.blood_type", label: "Blood Type" },
-  // { name: "registration_date", label: "Registration Date" },
+  { name: "name", label: "Name" },
+  { name: "gender", label: "Gender" },
+  { name: "date_of_birth", label: "Date of Birth" },
+  { name: "phone_number", label: "Phone Number" },
+  { name: "blood_type", label: "Blood Type" },
 ];
 
 // Form fields with conditional visibility

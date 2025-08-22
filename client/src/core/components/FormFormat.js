@@ -46,8 +46,6 @@ const FormFormat = ({ data, fields }) => {
       let changed = false;
       const newData = { ...prev };
 
-      // console.log(newData);
-
       fields.forEach((field) => {
         const hasValue =
           newData[field.name] !== undefined && newData[field.name] !== null;
@@ -62,7 +60,7 @@ const FormFormat = ({ data, fields }) => {
 
       return changed ? newData : prev; // ⛔ prevent setState loop
     });
-  }, []); // ✅ only run once on mount
+  }, [fields]); // ✅ only run once on mount
 
   const handleSubmit = async () => {
     handleFormSubmit({
@@ -101,7 +99,7 @@ const FormFormat = ({ data, fields }) => {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {fields.map((field, index) => {
-                if (!shouldShowField(field, view)) return null;
+                if (!shouldShowField(field, view, inputData)) return null;
                 if (["spacer", "half-spacer", "label"].includes(field.type)) {
                   return renderSpacer(field, index);
                 }
@@ -133,57 +131,6 @@ const FormFormat = ({ data, fields }) => {
           </>
         </div>
 
-        {/* <div className="flex space-x-4 mt-6">
-          {isViewing && hasUpdateDeletePermission && (
-            <button
-              type="button"
-              onClick={() => handleEdit({ tablename, id, navigate })}
-              className="flex items-center px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
-            >
-              <Edit className="mr-2" />
-              Edit
-            </button>
-          )}
-
-          {isCreating && (
-            <button
-              type="submit"
-              className="flex items-center px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg"
-            >
-              <PlusCircle className="mr-2" />
-              Submit
-            </button>
-          )}
-
-          {isEditing && (
-            <button
-              type="submit"
-              className="flex items-center px-4 py-2 text-white bg-yellow-600 hover:bg-yellow-700 rounded-lg"
-            >
-              <Save className="mr-2" />
-              Update
-            </button>
-          )}
-
-          {canDelete && (
-            <button
-              type="button"
-              // onClick={() =>
-              //   handleFormDelete({
-              //     dispatch,
-              //     tablename,
-              //     id,
-              //     navigate,
-              //   })
-              // }
-              onClick={() => setShowDeleteModal(true)}
-              className="flex items-center px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg"
-            >
-              <Trash className="mr-2" />
-              Delete
-            </button>
-          )}
-        </div> */}
         <FormActionButtons
           isViewing={isViewing}
           isCreating={isCreating}

@@ -58,7 +58,7 @@ export default function Sidebar({ children }) {
             user: userInfo.id,
           });
 
-          console.log(res);
+          // console.log(res);
 
           setRecord(res[0]); // save the full record
         } catch (error) {

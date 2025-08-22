@@ -11,12 +11,11 @@ import ReviewsTab from "../DoctorDetails/ReviewsTab";
 import CalendarTab from "../Calendar/CalendarTab";
 import ClinicalRecordTab from "./ClinicalRecordTab";
 
-export default function UserDashboardPage() {
-  const { tablename, id } = useParams();
+export default function UserDashboardPage({ data }) {
+  const { id } = useParams();
   const dispatch = useDispatch();
   const { refreshKey } = useSelector((state) => state.utils);
 
-  const [data, setData] = useState(null);
   const [appointments, setAppointments] = useState(null);
   const [mainTab, setMainTab] = useState(null); // <== will be set dynamically
   const [loading, setLoading] = useState(true);
@@ -24,21 +23,16 @@ export default function UserDashboardPage() {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const record = await apiService.get(dispatch, `${tablename}/${id}`);
-
         const userAppointments = await apiService.get(
           dispatch,
           "appointments",
-          record?.user?._id ? { doctor: record.user._id } : {}
+          data._id ? { doctor: data._id } : {}
         );
 
-        // console.log(record);
-
-        setData(record);
         setAppointments(userAppointments);
 
         // Dynamically set default tab based on role
-        const role = record?.user?.role;
+        const role = data.role;
         if (role === "doctor") {
           setMainTab("overview");
         } else if (role === "patient") {
@@ -47,14 +41,14 @@ export default function UserDashboardPage() {
           setMainTab("dashboard");
         }
       } catch (error) {
-        console.error(`Error fetching ${tablename} details:`, error);
+        console.error(`Error fetching user details:`, error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchDetails();
-  }, [tablename, id, dispatch, refreshKey]);
+  }, [id, dispatch, refreshKey, data]);
 
   const getTabItemsForRole = (role) => {
     switch (role) {
@@ -78,16 +72,16 @@ export default function UserDashboardPage() {
     }
   };
 
-  const tabItems = data?.user ? getTabItemsForRole(data.user.role) : [];
+  const tabItems = getTabItemsForRole(data.role);
 
   const renderTabContent = () => {
-    if (!data || !data.user || !mainTab) {
+    if (!data || !mainTab) {
       return (
         <div className="text-center text-gray-500">No user data found.</div>
       );
     }
 
-    const userId = data.user._id;
+    const userId = data._id;
 
     switch (mainTab) {
       // patient
@@ -96,7 +90,7 @@ export default function UserDashboardPage() {
       // case "appointments":
       //   return <AppointmentsTab id={userId} />;
       case "patientCalendar":
-        return <CalendarTab id={userId} tablename={tablename} />;
+        return <CalendarTab id={userId} tablename={"users"} />;
       case "clinical-records":
         return <ClinicalRecordTab data={data} patientId={userId} />;
 
@@ -108,7 +102,7 @@ export default function UserDashboardPage() {
       case "patients":
         return <PatientsTab appointments={appointments} doctorID={userId} />;
       case "calendar":
-        return <CalendarTab id={userId} tablename={tablename} />;
+        return <CalendarTab id={userId} tablename={"users"} />;
       case "reviews":
         return <ReviewsTab data={data} />;
 

@@ -4,7 +4,7 @@ import { loggedUserData } from "../../services/slices/userSlice";
 
 export const handleFormSubmit = async ({
   dispatch,
-  tablename,
+  tablename: rawTablename,
   id,
   data,
   fields,
@@ -13,10 +13,21 @@ export const handleFormSubmit = async ({
   userInfo,
 }) => {
   try {
+    // ✅ Fix: normalize tablename (patients/doctors should map to users)
+    const tablename =
+      rawTablename === "patients" || rawTablename === "doctors"
+        ? "users"
+        : rawTablename;
+
     const hasFile = fileData || fields.some((f) => f.type === "file");
 
     // Clone original data to avoid mutating state
     const payload = JSON.parse(JSON.stringify(data));
+
+    // ✅ If creating patient/doctor → set role
+    if (!id && (rawTablename === "patients" || rawTablename === "doctors")) {
+      payload.role = rawTablename === "patients" ? "patient" : "doctor";
+    }
 
     // Replace reference fields with just their IDs
     fields.forEach((field) => {
@@ -47,11 +58,20 @@ export const handleFormSubmit = async ({
     // If form uses file
     if (hasFile) {
       const formData = new FormData();
+      // for (const [key, value] of Object.entries(payload)) {
+      //   formData.append(
+      //     key,
+      //     typeof value === "object" ? JSON.stringify(value) : value
+      //   );
+      // }
       for (const [key, value] of Object.entries(payload)) {
-        formData.append(
-          key,
-          typeof value === "object" ? JSON.stringify(value) : value
-        );
+        if (Array.isArray(value)) {
+          value.forEach((v) => formData.append(`${key}[]`, v));
+        } else if (typeof value === "object" && value !== null) {
+          formData.append(key, JSON.stringify(value));
+        } else {
+          formData.append(key, value);
+        }
       }
 
       if (fileData) {
@@ -64,7 +84,6 @@ export const handleFormSubmit = async ({
         await apiService.post(dispatch, tablename, formData, true);
       }
     } else {
-      console.log(payload);
       if (id) {
         await apiService.put(dispatch, tablename, id, payload);
       } else {

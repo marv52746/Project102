@@ -2,14 +2,10 @@ import { bloodTypeOptions, doctorSpecializationOptions } from "./choices";
 import { genderOptions, roleOptions } from "./formFieldPresets";
 
 export const doctorTableColumns = [
-  { name: "user.name", label: "Name" },
-  { name: "user.gender", label: "Gender" },
-  { name: "user.date_of_birth", label: "Date of Birth" },
-  // { name: "emergency_contact", label: "Emergency Contact" },
-  // { name: "patient.address", label: "Address" },
-  { name: "user.phone_number", label: "Phone Number" },
-  // { name: "blood_type", label: "Blood Type" },
-  // { name: "registration_date", label: "Registration Date" },
+  { name: "name", label: "Name" },
+  { name: "gender", label: "Gender" },
+  { name: "date_of_birth", label: "Date of Birth" },
+  { name: "phone_number", label: "Phone Number" },
 ];
 
 // Form fields with conditional visibility
@@ -46,14 +42,14 @@ export const doctorFormFields = [
   },
   { type: "spacer", showOn: "all", section: "main" },
   {
-    name: "user.first_name",
+    name: "first_name",
     label: "First Name",
     showOn: "all",
     required: true,
     section: "user",
   },
   {
-    name: "user.last_name",
+    name: "last_name",
     label: "Last Name",
     showOn: "all",
     required: true,
@@ -61,7 +57,7 @@ export const doctorFormFields = [
   },
   // { type: "half-spacer", showOn: "create" },
   {
-    name: "user.email",
+    name: "email",
     label: "Email",
     type: "email",
     showOn: "all",
@@ -69,7 +65,7 @@ export const doctorFormFields = [
     section: "user", // 👈 to make it toggleable
   },
   {
-    name: "user.date_of_birth",
+    name: "date_of_birth",
     label: "Date of Birth",
     type: "date",
     showOn: "all",
@@ -77,7 +73,7 @@ export const doctorFormFields = [
     section: "user", // 👈 to make it toggleable
   },
   {
-    name: "user.password",
+    name: "password",
     label: "Password",
     type: "password",
     showOn: "create",
@@ -85,7 +81,7 @@ export const doctorFormFields = [
     section: "user", // 👈 to make it toggleable
   },
   {
-    name: "user.phone_number",
+    name: "phone_number",
     label: "Phone",
     type: "tel",
     showOn: "all",
@@ -93,7 +89,7 @@ export const doctorFormFields = [
     section: "user", // 👈 to make it toggleable
   },
   {
-    name: "user.role",
+    name: "role",
     label: "Role",
     type: "select",
     options: roleOptions,
@@ -102,7 +98,7 @@ export const doctorFormFields = [
     disabled: true,
   },
   {
-    name: "user.gender",
+    name: "gender",
     label: "Gender",
     type: "select",
     options: genderOptions,
@@ -111,7 +107,7 @@ export const doctorFormFields = [
     section: "user", // 👈 to make it toggleable
   },
   {
-    name: "user.blood_type",
+    name: "blood_type",
     label: "Blood Type",
     options: bloodTypeOptions,
     type: "select",
@@ -122,18 +118,18 @@ export const doctorFormFields = [
 
   { type: "spacer", showOn: "all", section: "user" },
   {
-    name: "user.address",
+    name: "address",
     label: "Address",
     type: "textarea",
     showOn: "all",
     required: true,
     section: "user", // 👈 to make it toggleable
   },
-  // {
-  //   name: "user.avatar",
-  //   label: "Avatar",
-  //   type: "file",
-  //   showOn: "all",
-  //   section: "user",
-  // },
+  {
+    name: "avatar",
+    label: "Avatar",
+    type: "file",
+    showOn: "all",
+    section: "user",
+  },
 ];

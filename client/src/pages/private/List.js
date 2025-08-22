@@ -18,6 +18,7 @@ function List() {
   return (
     <ListFormat
       apiURL={config.apiURL}
+      query={config.query}
       fieldData={config.fieldData}
       mode="view"
       title={config.title}

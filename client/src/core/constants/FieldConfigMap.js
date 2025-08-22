@@ -16,12 +16,14 @@ import {
 export const formConfigMap = {
   // Management Form
   patients: {
-    apiURL: "patients",
+    apiURL: "users",
+    query: { role: "patient" },
     getFields: () => getFields(null, patientFormFields),
     title: "Patients",
   },
   doctors: {
-    apiURL: "doctors",
+    apiURL: "users",
+    query: { role: "doctor" },
     getFields: () => getFields(null, doctorFormFields),
     title: "Doctors",
   },
@@ -57,12 +59,14 @@ export const formConfigMap = {
 export const listConfigMap = {
   // Management List
   doctors: {
-    apiURL: "doctors",
+    apiURL: "users",
+    query: { role: "doctor" },
     fieldData: getFields(doctorTableColumns),
     title: "Doctors",
   },
   patients: {
-    apiURL: "patients",
+    apiURL: "users",
+    query: { role: "patient" },
     fieldData: getFields(patientTableColumns),
     title: "Patients",
   },

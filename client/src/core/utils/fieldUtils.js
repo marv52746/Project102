@@ -14,9 +14,25 @@ export const getFields = (tableColumn, formFields) => {
   }
 };
 
-export const shouldShowField = (field, view) => {
-  const showOn = (field.showOn || "all").split(",").map((s) => s.trim());
-  return showOn.includes("all") || showOn.includes(view);
+/**
+ * Decide if a field should show based on `showOn` and `condition`
+ */
+export const shouldShowField = (field, view, inputData = {}) => {
+  // 1️⃣ Respect showOn
+  if (field.showOn && field.showOn !== "all") {
+    const views = field.showOn.split(",").map((v) => v.trim());
+    if (!views.includes(view)) return false;
+  }
+
+  // 2️⃣ Respect condition
+  if (field.condition) {
+    // Example: condition === "doctor"
+    // Will only show if inputData.role === "doctor"
+    const role = inputData.role;
+    if (role !== field.condition) return false;
+  }
+
+  return true;
 };
 
 export const getInputValue = (inputData, field) => {

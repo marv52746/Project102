@@ -25,7 +25,7 @@ export default function AppointmentModal({
   useEffect(() => {
     setInputData((prev) => {
       let changed = false;
-      const newData = { patient: patientData.user, ...prev };
+      const newData = { patient: patientData, ...prev };
 
       // console.log(newData);
 
