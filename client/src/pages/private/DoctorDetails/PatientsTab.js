@@ -18,24 +18,15 @@ export default function PatientsTab({ appointments }) {
   const [visibleAppointments, setVisibleAppointments] = useState(5);
   const [visiblePatients, setVisiblePatients] = useState(5);
 
-  const handleClick = async (recordId) => {
+  const handleClick = async (record) => {
     if (activeTab === "appointments") {
-      navigate(`/form/appointments/view/${recordId}`);
+      navigate(`/form/appointments/view/${record}`);
     } else if (activeTab === "patients") {
       try {
-        const res = await apiService.get(dispatch, "patients", {
-          user: recordId,
-        });
-
-        console.log(res);
-
-        // Assuming your API returns an array of patients matching the user
-        const patient = Array.isArray(res) ? res[0] : res;
-
-        if (patient?._id) {
-          navigate(`/form/patients/view/${patient._id}`);
+        if (record?._id) {
+          navigate(`/form/patients/view/${record._id}`);
         } else {
-          console.error("Patient not found for user:", recordId);
+          console.error("Patient not found for user:", record.name);
         }
       } catch (error) {
         console.error("Error fetching patient by user:", error);

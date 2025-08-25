@@ -23,7 +23,7 @@ const InternalLayout = () => {
   };
 
   return (
-    <div className={`flex h-screen ${theme}`}>
+    <div className={`flex h-screen overflow-hidden ${theme}`}>
       {/* Sidebar for internal users */}
       <Sidebar>
         {(expanded) => (

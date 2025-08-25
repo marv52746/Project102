@@ -9,6 +9,7 @@ import { genderOptions, roleOptions } from "./formFieldPresets";
 //   { name: "user.blood_type", label: "Blood Type" },
 // ];
 export const patientTableColumns = [
+  // { name: "avatar", label: "Avatar" },
   { name: "name", label: "Name" },
   { name: "gender", label: "Gender" },
   { name: "date_of_birth", label: "Date of Birth" },

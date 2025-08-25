@@ -3,7 +3,7 @@ import { genderOptions, roleOptions } from "./formFieldPresets";
 
 // Columns used in the table list
 export const userTableColumns = [
-  { name: "avatar", label: "Avatar" },
+  // { name: "avatar", label: "Avatar" },
   { name: "name", label: "Name" },
   { name: "email", label: "Email" },
   { name: "phone_number", label: "Phone" },
@@ -25,9 +25,20 @@ export const userSettings = [
 // Form field definitions with conditional visibility
 // showOn: 'create' | 'edit' | 'view' | 'all'
 export const userFormFields = [
-  // { name: "name", label: "Name", type: "text", showOn: "all" },
-  { name: "first_name", label: "First Name", showOn: "all", required: true },
-  { name: "last_name", label: "Last Name", showOn: "all", required: true },
+  {
+    name: "first_name",
+    label: "First Name",
+    showOn: "all",
+    required: true,
+    type: "text",
+  },
+  {
+    name: "last_name",
+    label: "Last Name",
+    showOn: "all",
+    required: true,
+    type: "text",
+  },
   // { type: "half-spacer", showOn: "create" },
   {
     name: "email",

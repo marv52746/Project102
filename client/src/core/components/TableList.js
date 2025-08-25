@@ -187,6 +187,18 @@ const TableList = ({ data, columns }) => {
                               {item.patient?.name || "-"}
                             </span>
                           </div>
+                        ) : col.name === "name" &&
+                          (tablename === "doctors" ||
+                            tablename === "patients" ||
+                            tablename === "users") ? (
+                          <div className="flex items-center space-x-3">
+                            <img
+                              src={getAvatarUrl(item.avatar)}
+                              alt="User Avatar"
+                              className="w-8 h-8 rounded-full"
+                            />
+                            <span className="truncate">{value || "-"}</span>
+                          </div>
                         ) : col.name.toLowerCase().includes("date") ? (
                           formatFullDate(value)
                         ) : (

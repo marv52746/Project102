@@ -26,6 +26,7 @@ const inventoryRoutes = require("./inventory/inventoryItemRoutes");
 const inventoryLogRoutes = require("./inventory/inventoryLogRoutes");
 const activityRoutes = require("./core/activityRoutes");
 const pregnancyRoutes = require("./medical/pregnancyRoutes");
+const notificationRoutes = require("./notification/notifications");
 
 // Core routes
 router.use("/file", fileRoutes);
@@ -33,6 +34,8 @@ router.use("/users", userRoutes);
 router.use("/properties", propertyRoutes);
 router.use("/auth", authRoutes); // ✅ REGISTER AUTH ROUTE HERE
 router.use("/activities", activityRoutes);
+
+router.use("/send", notificationRoutes);
 
 router.use("/calendar", calendarRoute);
 
