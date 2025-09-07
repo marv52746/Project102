@@ -82,21 +82,21 @@ export default function Sidebar({ children }) {
     if (!userInfo) return;
 
     switch (userInfo.role) {
-      case "doctor":
-        if (record?._id) {
-          navigate(`/form/doctors/view/${record._id}`);
-        } else {
-          navigate("/list/doctors");
-        }
-        break;
+      // case "doctor":
+      //   if (record?._id) {
+      //     navigate(`/form/doctors/view/${record._id}`);
+      //   } else {
+      //     navigate("/list/doctors");
+      //   }
+      //   break;
 
-      case "patient":
-        if (record?._id) {
-          navigate(`/form/patients/view/${record._id}`);
-        } else {
-          navigate("/list/patients");
-        }
-        break;
+      // case "patient":
+      //   if (record?._id) {
+      //     navigate(`/form/patients/view/${record._id}`);
+      //   } else {
+      //     navigate("/list/patients");
+      //   }
+      //   break;
 
       default:
         navigate(`/form/users/view/${userInfo.id}`);

@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { User, BarChart, DollarSign } from "lucide-react";
+import {
+  User,
+  BarChart,
+  DollarSign,
+  CalendarCheck2,
+  CalendarClock,
+} from "lucide-react";
 import StatCard from "../../../core/components/dashboard/StatCard";
 import AppointmentsTable from "../../../core/components/appoinment/AppointmentsTable";
 import ComboChart2 from "../../../core/components/dashboard/ComboChart2";
@@ -79,6 +85,25 @@ function Dashboard() {
     );
   }).length;
 
+  // 🔹 Filter completed appointments this month & last month
+  const completedAppointmentsThisMonth = appointments.filter((a) => {
+    const date = new Date(a.date);
+    return (
+      a.status === "completed" &&
+      date.getFullYear() === currentYear &&
+      date.getMonth() === currentMonth
+    );
+  }).length;
+
+  const completedAppointmentsLastMonth = appointments.filter((a) => {
+    const date = new Date(a.date);
+    return (
+      a.status === "completed" &&
+      date.getFullYear() === currentYear &&
+      date.getMonth() === currentMonth - 1
+    );
+  }).length;
+
   // 🔹 Utility to calculate trend
   const getTrend = (current, prev) => {
     if (prev === 0 && current === 0)
@@ -97,13 +122,37 @@ function Dashboard() {
     appointmentsThisMonth,
     appointmentsLastMonth
   );
+  const completedAppointmentTrend = getTrend(
+    completedAppointmentsThisMonth,
+    completedAppointmentsLastMonth
+  );
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const currentMonthName = monthNames[currentMonth];
 
   return (
     <div className="mx-auto p-4">
+      {/* <h3 className="text-xl font-semibold text-text-secondary mb-4">
+        Overview – {currentMonthName} {currentYear}
+      </h3> */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <StatCard
           icon={User}
-          title="Patients"
+          title="New Patients"
           value={patientsThisMonth.toString()}
           percentage={patientTrend.percentage}
           trend={patientTrend.trend}
@@ -111,21 +160,21 @@ function Dashboard() {
         />
 
         <StatCard
-          icon={BarChart}
+          icon={CalendarClock}
           title="Appointments"
           value={appointmentsThisMonth.toString()}
           percentage={appointmentTrend.percentage}
           trend={appointmentTrend.trend}
-          color="#10B981"
+          color="#3b82f6"
         />
 
         <StatCard
-          icon={DollarSign}
-          title="Total Revenue"
-          value="₱7,300"
-          percentage="+10%"
-          trend="up"
-          color="#f59e0b"
+          icon={CalendarCheck2}
+          title="Completed Appointments"
+          value={completedAppointmentsThisMonth.toString()}
+          percentage={completedAppointmentTrend.percentage}
+          trend={completedAppointmentTrend.trend}
+          color="#10B981"
         />
       </div>
 

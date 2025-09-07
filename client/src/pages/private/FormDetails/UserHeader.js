@@ -24,6 +24,7 @@ import {
   handleFormDelete,
 } from "../../../core/components/formActions/formHandlers";
 import ConfirmDeleteModal from "../../../core/components/modal/ConfirmDeleteModal";
+import ClinicalRecordButton from "../../../core/components/formActions/ClinicalRecordButton";
 
 export default function UserHeader({ data }) {
   const userInfo = useSelector((state) => state.user.userInfo);
@@ -118,13 +119,14 @@ export default function UserHeader({ data }) {
 
       {/* Actions */}
       <div className="flex items-start gap-2 relative min-w-fit">
-        <button
+        {/* <button
           onClick={() => setShowModal(true)}
           className="bg-blue-600 text-white text-sm px-3 py-1.5 rounded hover:bg-blue-700 transition flex items-center gap-1"
         >
           <Plus className="w-4 h-4" />
           Clinical Record
-        </button>
+        </button> */}
+        <ClinicalRecordButton patient={user} />
 
         <div className="relative" ref={dropdownRef}>
           <button

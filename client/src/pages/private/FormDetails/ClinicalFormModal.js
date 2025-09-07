@@ -15,7 +15,7 @@ export default function ClinicalFormModal({
   onClose,
   patient,
   mode, // create | edit | view
-  initialData,
+  initialData = {}, // default to empty object
   type,
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,7 +55,7 @@ export default function ClinicalFormModal({
       dispatch,
       tablename: formData.type,
       data: payload,
-      id: initialData._id || null,
+      id: initialData._id ? initialData._id : null,
       fields,
     });
     onClose();

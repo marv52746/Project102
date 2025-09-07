@@ -1,9 +1,14 @@
+const { UserDb } = require("../../model/User");
+const {
+  createNotificationService,
+} = require("../../service/notificationService");
 const { logActivity } = require("../../utils/activityLogger");
 
 class BaseController {
   constructor(model, tableName) {
     this.model = model;
     this.tableName = tableName || model.modelName; // fallback to Mongoose model name
+    this.modelName = model.modelName?.toLowerCase(); // ✅ keep a lowercase model name for comparisons
   }
 
   // ✅ Centralized logging method so we don't repeat tableName
@@ -61,6 +66,7 @@ class BaseController {
       const savedItem = await newItem.save();
 
       await this.logActivity("create", savedItem, req.user?._id);
+
       res.status(201).json(savedItem);
     } catch (error) {
       res.status(500).json({ error: error.message });

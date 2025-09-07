@@ -356,93 +356,95 @@ export default function ClinicalRecordTab({ patientId }) {
 
           {clinicalTab === "vitals" && (
             <ul className="space-y-3 w-full">
-              {vitals.map((v, index) => {
-                const heightMeters = v.height ? v.height / 100 : null;
-                const bmi =
-                  heightMeters && v.weight
-                    ? (v.weight / (heightMeters * heightMeters)).toFixed(2)
-                    : null;
+              {vitals
+                .sort((a, b) => new Date(b.date) - new Date(a.date)) // 👈 recent first
+                .map((v, index) => {
+                  const heightMeters = v.height ? v.height / 100 : null;
+                  const bmi =
+                    heightMeters && v.weight
+                      ? (v.weight / (heightMeters * heightMeters)).toFixed(2)
+                      : null;
 
-                // Determine BMI category and color
-                let bmiCategory = "";
-                let bmiColor = "";
+                  // Determine BMI category and color
+                  let bmiCategory = "";
+                  let bmiColor = "";
 
-                if (bmi) {
-                  const bmiValue = parseFloat(bmi);
-                  if (bmiValue < 18.5) {
-                    bmiCategory = "Underweight";
-                    bmiColor = "text-yellow-600";
-                  } else if (bmiValue < 25) {
-                    bmiCategory = "Normal";
-                    bmiColor = "text-green-600";
-                  } else if (bmiValue < 30) {
-                    bmiCategory = "Overweight";
-                    bmiColor = "text-orange-600";
-                  } else {
-                    bmiCategory = "Obese";
-                    bmiColor = "text-red-600";
+                  if (bmi) {
+                    const bmiValue = parseFloat(bmi);
+                    if (bmiValue < 18.5) {
+                      bmiCategory = "Underweight";
+                      bmiColor = "text-yellow-600";
+                    } else if (bmiValue < 25) {
+                      bmiCategory = "Normal";
+                      bmiColor = "text-green-600";
+                    } else if (bmiValue < 30) {
+                      bmiCategory = "Overweight";
+                      bmiColor = "text-orange-600";
+                    } else {
+                      bmiCategory = "Obese";
+                      bmiColor = "text-red-600";
+                    }
                   }
-                }
 
-                return (
-                  <li
-                    key={index}
-                    onClick={() => {
-                      setViewType(clinicalTab);
-                      setViewData(v);
-                      setOpenViewModal(true);
-                    }}
-                    className="p-3 rounded-md bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer"
-                  >
-                    <div className="flex justify-between items-center mb-1 text-blue-700 font-semibold text-sm">
-                      <div className="flex items-center gap-2">
-                        <Activity className="h-4 w-4" />
-                        <span>{formatFullDate(v.date)}</span>
-                      </div>
-                      <span className="text-xs text-blue-600">
-                        {v.time || ""}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-gray-700 text-xs">
-                      <div>
-                        <strong>BP:</strong> {v.blood_pressure || "-"}
-                      </div>
-                      <div>
-                        <strong>HR:</strong>{" "}
-                        {v.heart_rate ? `${v.heart_rate} bpm` : "-"}
-                      </div>
-                      <div>
-                        <strong>Temp:</strong>{" "}
-                        {v.temperature ? `${v.temperature} °C` : "-"}
-                      </div>
-                      <div>
-                        <strong>RR:</strong> {v.respiratory_rate || "-"}
-                      </div>
-                      <div>
-                        <strong>Weight:</strong>{" "}
-                        {v.weight ? `${v.weight} kg` : "-"}
-                      </div>
-                      <div>
-                        <strong>Height:</strong>{" "}
-                        {v.height ? `${v.height} cm` : "-"}
-                      </div>
-
-                      {bmi && (
-                        <div className="col-span-2">
-                          <strong>BMI:</strong> {bmi}{" "}
-                          <span className={`${bmiColor} font-semibold ml-2`}>
-                            ({bmiCategory})
-                          </span>
+                  return (
+                    <li
+                      key={index}
+                      onClick={() => {
+                        setViewType(clinicalTab);
+                        setViewData(v);
+                        setOpenViewModal(true);
+                      }}
+                      className="p-3 rounded-md bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer"
+                    >
+                      <div className="flex justify-between items-center mb-1 text-blue-700 font-semibold text-sm">
+                        <div className="flex items-center gap-2">
+                          <Activity className="h-4 w-4" />
+                          <span>{formatFullDate(v.date)}</span>
                         </div>
-                      )}
-                      <div>
-                        <strong>Notes:</strong> {v.notes ? `${v.notes}` : "-"}
+                        <span className="text-xs text-blue-600">
+                          {v.time || ""}
+                        </span>
                       </div>
-                    </div>
-                  </li>
-                );
-              })}
+
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-gray-700 text-xs">
+                        <div>
+                          <strong>BP:</strong> {v.blood_pressure || "-"}
+                        </div>
+                        <div>
+                          <strong>HR:</strong>{" "}
+                          {v.heart_rate ? `${v.heart_rate} bpm` : "-"}
+                        </div>
+                        <div>
+                          <strong>Temp:</strong>{" "}
+                          {v.temperature ? `${v.temperature} °C` : "-"}
+                        </div>
+                        <div>
+                          <strong>RR:</strong> {v.respiratory_rate || "-"}
+                        </div>
+                        <div>
+                          <strong>Weight:</strong>{" "}
+                          {v.weight ? `${v.weight} kg` : "-"}
+                        </div>
+                        <div>
+                          <strong>Height:</strong>{" "}
+                          {v.height ? `${v.height} cm` : "-"}
+                        </div>
+
+                        {bmi && (
+                          <div className="col-span-2">
+                            <strong>BMI:</strong> {bmi}{" "}
+                            <span className={`${bmiColor} font-semibold ml-2`}>
+                              ({bmiCategory})
+                            </span>
+                          </div>
+                        )}
+                        <div>
+                          <strong>Notes:</strong> {v.notes ? `${v.notes}` : "-"}
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
             </ul>
           )}
         </Card>

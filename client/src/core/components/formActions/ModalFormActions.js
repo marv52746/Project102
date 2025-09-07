@@ -66,7 +66,7 @@ export default function ModalFormActions({ report, onClose, userRole }) {
           }}
           className="px-5 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex items-center gap-2"
         >
-          Cancel
+          Cancel Appointment
         </button>
       )}
 

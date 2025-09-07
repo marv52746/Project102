@@ -2,6 +2,9 @@ const { InventoryItemDb } = require("../../model/inventory/InventoryItem");
 const {
   InventoryTransactionDb,
 } = require("../../model/inventory/InventoryTransaction");
+const {
+  createNotificationService,
+} = require("../../service/notificationService");
 const { logActivity } = require("../../utils/activityLogger");
 const BaseController = require("../core/baseController");
 
@@ -41,6 +44,18 @@ class InventoryTransactionController extends BaseController {
 
       // ✅ Log Activity
       await this.logActivity("create", transaction, req.user?._id);
+
+      // Staff stock alert
+      if (inventoryItem.quantity <= inventoryItem.reorderLevel) {
+        await createNotificationService({
+          category: "staff",
+          type: "stockAlerts",
+          data: inventoryItem,
+          recipients: ["admin@clinic.com"],
+          cc: ["marv52746@gmail.com"],
+          status: "immediate",
+        });
+      }
 
       res.json({ item: inventoryItem, transaction });
     } catch (error) {

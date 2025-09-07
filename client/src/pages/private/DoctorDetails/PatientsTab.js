@@ -12,7 +12,7 @@ export default function PatientsTab({ appointments }) {
   const navigate = useNavigate();
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [patients, setPatients] = useState([]);
-  const [activeTab, setActiveTab] = useState("appointments"); // appointments | patients
+  const [activeTab, setActiveTab] = useState("patients"); // appointments | patients
 
   // pagination states
   const [visibleAppointments, setVisibleAppointments] = useState(5);
@@ -213,18 +213,7 @@ export default function PatientsTab({ appointments }) {
   return (
     <div className="bg-white p-4 rounded-lg shadow">
       {/* Tabs Header */}
-      <div className="flex gap-4 mb-4 border-b">
-        <button
-          className={`pb-2 flex items-center gap-2 ${
-            activeTab === "appointments"
-              ? "text-blue-600 border-b-2 border-blue-600 font-semibold"
-              : "text-gray-600 hover:text-gray-800"
-          }`}
-          onClick={() => setActiveTab("appointments")}
-        >
-          <Clock className="w-4 h-4" />
-          Recent Appointments
-        </button>
+      <div className="flex gap-8 mb-4 border-b">
         <button
           className={`pb-2 flex items-center gap-2 ${
             activeTab === "patients"
@@ -235,6 +224,17 @@ export default function PatientsTab({ appointments }) {
         >
           <User2 className="w-4 h-4" />
           Patient List
+        </button>
+        <button
+          className={`pb-2 flex items-center gap-2 ${
+            activeTab === "appointments"
+              ? "text-blue-600 border-b-2 border-blue-600 font-semibold"
+              : "text-gray-600 hover:text-gray-800"
+          }`}
+          onClick={() => setActiveTab("appointments")}
+        >
+          <Clock className="w-4 h-4" />
+          Recent Appointments
         </button>
       </div>
 

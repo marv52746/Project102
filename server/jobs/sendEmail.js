@@ -7,8 +7,12 @@ async function sendEmail(notification) {
       from:
         notification.from || `"Clinic Reminder" <${process.env.EMAIL_USER}>`,
       to: notification.to,
+      cc: notification.cc || undefined,
+      bcc: notification.bcc || undefined,
       subject: notification.subject,
-      text: notification.text,
+      html: notification.html,
+      // html: "<h1>Welcome</h1><p>That was easy!</p>",
+      // text: notification.text || "Your email client does not support HTML.", // fallback
     };
 
     await transporter.sendMail(mailOptions);

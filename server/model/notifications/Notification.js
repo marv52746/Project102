@@ -8,8 +8,14 @@ const NotificationSchema = new mongoose.Schema(
       default: process.env.EMAIL_USER, // fallback to system email
     },
     to: {
-      type: String,
+      type: [String],
       required: true,
+    },
+    cc: {
+      type: [String],
+    },
+    bcc: {
+      type: [String],
     },
     subject: {
       type: String,
@@ -17,7 +23,9 @@ const NotificationSchema = new mongoose.Schema(
     },
     text: {
       type: String,
-      required: true,
+    },
+    html: {
+      type: String,
     },
     status: {
       type: String,

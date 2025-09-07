@@ -1,19 +1,30 @@
 const sendEmail = require("../../jobs/sendEmail");
 const { NotificationDb } = require("../../model/notifications/Notification");
+const {
+  createNotificationService,
+} = require("../../service/notificationService");
 
 // controller methods
 const notificationController = {
   // create a new notification (to be sent later or immediately)
+  // createNotification: async (req, res) => {
+  //   try {
+  //     const notification = new NotificationDb(req.body);
+  //     await notification.save();
+
+  //     // ✅ Check status before sending
+  //     if (notification.status === "immediate") {
+  //       await sendEmail(notification);
+  //     }
+
+  //     res.status(201).json(notification);
+  //   } catch (err) {
+  //     res.status(400).json({ error: err.message });
+  //   }
+  // },
   createNotification: async (req, res) => {
     try {
-      const notification = new NotificationDb(req.body);
-      await notification.save();
-
-      // ✅ Check status before sending
-      if (notification.status === "immediate") {
-        await sendEmail(notification);
-      }
-
+      const notification = await createNotificationService(req.body);
       res.status(201).json(notification);
     } catch (err) {
       res.status(400).json({ error: err.message });

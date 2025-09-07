@@ -1,6 +1,7 @@
 import React from "react";
 import { CheckCircle, X, User, Stethoscope } from "lucide-react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom"; // ✅ add this
 import { handleCompleteAppointment } from "../formActions/formHandlers";
 import { formatDate, formatTime } from "../../utils/dateUtils";
 import { capitalizeText } from "../../utils/stringUtils";
@@ -8,6 +9,7 @@ import ModalFormActions from "../formActions/ModalFormActions";
 
 function CalendarModalDetails({ report, onClose }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // ✅ hook for navigation
   if (!report) return null;
 
   const onComplete = async () => {
@@ -18,6 +20,10 @@ function CalendarModalDetails({ report, onClose }) {
       data: { status: "completed" },
     });
     onClose();
+  };
+
+  const handleRedirect = (id, table) => {
+    if (id) navigate(`/form/${table}/view/${id}`); // ✅ route to user form by id
   };
 
   return (
@@ -51,11 +57,15 @@ function CalendarModalDetails({ report, onClose }) {
               icon={User}
               label="Patient"
               value={report.patient?.name || "N/A"}
+              onClick={() => handleRedirect(report.patient?._id, "patients")}
+              clickable
             />
             <InfoCard
               icon={Stethoscope}
               label="Doctor"
               value={report.doctor?.name || "N/A"}
+              onClick={() => handleRedirect(report.doctor?._id, "doctors")}
+              clickable
             />
             <InfoCard label="Reason" value={report.reason || "N/A"} />
             <InfoCard
@@ -78,13 +88,24 @@ function CalendarModalDetails({ report, onClose }) {
   );
 }
 
-const InfoCard = ({ icon: Icon, label, value }) => (
-  <div className="flex flex-col">
+const InfoCard = ({ icon: Icon, label, value, onClick, clickable }) => (
+  <div
+    className={`flex flex-col ${clickable ? "cursor-pointer" : ""}`}
+    onClick={onClick}
+  >
     <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
       {Icon && <Icon size={14} className="text-gray-500" />}
       {label}
     </span>
-    <span className="text-gray-800 mt-1">{value}</span>
+    <span
+      className={`mt-1 ${
+        clickable
+          ? "text-blue-600 hover:underline hover:text-blue-800"
+          : "text-gray-800"
+      }`}
+    >
+      {value}
+    </span>
   </div>
 );
 
