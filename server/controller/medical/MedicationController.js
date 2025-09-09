@@ -4,7 +4,7 @@ const BaseController = require("../core/baseController");
 class MedicationController extends BaseController {
   constructor() {
     super(MedicationDb);
-    this.populateFields = ["patient"];
+    this.populateFields = ["patient", "appointment"];
   }
 
   // Add medication-specific methods here if needed

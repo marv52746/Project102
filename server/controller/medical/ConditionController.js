@@ -4,7 +4,7 @@ const BaseController = require("../core/baseController");
 class ConditionController extends BaseController {
   constructor() {
     super(ConditionDb);
-    this.populateFields = ["patient"];
+    this.populateFields = ["patient", "appointment"];
   }
 
   // Add condition-specific methods here if needed

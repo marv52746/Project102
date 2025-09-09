@@ -80,7 +80,7 @@ export default function OverviewTab({ appointments }) {
 
         setActivities(recentActivities);
         setupcomingAppointments(upcomingAppointmentsArr);
-        console.log(upcomingAppointmentsArr);
+        // console.log(upcomingAppointmentsArr);
       } catch (err) {
         console.error("Error fetching appointments:", err);
       }

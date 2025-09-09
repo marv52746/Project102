@@ -8,7 +8,16 @@ const BaseController = require("../core/baseController");
 class AppointmentController extends BaseController {
   constructor() {
     super(AppointmentDb);
-    this.populateFields = ["patient", "doctor"];
+    this.populateFields = [
+      "patient",
+      "doctor",
+      "vitals",
+      "medication",
+      "allergy",
+      "condition",
+      "surgical",
+      "pregnancy",
+    ];
     // super(AppointmentDb, ["patient", "doctor"]);
   }
 

@@ -34,6 +34,7 @@ const documentsSeed = [
 // Main Component
 export default function DashboardTab({ patientId, data }) {
   const { refreshKey } = useSelector((state) => state.utils);
+  const [manualRefresh, setManualRefresh] = useState(0);
 
   const [vitals, setVitals] = useState(null);
   const [appointments, setAppointments] = useState([]);
@@ -68,31 +69,40 @@ export default function DashboardTab({ patientId, data }) {
             new Date(b.created_on || b._id) - new Date(a.created_on || a._id)
         );
 
-        setVitals(sortedVitals[0] || null);
-        setAppointments(
-          filterByPatient(appointmentData)
-            // .filter((app) => new Date(app.date) >= new Date())
-            // .sort((a, b) => new Date(a.date) - new Date(b.date))
-            .filter((app) => {
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-              const appDate = new Date(app.date);
-              appDate.setHours(0, 0, 0, 0);
+        const filteredAppointments = filterByPatient(appointmentData)
+          // .filter((app) => new Date(app.date) >= new Date())
+          // .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .filter((app) => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const appDate = new Date(app.date);
+            appDate.setHours(0, 0, 0, 0);
 
-              return (
-                appDate >= today &&
-                ["scheduled", "rescheduled"].includes(app.status)
-              );
-            })
-            .sort((a, b) => new Date(a.date) - new Date(b.date))
-        );
+            return (
+              appDate >= today &&
+              ["scheduled", "rescheduled"].includes(app.status)
+            );
+          })
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        setAppointments(filteredAppointments);
+        setVitals(sortedVitals[0] || null);
+
+        // If the modal is open, refresh its data
+        if (openViewModal && viewData) {
+          const updatedView = filteredAppointments.find(
+            (app) => app._id === viewData._id
+          );
+          if (updatedView) setViewData(updatedView);
+        }
       } catch (error) {
         console.error("Error fetching clinical data:", error);
       }
     };
-
     fetchData();
-  }, [dispatch, patientId, refreshKey]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, patientId, refreshKey, manualRefresh]);
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
@@ -227,6 +237,7 @@ export default function DashboardTab({ patientId, data }) {
             setViewType(null);
           }}
           isOpen={true}
+          onRefresh={() => setManualRefresh((prev) => prev + 1)} // ✅ now it’s a callback
         />
       )}
 

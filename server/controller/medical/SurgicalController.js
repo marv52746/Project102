@@ -4,7 +4,7 @@ const BaseController = require("../core/baseController");
 class SurgicalController extends BaseController {
   constructor() {
     super(SurgicalDb);
-    this.populateFields = ["patient"];
+    this.populateFields = ["patient", "appointment"];
   }
 
   // Add surgical-specific methods here if needed

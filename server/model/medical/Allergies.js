@@ -3,6 +3,7 @@ const { ObjectId } = mongoose.Schema;
 
 const allergySchema = new mongoose.Schema({
   patient: { type: ObjectId, ref: "user", required: true },
+  appointment: { type: ObjectId, ref: "appointment" },
 
   name: String, // e.g., "Penicillin"
   reaction: String, // e.g., "Rash"

@@ -46,6 +46,15 @@ const appointmentSchema = new Schema(
       enum: ["scheduled", "completed", "cancelled", "no-show", "rescheduled"],
       default: "scheduled",
     },
+
+    // ✅ References to clinical records
+    vitals: [{ type: Schema.Types.ObjectId, ref: "vitals" }],
+    medication: [{ type: Schema.Types.ObjectId, ref: "medication" }],
+    allergy: [{ type: Schema.Types.ObjectId, ref: "allergy" }],
+    condition: [{ type: Schema.Types.ObjectId, ref: "condition" }],
+    surgical: [{ type: Schema.Types.ObjectId, ref: "surgical" }],
+    pregnancy: [{ type: Schema.Types.ObjectId, ref: "pregnancy" }],
+
     created_by: {
       type: Schema.Types.ObjectId,
       ref: "user",

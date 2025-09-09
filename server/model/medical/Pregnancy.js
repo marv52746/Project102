@@ -3,6 +3,7 @@ const { ObjectId } = mongoose.Schema;
 
 const pregnancySchema = new mongoose.Schema({
   patient: { type: ObjectId, ref: "user", required: true },
+  appointment: { type: ObjectId, ref: "appointment" },
 
   is_pregnant: { type: Boolean, default: false },
   gravida: { type: Number, default: 0 }, // total pregnancies

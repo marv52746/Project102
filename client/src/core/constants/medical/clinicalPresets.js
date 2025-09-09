@@ -226,12 +226,12 @@ export const pregnancyFormFields = [
     ref: "users",
     hidden: true,
   },
-  {
-    name: "is_pregnant",
-    label: "Pregnancy Status",
-    type: "checkbox",
-    required: true,
-  },
+  // {
+  //   name: "is_pregnant",
+  //   label: "Pregnancy Status",
+  //   type: "checkbox",
+  //   required: true,
+  // },
   {
     name: "gravida",
     label: "Gravida",

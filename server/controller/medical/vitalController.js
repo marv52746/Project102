@@ -4,7 +4,7 @@ const BaseController = require("../core/baseController");
 class VitalController extends BaseController {
   constructor() {
     super(VitalsDb);
-    this.populateFields = ["patient"];
+    this.populateFields = ["patient", "appointment"];
   }
 
   // Add vital-specific methods here

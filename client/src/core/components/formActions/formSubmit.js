@@ -13,6 +13,8 @@ export const handleFormSubmit = async ({
   userInfo,
 }) => {
   try {
+    // console.log(data);
+
     // ✅ Fix: normalize tablename (patients/doctors should map to users)
     const tablename =
       rawTablename === "patients" || rawTablename === "doctors"
@@ -55,15 +57,11 @@ export const handleFormSubmit = async ({
       }
     });
 
+    let savedRecord;
+
     // If form uses file
     if (hasFile) {
       const formData = new FormData();
-      // for (const [key, value] of Object.entries(payload)) {
-      //   formData.append(
-      //     key,
-      //     typeof value === "object" ? JSON.stringify(value) : value
-      //   );
-      // }
       for (const [key, value] of Object.entries(payload)) {
         if (Array.isArray(value)) {
           value.forEach((v) => formData.append(`${key}[]`, v));
@@ -79,15 +77,26 @@ export const handleFormSubmit = async ({
       }
 
       if (id) {
-        await apiService.put(dispatch, tablename, id, formData, true);
+        savedRecord = await apiService.put(
+          dispatch,
+          tablename,
+          id,
+          formData,
+          true
+        );
       } else {
-        await apiService.post(dispatch, tablename, formData, true);
+        savedRecord = await apiService.post(
+          dispatch,
+          tablename,
+          formData,
+          true
+        );
       }
     } else {
       if (id) {
-        await apiService.put(dispatch, tablename, id, payload);
+        savedRecord = await apiService.put(dispatch, tablename, id, payload);
       } else {
-        await apiService.post(dispatch, tablename, payload);
+        savedRecord = await apiService.post(dispatch, tablename, payload);
       }
     }
 
@@ -115,6 +124,9 @@ export const handleFormSubmit = async ({
     if (navigate) {
       navigate(`/list/${tablename}`);
     }
+
+    // ✅ Return the saved record
+    return savedRecord;
   } catch (error) {
     console.error("Form Submit Error:", error);
     dispatch(showNotification({ message: error.message, type: "error" }));

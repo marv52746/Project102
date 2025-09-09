@@ -24,12 +24,14 @@ const ConfirmModal = ({
         <h2 className="text-lg font-semibold mb-2">{title}</h2>
         <p className="text-gray-600 mb-6">{description}</p>
         <div className="flex justify-center gap-4">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100"
-          >
-            {cancelText}
-          </button>
+          {cancelText && (
+            <button
+              onClick={onClose}
+              className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100"
+            >
+              {cancelText}
+            </button>
+          )}
           <button
             onClick={onConfirm}
             className={`px-4 py-2 text-white rounded hover:brightness-90 ${confirmColor}`}

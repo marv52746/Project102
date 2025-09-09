@@ -99,6 +99,31 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: [],
   },
+  schedule: [
+    {
+      day: {
+        type: String,
+        enum: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ],
+        required: true,
+      },
+      morning: {
+        type: String,
+        default: "-", // e.g. "9:00–12:00" or "-"
+      },
+      afternoon: {
+        type: String,
+        default: "-",
+      },
+    },
+  ],
 });
 
 // // 🔐 Hash password before saving

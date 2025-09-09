@@ -3,6 +3,7 @@ const { ObjectId } = mongoose.Schema;
 
 const conditionSchema = new mongoose.Schema({
   patient: { type: ObjectId, ref: "user", required: true },
+  appointment: { type: ObjectId, ref: "appointment" },
 
   name: {
     type: String,

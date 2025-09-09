@@ -60,13 +60,14 @@ export default function UserDashboardPage({ data }) {
           { key: "calendar", label: "Calendar" },
           { key: "patients", label: "Patients" },
           { key: "reviews", label: "Reviews" },
+          { key: "consultation-history", label: "Apppointment History" },
         ];
       case "patient":
         return [
           { key: "dashboard", label: "Overview" },
           { key: "clinical-records", label: "Clinical Records" },
-          { key: "consultation-history", label: "Consultation History" },
           { key: "patientCalendar", label: "Calendar" },
+          { key: "consultation-history", label: "Apppointment History" },
         ];
       default:
         return [{ key: "dashboard", label: "Overview" }];
@@ -84,7 +85,7 @@ export default function UserDashboardPage({ data }) {
 
     const userId = data._id;
 
-    console.log(appointments);
+    // console.log(appointments);
 
     switch (mainTab) {
       // patient

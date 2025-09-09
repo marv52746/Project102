@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { CheckCircle, XCircle, Ban, RefreshCw } from "lucide-react";
+import {
+  CheckCircle,
+  XCircle,
+  Ban,
+  RefreshCw,
+  AlertTriangle,
+} from "lucide-react";
 import { useDispatch } from "react-redux";
 import { handleCompleteAppointment } from "../formActions/formHandlers";
 import ConfirmModal from "../modal/ConfirmModal";
@@ -11,7 +17,12 @@ import ConfirmModal from "../modal/ConfirmModal";
  *  - onClose: function to close modal
  *  - userRole: optional, restrict buttons based on role
  */
-export default function ModalFormActions({ report, onClose, userRole }) {
+export default function ModalFormActions({
+  report,
+  onClose,
+  userRole,
+  setError,
+}) {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState({});
@@ -46,6 +57,20 @@ export default function ModalFormActions({ report, onClose, userRole }) {
     onClose();
   };
 
+  const openErrorModal = (message) => {
+    setModalConfig({
+      title: "Validation Error",
+      description: message,
+      confirmText: "OK",
+      cancelText: "", // hide cancel button
+      confirmColor: "bg-red-600",
+      icon: <AlertTriangle className="w-6 h-6 text-red-600" />,
+      onConfirm: () => setIsModalOpen(false),
+      onClose: () => setIsModalOpen(false),
+    });
+    setIsModalOpen(true);
+  };
+
   // Example restriction: only doctor can complete
   const canComplete = userRole === "doctor" && report.status !== "completed";
 
@@ -70,28 +95,13 @@ export default function ModalFormActions({ report, onClose, userRole }) {
         </button>
       )}
 
-      {/* {report.status !== "no-show" && (
-        <button
-          onClick={() => {
-            setModalConfig({
-              title: "Cancel Appointment",
-              description: "Do you want to mark this appointment as no-show?",
-              confirmText: "Confirm",
-              confirmColor: "bg-yellow-500",
-              icon: <XCircle className="w-5 h-5 text-yellow-500" />,
-              onConfirm: onCancel,
-            }) || setIsModalOpen(true);
-            // onClose();
-          }}
-          className="px-5 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 flex items-center gap-2"
-        >
-          No Show
-        </button>
-      )} */}
-
       {canComplete && (
         <button
           onClick={() => {
+            // if (!report.notes || report.notes.trim() === "") {
+            //   openErrorModal("⚠️ Please add doctor notes before completing.");
+            //   return;
+            // }
             setModalConfig({
               title: "Mark as Complete",
               description: "Do you want to mark this appointment as completed?",

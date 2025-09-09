@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function ConsultationHistoryTab() {
-  const { id } = useParams();
+  const { id, tablename } = useParams();
   const dispatch = useDispatch();
   const { refreshKey } = useSelector((state) => state.utils);
 
@@ -15,24 +15,32 @@ export default function ConsultationHistoryTab() {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
+        let userType = tablename === "doctors" ? "doctor" : "patient";
         const userAppointments = await apiService.get(
           dispatch,
           "appointments",
           {
-            patient: id,
+            [userType]: id,
             status: "completed",
           }
         );
 
-        setAppointments(userAppointments || []);
-        console.log("Consultation history:", userAppointments);
+        // ✅ sort by date + time (latest first)
+        const sortedAppointments = (userAppointments || []).sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return dateB - dateA; // descending
+        });
+
+        setAppointments(sortedAppointments || []);
+        console.log("Consultation history:", sortedAppointments);
       } catch (error) {
         console.error("Error fetching appointment details:", error);
       }
     };
 
     fetchDetails();
-  }, [id, dispatch, refreshKey]);
+  }, [id, dispatch, refreshKey, tablename]);
 
   if (!appointments.length) {
     return (

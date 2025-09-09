@@ -3,6 +3,7 @@ const { ObjectId } = mongoose.Schema;
 
 const vitalsSchema = new mongoose.Schema({
   patient: { type: ObjectId, ref: "user", required: true },
+  appointment: { type: ObjectId, ref: "appointment" },
 
   date: { type: Date, default: Date.now },
   blood_pressure: String, // e.g., "120/80"
