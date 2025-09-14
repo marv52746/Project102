@@ -46,6 +46,11 @@ function CalendarModal({ report, onClose }) {
       color: "bg-blue-500",
       icon: Clock,
     },
+    ready: {
+      text: "Ready",
+      color: "bg-green-500",
+      icon: Clock,
+    },
     cancelled: {
       text: "Cancelled",
       color: "bg-gray-400",

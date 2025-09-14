@@ -54,7 +54,7 @@ export const surgeryFormFields = [
     label: "Year",
     type: "number",
     placeholder: "e.g. 2025",
-    default: 2025,
+    // default: 2025,
   },
   { name: "surgeon", label: "Surgeon", placeholder: "e.g. Dr. Santos" },
   {
@@ -103,7 +103,7 @@ export const medicationFormFields = [
     name: "start_date",
     label: "Start Date",
     type: "date",
-    default: new Date(),
+    // default: new Date(),
   },
   { name: "end_date", label: "End Date", type: "date" },
   {
@@ -172,7 +172,7 @@ export const conditionFormFields = [
     name: "diagnosed_date",
     label: "Diagnosed Date",
     type: "date",
-    default: new Date(),
+    // default: new Date(),
   },
   {
     name: "notes",
@@ -194,14 +194,14 @@ export const appointmentsFormFields = [
     name: "date",
     label: "Date",
     type: "date",
-    default: new Date(),
+    // default: new Date(),
     required: true,
   },
   {
     name: "time",
     label: "Time",
     type: "time",
-    default: new Date().toTimeString().slice(0, 5),
+    // default: new Date().toTimeString().slice(0, 5),
     required: true,
   },
   {

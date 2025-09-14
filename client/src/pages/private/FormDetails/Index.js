@@ -11,6 +11,7 @@ import ReviewsTab from "../DoctorDetails/ReviewsTab";
 import CalendarTab from "../Calendar/CalendarTab";
 import ClinicalRecordTab from "./ClinicalRecordTab";
 import ConsultationHistoryTab from "./ConsultationHistoryTab";
+import DashboardTabStaff from "./DashboardTabStaff";
 
 export default function UserDashboardPage({ data }) {
   const { id } = useParams();
@@ -38,6 +39,8 @@ export default function UserDashboardPage({ data }) {
           setMainTab("overview");
         } else if (role === "patient") {
           setMainTab("dashboard");
+        } else if (role === "staff") {
+          setMainTab("staff-dashboard");
         } else {
           setMainTab("dashboard");
         }
@@ -52,15 +55,22 @@ export default function UserDashboardPage({ data }) {
   }, [id, dispatch, refreshKey, data]);
 
   const getTabItemsForRole = (role) => {
+    // console.log(role);
     switch (role) {
+      case "staff":
+        return [
+          { key: "staff-dashboard", label: "Overview" },
+          { key: "patients-all", label: "Patient List" },
+        ];
+
       case "doctor":
         return [
           { key: "overview", label: "Overview" },
           { key: "schedule", label: "Schedule" },
           { key: "calendar", label: "Calendar" },
-          { key: "patients", label: "Patients" },
-          { key: "reviews", label: "Reviews" },
+          { key: "patients", label: "Patient List" },
           { key: "consultation-history", label: "Apppointment History" },
+          // { key: "reviews", label: "Reviews" },
         ];
       case "patient":
         return [
@@ -69,12 +79,14 @@ export default function UserDashboardPage({ data }) {
           { key: "patientCalendar", label: "Calendar" },
           { key: "consultation-history", label: "Apppointment History" },
         ];
+
       default:
         return [{ key: "dashboard", label: "Overview" }];
     }
   };
 
   const tabItems = getTabItemsForRole(data.role);
+  // console.log(tabItems);
 
   const renderTabContent = () => {
     if (!data || !mainTab) {
@@ -84,15 +96,13 @@ export default function UserDashboardPage({ data }) {
     }
 
     const userId = data._id;
-
+    // console.log(mainTab);
     // console.log(appointments);
 
     switch (mainTab) {
       // patient
       case "dashboard":
         return <DashboardTab data={data} patientId={userId} />;
-      // case "appointments":
-      //   return <AppointmentsTab id={userId} />;
       case "patientCalendar":
         return <CalendarTab id={userId} tablename={"users"} />;
       case "clinical-records":
@@ -111,6 +121,12 @@ export default function UserDashboardPage({ data }) {
         return <CalendarTab id={userId} tablename={"users"} />;
       case "reviews":
         return <ReviewsTab data={data} />;
+
+      // staff
+      case "staff-dashboard":
+        return <DashboardTabStaff appointments={appointments} />;
+      case "patients-all":
+        return <PatientsTab data={data} />;
 
       default:
         return (

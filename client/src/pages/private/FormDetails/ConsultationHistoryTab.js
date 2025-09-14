@@ -4,6 +4,7 @@ import { capitalizeText } from "../../../core/utils/stringUtils";
 import apiService from "../../../core/services/apiService";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
 
 export default function ConsultationHistoryTab() {
   const { id, tablename } = useParams();
@@ -11,6 +12,7 @@ export default function ConsultationHistoryTab() {
   const { refreshKey } = useSelector((state) => state.utils);
 
   const [appointments, setAppointments] = useState([]);
+  const [selectedReport, setSelectedReport] = useState(null); // 👈 track selected row
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -77,7 +79,11 @@ export default function ConsultationHistoryTab() {
         </thead>
         <tbody className="divide-y divide-gray-200">
           {appointments.map((app) => (
-            <tr key={app._id} className="hover:bg-gray-50">
+            <tr
+              key={app._id}
+              className="hover:bg-gray-50 cursor-pointer"
+              onClick={() => setSelectedReport(app)}
+            >
               <td className="px-4 py-2">{formatDate(app.date)}</td>
               <td className="px-4 py-2">{formatTime(app.time)}</td>
               <td className="px-4 py-2">{app.doctor?.name || "N/A"}</td>
@@ -100,6 +106,14 @@ export default function ConsultationHistoryTab() {
           ))}
         </tbody>
       </table>
+      {/* Modal */}
+      {selectedReport && (
+        <CalendarModalDetails
+          report={selectedReport}
+          onClose={() => setSelectedReport(null)}
+          onRefresh={() => setSelectedReport(null)} // optional refresh
+        />
+      )}
     </div>
   );
 }

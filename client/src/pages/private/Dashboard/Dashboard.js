@@ -38,7 +38,7 @@ function Dashboard() {
       try {
         const [appointmentsRes, patientsRes] = await Promise.all([
           apiService.get(dispatch, "appointments"),
-          apiService.get(dispatch, "patients"),
+          apiService.get(dispatch, "users", { role: "patient" }),
         ]);
 
         setAppointments(appointmentsRes || []);
@@ -54,6 +54,8 @@ function Dashboard() {
   }, [dispatch]);
 
   if (loading) return <div className="p-4">Loading...</div>;
+
+  // console.log(patients);
 
   // 🔹 Filter patients created this month & last month
   const patientsThisMonth = patients.filter((p) => {

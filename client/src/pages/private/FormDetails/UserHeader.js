@@ -1,11 +1,10 @@
 import {
   FileText,
   MapPin,
-  MoreHorizontal,
   Phone,
-  Plus,
   Edit,
   Trash2,
+  MoreVertical,
 } from "lucide-react";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -24,7 +23,6 @@ import {
   handleFormDelete,
 } from "../../../core/components/formActions/formHandlers";
 import ConfirmDeleteModal from "../../../core/components/modal/ConfirmDeleteModal";
-import ClinicalRecordButton from "../../../core/components/formActions/ClinicalRecordButton";
 
 export default function UserHeader({ data }) {
   const userInfo = useSelector((state) => state.user.userInfo);
@@ -119,21 +117,16 @@ export default function UserHeader({ data }) {
 
       {/* Actions */}
       <div className="flex items-start gap-2 relative min-w-fit">
-        {/* <button
-          onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white text-sm px-3 py-1.5 rounded hover:bg-blue-700 transition flex items-center gap-1"
-        >
-          <Plus className="w-4 h-4" />
-          Clinical Record
-        </button> */}
-        <ClinicalRecordButton patient={user} />
+        {/* {data.role === "patient" && (
+          <ClinicalRecordButton patient={user} data={data} />
+        )} */}
 
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setShowDropdown((prev) => !prev)}
             className="p-2 hover:bg-gray-100 rounded-md transition"
           >
-            <MoreHorizontal className="h-5 w-5 text-gray-600" />
+            <MoreVertical className="h-5 w-5 text-gray-600" />
           </button>
           {showDropdown && (
             <div className="absolute right-0 mt-2 w-36 bg-white border rounded shadow z-10 overflow-hidden">

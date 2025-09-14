@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import ClinicalFormModal from "../../../pages/private/FormDetails/ClinicalFormModal";
+import ClinicalRecordButtonNew from "./ClinicalRecordButtonNew";
 
-export default function ClinicalRecordButton({ patient }) {
+export default function ClinicalRecordButton({ patient, data }) {
   const [showModal, setShowModal] = useState(false);
 
   return (
@@ -16,14 +16,20 @@ export default function ClinicalRecordButton({ patient }) {
       </button>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-          <div className="bg-white w-full max-w-lg p-6 rounded-md shadow-lg relative z-50">
-            <ClinicalFormModal
-              patient={patient}
-              onClose={() => setShowModal(false)}
-            />
-          </div>
-        </div>
+        // <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+        //   <div className="bg-white w-full max-w-lg p-6 rounded-md shadow-lg relative z-50">
+        //     <ClinicalFormModal
+        //       patient={patient}
+        //       onClose={() => setShowModal(false)}
+        //     />
+        //   </div>
+        // </div>
+
+        <ClinicalRecordButtonNew
+          report={data}
+          onClose={() => setShowModal(false)}
+          isOpen={true}
+        />
       )}
     </>
   );

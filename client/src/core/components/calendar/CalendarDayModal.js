@@ -27,6 +27,7 @@ const formatTime = (timeStr) => {
 
 const statusColors = {
   scheduled: "bg-blue-100 text-blue-800",
+  ready: "bg-green-100 text-green-800",
   completed: "bg-green-100 text-green-800",
   cancelled: "bg-gray-200 text-gray-600",
   rescheduled: "bg-purple-100 text-purple-800",

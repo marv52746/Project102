@@ -212,7 +212,7 @@ export default function PatientsTab({ appointments }) {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow">
-      {/* Tabs Header */}
+      {/* 
       <div className="flex gap-8 mb-4 border-b">
         <button
           className={`pb-2 flex items-center gap-2 ${
@@ -236,9 +236,8 @@ export default function PatientsTab({ appointments }) {
           <Clock className="w-4 h-4" />
           Recent Appointments
         </button>
-      </div>
+      </div> */}
 
-      {/* Tab Content */}
       {activeTab === "appointments"
         ? renderAppointmentsTable(filteredAppointments)
         : renderPatientsTable(patients)}

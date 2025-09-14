@@ -10,20 +10,8 @@ import CalendarModalDetails from "../../../core/components/calendar/CalendarModa
 import { capitalizeText } from "../../../core/utils/stringUtils";
 import AppointmentModal from "./AppointmentModal";
 import { formConfigMap } from "../../../core/constants/FieldConfigMap";
-
-// Helper component to show each vital
-function VitalItem({ icon: Icon, label, value }) {
-  if (!value) return null;
-  return (
-    <li className="flex items-center gap-2 p-3 rounded-md bg-blue-50 border border-blue-100">
-      <Icon className="h-5 w-5 text-blue-600" />
-      <div>
-        <div className="font-medium text-gray-700">{label}</div>
-        <div className="text-xs text-gray-500">{value}</div>
-      </div>
-    </li>
-  );
-}
+import VitalItem from "../../../core/components/calendar/VitalItem";
+import UpcomingAppointments from "./UpcomingAppointments";
 
 const documentsSeed = [
   { id: 1, name: "Check In" },
@@ -79,8 +67,7 @@ export default function DashboardTab({ patientId, data }) {
             appDate.setHours(0, 0, 0, 0);
 
             return (
-              appDate >= today &&
-              ["scheduled", "rescheduled"].includes(app.status)
+              appDate >= today && ["scheduled", "ready"].includes(app.status)
             );
           })
           .sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -138,70 +125,15 @@ export default function DashboardTab({ patientId, data }) {
         </Card>
 
         {/* Upcoming Appointments */}
-
-        <Card>
-          <div className="flex items-center justify-between pb-4">
-            <h2 className="text-md font-semibold text-gray-700">
-              Upcoming Appointments
-            </h2>
-            <button
-              onClick={() => setShowModal(true)}
-              className="px-3 py-1 text-sm text-blue-600 hover:text-blue-800"
-            >
-              + Schedule Appointment
-            </button>
-          </div>
-          {appointments.length ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {appointments.map((app) => (
-                <div
-                  key={app._id}
-                  className="p-4 rounded-lg border border-gray-200 shadow-sm bg-white hover:shadow-md transition cursor-pointer"
-                  onClick={() => {
-                    setViewType("appointments");
-                    setViewData(app);
-                    setOpenViewModal(true);
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-md font-semibold text-blue-600">
-                      {new Date(app.date).toLocaleDateString(undefined, {
-                        weekday: "short",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </span>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        app.status === "scheduled"
-                          ? "bg-gray-100 text-gray-700"
-                          : app.status === "cancelled"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {capitalizeText(app.status) || "Scheduled"}
-                    </span>
-                  </div>
-
-                  <div className="mt-2 text-gray-700 font-medium">
-                    {app.doctor?.name || "Doctor"}
-                  </div>
-
-                  {app.reason && (
-                    <div className="mt-1 text-sm text-gray-500 truncate">
-                      {app.reason}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-center">
-              No upcoming appointments.
-            </p>
-          )}
-        </Card>
+        <UpcomingAppointments
+          title={"Upcoming Appointments"}
+          appointments={appointments}
+          onSelect={(app) => {
+            setViewType("appointments");
+            setViewData(app);
+            setOpenViewModal(true);
+          }}
+        />
       </div>
 
       {/* TIMELINE + DOCUMENTS */}

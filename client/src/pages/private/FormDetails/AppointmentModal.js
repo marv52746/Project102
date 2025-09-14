@@ -41,44 +41,22 @@ export default function AppointmentModal({
         }
       });
 
-      // fields.forEach((field) => {
-      //   const hasValue =
-      //     newData[field.name] !== undefined && newData[field.name] !== null;
-
-      //   // ✅ Set default from field.default or patient prop
-      //   if (!hasValue) {
-      //     if (field.name === "patient" && patientData) {
-      //       newData[field.name] = {
-      //         label: patientData.user.name,
-      //         value: patientData._id,
-      //         full: patientData,
-      //       };
-      //       changed = true;
-      //     } else if (field.default !== undefined) {
-      //       newData[field.name] =
-      //         typeof field.default === "function"
-      //           ? field.default()
-      //           : field.default;
-      //       changed = true;
-      //     }
-      //   }
-      // });
-
-      // console.log(patientData);
-
       return changed ? newData : prev; // ⛔ prevent setState loop
     });
   }, [fields, patientData]); // ✅ only run once on mount
 
   const handleChange = (e) => {
     handleInputChange({ e, setInputData, setFileData });
+    // console.log(inputData);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // ✅ stop page reload
+
     handleFormSubmit({
       dispatch,
       tablename: "appointments",
-      id: patient._id,
+      // id: patient._id,
       data: inputData,
       fields,
       fileData,
@@ -100,36 +78,41 @@ export default function AppointmentModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {fields.map((field, index) => {
-            if (!shouldShowField(field, mode)) return null;
-            if (["spacer", "half-spacer", "label"].includes(field.type)) {
-              return renderSpacer(field, index);
-            }
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-2 gap-4">
+            {fields.map((field, index) => {
+              if (!shouldShowField(field, mode)) return null;
+              if (["spacer", "half-spacer", "label"].includes(field.type)) {
+                return renderSpacer(field, index);
+              }
 
-            // Section label
-            if (field.type === "label") {
+              // Section label
+              if (field.type === "label") {
+                return (
+                  <div key={index} className="col-span-2">
+                    <h3 className="text-md font-semibold text-gray-600 mt-4 mb-2">
+                      {field.label}
+                    </h3>
+                  </div>
+                );
+              }
+              if (!field.name) return null;
+
               return (
-                <div key={index} className="col-span-2">
-                  <h3 className="text-md font-semibold text-gray-600 mt-4 mb-2">
-                    {field.label}
-                  </h3>
+                <div key={index} className={field.fullRow ? "col-span-2" : ""}>
+                  {renderField({
+                    field,
+                    index,
+                    inputData,
+                    handleChange,
+                    setInputData,
+                    fields,
+                    dispatch,
+                  })}
                 </div>
               );
-            }
-            if (!field.name) return null;
-
-            return renderField({
-              field,
-              index,
-              inputData,
-              handleChange,
-              setInputData,
-              fields,
-              dispatch,
-            });
-          })}
-
+            })}
+          </div>
           {mode !== "view" && (
             <div className="flex justify-end sticky bottom-0 pt-4">
               <button

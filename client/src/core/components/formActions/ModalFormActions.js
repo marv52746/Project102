@@ -6,7 +6,7 @@ import {
   RefreshCw,
   AlertTriangle,
 } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { handleCompleteAppointment } from "../formActions/formHandlers";
 import ConfirmModal from "../modal/ConfirmModal";
 
@@ -22,10 +22,12 @@ export default function ModalFormActions({
   onClose,
   userRole,
   setError,
+  onRefresh,
 }) {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState({});
+  const userInfo = useSelector((state) => state.user.userInfo);
 
   const onComplete = async () => {
     handleCompleteAppointment({
@@ -34,6 +36,17 @@ export default function ModalFormActions({
       id: report._id,
       data: { status: "completed" },
     });
+    onClose();
+  };
+
+  const onReady = async () => {
+    handleCompleteAppointment({
+      dispatch,
+      tablename: "appointments",
+      id: report._id,
+      data: { status: "ready" },
+    });
+    onRefresh();
     onClose();
   };
 
@@ -72,7 +85,7 @@ export default function ModalFormActions({
   };
 
   // Example restriction: only doctor can complete
-  const canComplete = userRole === "doctor" && report.status !== "completed";
+  const canComplete = userInfo.role === "doctor" && report.status === "ready";
 
   return (
     <>
@@ -95,6 +108,36 @@ export default function ModalFormActions({
         </button>
       )}
 
+      {report.status === "scheduled" && (
+        <button
+          onClick={() => {
+            setModalConfig({
+              title: "Mark as Ready",
+              description: "Do you want to mark this appointment as ready?",
+              confirmText: "Ready",
+              confirmColor: "bg-green-600",
+              icon: <CheckCircle className="w-5 h-5 text-green-600" />,
+              onConfirm: onReady,
+            }) || setIsModalOpen(true);
+            // onClose();
+          }}
+          // onClick={async () => {
+          // await apiService.put(dispatch, "appointments", report._id, {
+          //   status: "ready",
+          // });
+          // const updatedReport = await apiService.get(
+          //   dispatch,
+          //   `appointments/${report._id}`
+          // );
+          // setReport(updatedReport);
+          // if (onRefresh) onRefresh();
+          // }}
+          className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+        >
+          Mark as Ready
+        </button>
+      )}
+
       {canComplete && (
         <button
           onClick={() => {
@@ -114,7 +157,7 @@ export default function ModalFormActions({
           }}
           className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
         >
-          Complete
+          Mark as Complete
         </button>
       )}
 

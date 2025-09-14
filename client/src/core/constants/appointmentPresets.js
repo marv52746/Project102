@@ -12,6 +12,7 @@ export const appointmentTableColumns = [
 // Appointment status dropdown options (you can customize the labels)
 const appointmentStatusOptions = [
   { label: "Scheduled", value: "scheduled" },
+  { label: "Ready", value: "ready" },
   { label: "Completed", value: "completed" },
   { label: "Cancelled", value: "cancelled" },
   { label: "No-show", value: "no-show" },
@@ -69,6 +70,7 @@ export const appointmentFormFields = [
     type: "textarea",
     showOn: "all",
     required: true,
+    fullRow: true,
   },
   {
     name: "status",

@@ -1,24 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
   X,
-  User,
-  Stethoscope,
   FilePlus2,
   ClipboardList,
   Baby,
   Scissors,
   NotebookText,
   Check,
-  Gauge,
-  HeartPulse,
-  Thermometer,
-  Weight,
   Activity,
 } from "lucide-react";
 
-import { formatDate, formatTime } from "../../utils/dateUtils";
-import { capitalizeText } from "../../utils/stringUtils";
-import ModalFormActions from "../formActions/ModalFormActions";
 import {
   AllergiesModal,
   ConditionsModal,
@@ -29,16 +20,17 @@ import {
   VitalsModal,
 } from "../modal/BaseModal";
 import { clinicalFormFieldMap } from "../../constants/medical/clinicalPresets";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { handleFormSubmit } from "../formActions/formSubmit";
 import apiService from "../../services/apiService";
-import Card from "../../../pages/private/FormDetails/Card";
-import VitalItem from "./VitalItem";
 
-function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
+function ClinicalRecordButtonNew({
+  report: initialReport,
+  onClose,
+  onRefresh,
+}) {
   const [report, setReport] = useState(initialReport);
   const [activeModal, setActiveModal] = useState(null);
-  const userInfo = useSelector((state) => state.user.userInfo);
 
   const dispatch = useDispatch();
 
@@ -46,7 +38,6 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
     setReport(initialReport);
   }, [initialReport]);
 
-  // console.log(userInfo);
   // console.log(report);
 
   if (!report) return null;
@@ -147,10 +138,6 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
     setActiveModal(null);
   };
 
-  const handleRedirect = (id, table) => {
-    if (id) window.open(`/form/${table}/view/${id}`, "_blank");
-  };
-
   const handleActionClick = (type) => {
     setActiveModal(type);
   };
@@ -184,6 +171,13 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
           iconColor: "text-blue-600",
           borderColor: "border-gray-200",
         };
+      case "vitals":
+        return {
+          Icon: Activity,
+          bgColor: "bg-blue-100",
+          iconColor: "text-blue-600",
+          borderColor: "border-gray-200",
+        };
       case "pregnancy":
         return {
           Icon: Baby,
@@ -194,20 +188,6 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
       case "surgery":
         return {
           Icon: Scissors,
-          bgColor: "bg-blue-100",
-          iconColor: "text-blue-600",
-          borderColor: "border-gray-200",
-        };
-      case "findings":
-        return {
-          Icon: NotebookText,
-          bgColor: "bg-blue-100",
-          iconColor: "text-blue-600",
-          borderColor: "border-gray-200",
-        };
-      case "vitals":
-        return {
-          Icon: Activity,
           bgColor: "bg-blue-100",
           iconColor: "text-blue-600",
           borderColor: "border-gray-200",
@@ -245,17 +225,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
       desc: "Record pregnancy details",
     },
     { type: "surgery", title: "Add Surgery", desc: "Record surgical history" },
-    {
-      type: "findings",
-      title: "Add Notes",
-      desc: "Add notes to this appointment",
-    },
   ];
-
-  const visibleActionTypes =
-    userInfo.role === "staff"
-      ? actionTypes.filter((a) => a.type === "vitals")
-      : actionTypes;
 
   return (
     <div
@@ -263,86 +233,25 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-11/12 max-w-3xl shadow-xl max-h-[95vh] overflow-y-auto"
+        className="bg-white rounded-2xl w-11/12 max-w-3xl shadow-xl max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b">
           <div>
             <h2 className="text-xl font-semibold text-gray-800">
-              Appointment #{report.appointment_no}
+              Add Clinical Record
             </h2>
-            <p className="text-sm text-gray-500">
-              {formatDate(report.date)} at {formatTime(report.time)}
-            </p>
           </div>
           <button onClick={onClose}>
             <X className="w-5 h-5 text-gray-500 hover:text-black" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-6">
-          {/* VITALS */}
-          <ul className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            {report.vitals.length > 0 ? (
-              <>
-                <VitalItem
-                  icon={Gauge}
-                  label="Blood Pressure"
-                  value={report.vitals[0].blood_pressure}
-                />
-                <VitalItem
-                  icon={HeartPulse}
-                  label="Heart Rate"
-                  value={report.vitals[0].heart_rate}
-                />
-                <VitalItem
-                  icon={Thermometer}
-                  label="Temperature"
-                  value={report.vitals[0].temperature}
-                />
-                <VitalItem
-                  icon={Weight}
-                  label="Weight"
-                  value={report.vitals[0].weight}
-                />
-              </>
-            ) : (
-              <p className="col-span-full text-center text-gray-400">
-                No vitals available.
-              </p>
-            )}
-          </ul>
-
-          {/* Info Grid */}
+        {/* Content - Quick Actions*/}
+        <div className="p-6 space-y-10">
           <div className="grid grid-cols-3 gap-4">
-            <InfoCard
-              icon={User}
-              label="Patient"
-              value={report.patient?.name || "N/A"}
-              onClick={() => handleRedirect(report.patient?._id, "patients")}
-              clickable
-            />
-            <InfoCard
-              icon={Stethoscope}
-              label="Doctor"
-              value={report.doctor?.name || "N/A"}
-              onClick={() => handleRedirect(report.doctor?._id, "doctors")}
-              clickable
-            />
-            <InfoCard
-              label="Status"
-              value={capitalizeText(report.status) || "N/A"}
-              status={report.status}
-            />
-            <InfoCard label="Reason" value={report.reason || "N/A"} />
-            <InfoCard label="Notes" value={report.notes || "-"} />
-          </div>
-
-          {/* Quick Actions */}
-          <div className="grid grid-cols-3 gap-4">
-            {visibleActionTypes.map(({ type, title, desc }) => {
+            {actionTypes.map(({ type, title, desc }) => {
               const { Icon, bgColor, iconColor, borderColor } =
                 getActionIconProps(type);
               return (
@@ -366,19 +275,6 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
               );
             })}
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex justify-end gap-3 border-t p-4 bg-gray-50">
-          {(report.status === "scheduled" || report.status === "ready") && (
-            <ModalFormActions
-              setError
-              report={report}
-              onClose={onClose}
-              userRole={"doctor"}
-              onRefresh={onRefresh}
-            />
-          )}
         </div>
 
         {/* Modals */}
@@ -436,57 +332,4 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
   );
 }
 
-const InfoCard = ({ icon: Icon, label, value, onClick, clickable, status }) => {
-  const statusBadgeClasses = (s) => {
-    switch (s) {
-      case "ready":
-        return "bg-green-100 text-green-700";
-      case "scheduled":
-        return "bg-gray-100 text-gray-700";
-      case "cancelled":
-        return "bg-yellow-100 text-yellow-700";
-      case "completed":
-        return "bg-blue-100 text-blue-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
-
-  const displayValue = value ?? "N/A";
-
-  return (
-    <div
-      className={`flex flex-col ${clickable ? "cursor-pointer" : ""}`}
-      onClick={onClick}
-    >
-      <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
-        {Icon && <Icon size={14} className="text-gray-500" />}
-        {label}
-      </span>
-
-      <span className="mt-1">
-        {status ? (
-          <span
-            className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusBadgeClasses(
-              status
-            )}`}
-          >
-            {displayValue}
-          </span>
-        ) : (
-          <span
-            className={`${
-              clickable
-                ? "text-blue-600 hover:underline hover:text-blue-800"
-                : "text-gray-800"
-            }`}
-          >
-            {displayValue}
-          </span>
-        )}
-      </span>
-    </div>
-  );
-};
-
-export default CalendarModalDetails;
+export default ClinicalRecordButtonNew;

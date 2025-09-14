@@ -77,8 +77,8 @@ export default function ClinicalFormModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {type !== "appointments" && (
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+          {/* {type !== "appointments" && (
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Record Type
@@ -99,7 +99,7 @@ export default function ClinicalFormModal({
                 <option value="others">Others</option>
               </select>
             </div>
-          )}
+          )} */}
 
           {currentFields.map((field, idx) => {
             if (!field.name) return null;

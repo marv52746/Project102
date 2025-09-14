@@ -28,7 +28,7 @@ const BaseModal = ({ isOpen, onClose, title, children }) => {
 };
 
 // ✅ Dynamic form renderer
-const ClinicalForm = ({ fields, formData, setFormData, type }) => {
+const ClinicalForm = ({ fields, formData, setFormData, type, readOnly }) => {
   // console.log(type);
   const gridClass = type === "appointment" ? "col-span-2" : "col-span-1";
   return (
@@ -49,6 +49,7 @@ const ClinicalForm = ({ fields, formData, setFormData, type }) => {
                   rows={3}
                   className="w-full border rounded-lg p-2 text-sm"
                   value={value}
+                  disabled={readOnly}
                   placeholder={field.placeholder}
                   onChange={(e) =>
                     setFormData({ ...formData, [field.name]: e.target.value })
@@ -65,7 +66,7 @@ const ClinicalForm = ({ fields, formData, setFormData, type }) => {
                   }
                   placeholder={field.placeholder}
                   required={field.required}
-                  // disabled={mode === "view"}
+                  disabled={readOnly}
                   options={field.options || []} // Pass select options if any
                 />
               )}
@@ -148,6 +149,7 @@ const MultiEntryModal = ({
   columns,
   type,
   initialData = [],
+  status,
 }) => {
   const [entries, setEntries] = useState(
     Array.isArray(initialData) && initialData.length > 0 ? initialData : [{}]
@@ -180,6 +182,10 @@ const MultiEntryModal = ({
     onClose();
   };
 
+  const readOnly = status !== "scheduled" && status !== "ready";
+  // console.log(status);
+  // console.log(readOnly);
+
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} title={title}>
       <div className="space-y-6 max-h-[70vh] overflow-y-auto p-2">
@@ -194,7 +200,7 @@ const MultiEntryModal = ({
               </span>
 
               {/* Remove row button */}
-              {entries.length > 1 && (
+              {entries.length > 1 && !readOnly && (
                 <button
                   onClick={() => handleRemove(idx)}
                   className="absolute top-2 right-2 p-1 rounded-full hover:bg-red-100"
@@ -210,6 +216,7 @@ const MultiEntryModal = ({
                 setFormData={(data) => handleChange(idx, data)}
                 columns={columns}
                 type={type}
+                readOnly={readOnly}
               />
             </div>
           );
@@ -217,42 +224,52 @@ const MultiEntryModal = ({
       </div>
 
       {/* Footer */}
-      <div className="flex justify-between items-center mt-6">
-        {columns === 2 && (
-          <button
-            onClick={handleAddMore}
-            className="flex items-center gap-2 px-4 py-2 text-sm border rounded-lg hover:bg-gray-100"
-          >
-            <Plus className="w-4 h-4" /> Add More
-          </button>
-        )}
+      {!readOnly && (
+        <div className="flex justify-between items-center mt-6">
+          {columns === 2 && (
+            <button
+              onClick={handleAddMore}
+              className="flex items-center gap-2 px-4 py-2 text-sm border rounded-lg hover:bg-gray-100"
+            >
+              <Plus className="w-4 h-4" /> Add More
+            </button>
+          )}
 
-        <div className="flex gap-3">
-          <button
-            onClick={() => {
-              setEntries([{}]); // ✅ reset all inputs
-              onClose(); // ✅ close modal
-            }}
-            className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-100"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:brightness-90"
-          >
-            Save All
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                setEntries([{}]); // ✅ reset all inputs
+                onClose(); // ✅ close modal
+              }}
+              className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-100"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:brightness-90"
+            >
+              Save All
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </BaseModal>
   );
 };
 
 // ✅ Prescription Modal
-export const PrescriptionModal = ({ isOpen, onClose, onSave, initialData }) => {
+export const PrescriptionModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+  status,
+}) => {
+  // console.log(initialData);
   return (
     <MultiEntryModal
+      status={status}
       isOpen={isOpen}
       onClose={onClose}
       title="Add Prescription"
@@ -265,9 +282,16 @@ export const PrescriptionModal = ({ isOpen, onClose, onSave, initialData }) => {
 };
 
 // ✅ Findings Modal
-export const FindingsModal = ({ isOpen, onClose, onSave, initialData }) => {
+export const FindingsModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+  status,
+}) => {
   return (
     <MultiEntryModal
+      status={status}
       isOpen={isOpen}
       onClose={onClose}
       title="Add Findings"
@@ -280,9 +304,16 @@ export const FindingsModal = ({ isOpen, onClose, onSave, initialData }) => {
 };
 
 // ✅ Findings Modal
-export const ConditionsModal = ({ isOpen, onClose, onSave, initialData }) => {
+export const ConditionsModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+  status,
+}) => {
   return (
     <MultiEntryModal
+      status={status}
       isOpen={isOpen}
       onClose={onClose}
       title="Add Findings"
@@ -295,9 +326,16 @@ export const ConditionsModal = ({ isOpen, onClose, onSave, initialData }) => {
 };
 
 // ✅ Vitals Modal
-export const VitalsModal = ({ isOpen, onClose, onSave, initialData }) => {
+export const VitalsModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+  status,
+}) => {
   return (
     <MultiEntryModal
+      status={status}
       isOpen={isOpen}
       onClose={onClose}
       title="Add Vitals"
@@ -310,9 +348,16 @@ export const VitalsModal = ({ isOpen, onClose, onSave, initialData }) => {
 };
 
 // ✅ Surgeries Modal
-export const SurgeriesModal = ({ isOpen, onClose, onSave, initialData }) => {
+export const SurgeriesModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+  status,
+}) => {
   return (
     <MultiEntryModal
+      status={status}
       isOpen={isOpen}
       onClose={onClose}
       title="Add Surgeries"
@@ -325,9 +370,16 @@ export const SurgeriesModal = ({ isOpen, onClose, onSave, initialData }) => {
 };
 
 // ✅ Allergies Modal
-export const AllergiesModal = ({ isOpen, onClose, onSave, initialData }) => {
+export const AllergiesModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+  status,
+}) => {
   return (
     <MultiEntryModal
+      status={status}
       isOpen={isOpen}
       onClose={onClose}
       title="Add Allergies"
@@ -340,9 +392,16 @@ export const AllergiesModal = ({ isOpen, onClose, onSave, initialData }) => {
 };
 
 // ✅ Pregnancies Modal
-export const PregnanciesModal = ({ isOpen, onClose, onSave, initialData }) => {
+export const PregnanciesModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+  status,
+}) => {
   return (
     <MultiEntryModal
+      status={status}
       isOpen={isOpen}
       onClose={onClose}
       title="Add Pregnancies"
