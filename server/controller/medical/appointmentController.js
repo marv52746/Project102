@@ -17,6 +17,8 @@ class AppointmentController extends BaseController {
       "condition",
       "surgical",
       "pregnancy",
+      "labrequest",
+      "ultrasound",
     ];
     // super(AppointmentDb, ["patient", "doctor"]);
   }

@@ -22,6 +22,11 @@ const InternalLayout = () => {
     return route === parms.tablename ? "active" : "";
   };
 
+  const hideHeader =
+    parms.tablename === "users" &&
+    parms.type === "form" &&
+    parms.view === "User Details";
+
   return (
     <div className={`flex h-screen overflow-hidden ${theme}`}>
       {/* Sidebar for internal users */}
@@ -60,9 +65,9 @@ const InternalLayout = () => {
           parms.tablename === "calendar" ? "overflow-hidden" : "overflow-auto"
         }`}
       >
-        {parms.tablename !== "calendar" && parms.tablename !== "settings" && (
-          <Header parms={parms} />
-        )}
+        {parms.tablename !== "calendar" &&
+          parms.tablename !== "settings" &&
+          !hideHeader && <Header parms={parms} />}
         <Routes>
           {authRoute.map((route) => (
             <Route

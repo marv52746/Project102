@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Card from "./Card";
 import { FileText, Thermometer, HeartPulse, Gauge, Weight } from "lucide-react";
 import apiService from "../../../core/services/apiService";
@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 import ActivitiesTimeline from "./ActivitiesTimeline";
 
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
-import { capitalizeText } from "../../../core/utils/stringUtils";
 import AppointmentModal from "./AppointmentModal";
 import { formConfigMap } from "../../../core/constants/FieldConfigMap";
 import VitalItem from "../../../core/components/calendar/VitalItem";
@@ -92,74 +91,86 @@ export default function DashboardTab({ patientId, data }) {
   }, [dispatch, patientId, refreshKey, manualRefresh]);
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-      <div className="xl:col-span-2 space-y-4">
-        {/* VITALS */}
-        <Card>
-          <ul className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            {vitals ? (
-              <>
-                <VitalItem
-                  icon={Gauge}
-                  label="Blood Pressure"
-                  value={vitals.blood_pressure}
-                />
-                <VitalItem
-                  icon={HeartPulse}
-                  label="Heart Rate"
-                  value={vitals.heart_rate}
-                />
-                <VitalItem
-                  icon={Thermometer}
-                  label="Temperature"
-                  value={vitals.temperature}
-                />
-                <VitalItem icon={Weight} label="Weight" value={vitals.weight} />
-              </>
-            ) : (
-              <p className="col-span-full text-center text-gray-400">
-                No vitals available.
-              </p>
-            )}
-          </ul>
-        </Card>
+    <>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div className="xl:col-span-2 space-y-4">
+          {/* VITALS */}
+          <Card>
+            <ul className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              {vitals ? (
+                <>
+                  <VitalItem
+                    icon={Gauge}
+                    label="Blood Pressure"
+                    value={vitals.blood_pressure}
+                  />
+                  <VitalItem
+                    icon={HeartPulse}
+                    label="Heart Rate"
+                    value={vitals.heart_rate}
+                  />
+                  <VitalItem
+                    icon={Thermometer}
+                    label="Temperature"
+                    value={vitals.temperature}
+                  />
+                  <VitalItem
+                    icon={Weight}
+                    label="Weight"
+                    value={vitals.weight}
+                  />
+                </>
+              ) : (
+                <p className="col-span-full text-center text-gray-400">
+                  No vitals available.
+                </p>
+              )}
+            </ul>
+          </Card>
 
-        {/* Upcoming Appointments */}
-        <UpcomingAppointments
-          title={"Upcoming Appointments"}
-          appointments={appointments}
-          onSelect={(app) => {
-            setViewType("appointments");
-            setViewData(app);
-            setOpenViewModal(true);
-          }}
-        />
+          {/* Upcoming Appointments */}
+          <UpcomingAppointments
+            title={"Upcoming Appointments"}
+            appointments={appointments}
+            onSelect={(app) => {
+              setViewType("appointments");
+              setViewData(app);
+              setOpenViewModal(true);
+            }}
+          />
+        </div>
+
+        {/* TIMELINE + DOCUMENTS */}
+        <div className="space-y-4">
+          <ActivitiesTimeline patientId={patientId} />
+          <Card title="Documents">
+            <ul className="divide-y text-sm">
+              {documentsSeed.map((d) => (
+                <li
+                  key={d.id}
+                  className="py-2 flex items-center justify-between"
+                >
+                  <span className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-blue-500" /> {d.name}
+                  </span>
+                  <span className="flex items-center gap-2 text-gray-400">
+                    <button
+                      // onClick={reactToPrintFn}
+                      className="hover:text-gray-600"
+                      title="Print"
+                    >
+                      🖨️
+                    </button>
+                    <button className="hover:text-gray-600" title="Download">
+                      ⬇️
+                    </button>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </div>
       </div>
-
-      {/* TIMELINE + DOCUMENTS */}
-      <div className="space-y-4">
-        <ActivitiesTimeline patientId={patientId} />
-        <Card title="Documents">
-          <ul className="divide-y text-sm">
-            {documentsSeed.map((d) => (
-              <li key={d.id} className="py-2 flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-blue-500" /> {d.name}
-                </span>
-                <span className="flex items-center gap-2 text-gray-400">
-                  <button className="hover:text-gray-600" title="Print">
-                    🖨️
-                  </button>
-                  <button className="hover:text-gray-600" title="Download">
-                    ⬇️
-                  </button>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </div>
-
       {openViewModal && (
         <CalendarModalDetails
           report={viewData}
@@ -188,6 +199,6 @@ export default function DashboardTab({ patientId, data }) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

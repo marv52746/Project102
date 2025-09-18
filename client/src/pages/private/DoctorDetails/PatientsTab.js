@@ -1,61 +1,64 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { User2, Clock } from "lucide-react";
 import { getAge } from "../../../core/utils/tableUtils";
-import { getStatusClass } from "../../../core/utils/calendarUtils";
-import { capitalizeText } from "../../../core/utils/stringUtils";
 import { useNavigate } from "react-router-dom";
-import apiService from "../../../core/services/apiService";
+import { Search, Calendar, User, FileText, X } from "lucide-react";
+import AppointmentModal from "../FormDetails/AppointmentModal";
+import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
+import { capitalizeText } from "../../../core/utils/stringUtils";
 
 export default function PatientsTab({ appointments }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [filteredAppointments, setFilteredAppointments] = useState([]);
+
   const [patients, setPatients] = useState([]);
-  const [activeTab, setActiveTab] = useState("patients"); // appointments | patients
-
-  // pagination states
-  const [visibleAppointments, setVisibleAppointments] = useState(5);
+  const [searchTerm, setSearchTerm] = useState("");
   const [visiblePatients, setVisiblePatients] = useState(5);
+  const [selectedAppointments, setSelectedAppointments] = useState(null);
+  const [selectedAppointment, setSelectedAppointment] = useState(null); // ✅ new state
+  const [showModal, setShowModal] = useState(false);
 
-  const handleClick = async (record) => {
-    if (activeTab === "appointments") {
-      navigate(`/form/appointments/view/${record}`);
-    } else if (activeTab === "patients") {
-      try {
-        if (record?._id) {
-          navigate(`/form/patients/view/${record._id}`);
-        } else {
-          console.error("Patient not found for user:", record.name);
-        }
-      } catch (error) {
-        console.error("Error fetching patient by user:", error);
-      }
+  const handlePatientClick = (record) => {
+    if (record?._id) {
+      navigate(`/form/patients/view/${record._id}`);
     }
+  };
+
+  const handleAppointmentClick = (patientId) => {
+    const appts = (appointments || []).filter(
+      (appt) => appt?.patient?._id === patientId
+    );
+    setSelectedAppointments(appts);
+  };
+
+  const closeModal = () => {
+    setSelectedAppointment(null); // ✅ ensures CalendarModalDetails unmounts
+  };
+  const closeModalParent = () => {
+    setSelectedAppointments(null);
   };
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const now = new Date();
-        // ✅ today/past appointments only
-        const filtered = (appointments || []).filter(
-          (appt) => new Date(appt.date) <= now
-        );
-
-        setFilteredAppointments(filtered);
-
-        // Collect unique patients
         const patientMap = new Map();
         (appointments || []).forEach((appt) => {
           const patientId = appt?.patient?._id;
           if (!patientId) return;
           if (!patientMap.has(patientId)) {
-            patientMap.set(patientId, appt.patient);
+            patientMap.set(patientId, { ...appt.patient, appointments: [] });
           }
+          patientMap.get(patientId).appointments.push(appt);
         });
 
-        setPatients(Array.from(patientMap.values()));
+        const patientsWithVisits = Array.from(patientMap.values()).map((p) => {
+          const sortedAppts = p.appointments.sort(
+            (a, b) => new Date(b.date) - new Date(a.date)
+          );
+          return { ...p, lastVisit: sortedAppts[0]?.date || null };
+        });
+
+        setPatients(patientsWithVisits);
       } catch (error) {
         console.error(`Error fetching appointments list:`, error);
       }
@@ -64,183 +67,207 @@ export default function PatientsTab({ appointments }) {
     fetchDetails();
   }, [appointments, dispatch]);
 
-  const renderAppointmentsTable = (data) => (
-    <div>
-      <div className="overflow-x-auto max-h-96 overflow-y-auto rounded-lg">
-        <table className="min-w-full text-sm divide-y divide-gray-200">
-          <thead className="bg-gray-50 text-gray-600 sticky top-0">
-            <tr>
-              <th className="px-4 py-2 text-left">Patient</th>
-              <th className="px-4 py-2 text-left">Last Visit</th>
-              <th className="px-4 py-2 text-left">Reason</th>
-              <th className="px-4 py-2 text-left">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={4}
-                  className="px-4 py-4 text-center text-gray-500 italic"
-                >
-                  No appointments found.
-                </td>
-              </tr>
-            ) : (
-              data
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                .slice(0, visibleAppointments) // ✅ only show visible
-                .map((appt, idx) => (
-                  <tr
-                    key={idx}
-                    className=" hover:bg-blue-100 
-           cursor-pointer transition"
-                    onClick={() => handleClick(appt._id)}
-                  >
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center font-semibold text-sm">
-                          {appt.patient?.name?.[0] || "?"}
-                        </div>
-                        <span className="text-gray-800 font-medium">
-                          {appt.patient?.name || "Unknown"}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-700">
-                      {new Date(appt.date).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3 text-gray-700">
-                      {appt.reason || "—"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-700">
-                      <span
-                        className={`inline-block px-2 py-1 rounded-md text-xs font-medium ${getStatusClass(
-                          appt.status?.toLowerCase()
-                        )}`}
-                      >
-                        {capitalizeText(appt.status) || "—"}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {visibleAppointments < data.length && (
-        <div className="flex justify-center mt-3">
-          <button
-            onClick={() => setVisibleAppointments((prev) => prev + 10)}
-            className="px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200"
-          >
-            Show More
-          </button>
-        </div>
-      )}
-    </div>
+  const filteredPatients = patients.filter((p) =>
+    p?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const renderPatientsTable = (data) => (
-    <div>
-      <div className="overflow-x-auto max-h-96 overflow-y-auto border rounded-lg">
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-md">
+      {/* 🔍 Search bar */}
+      <div className="mb-4 flex items-center">
+        <div className="relative w-1/3">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search patient..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setVisiblePatients(5);
+            }}
+            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+
+      {/* Patient Table */}
+      <div className="overflow-x-auto max-h-[420px] overflow-y-auto border rounded-lg">
         <table className="min-w-full text-sm divide-y divide-gray-200">
-          <thead className="bg-gray-50 text-gray-600 sticky top-0">
+          <thead className="bg-gray-100 text-gray-700 sticky top-0">
             <tr>
-              <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Gender</th>
-              <th className="px-4 py-2 text-left">Birthday</th>
-              <th className="px-4 py-2 text-left">Age</th>
+              <th className="px-4 py-2 text-left font-semibold">Name</th>
+              <th className="px-4 py-2 text-left font-semibold">Gender</th>
+              <th className="px-4 py-2 text-left font-semibold">Birthday</th>
+              <th className="px-4 py-2 text-left font-semibold">Age</th>
+              <th className="px-4 py-2 text-left font-semibold">Last Visit</th>
+              <th className="px-4 py-2 text-left font-semibold">
+                Appointment Record
+              </th>
             </tr>
           </thead>
           <tbody>
-            {data.length === 0 ? (
+            {filteredPatients.length === 0 ? (
               <tr>
                 <td
-                  colSpan={4}
-                  className="px-4 py-4 text-center text-gray-500 italic"
+                  colSpan={6}
+                  className="px-4 py-6 text-center text-gray-500 italic"
                 >
                   No patients found.
                 </td>
               </tr>
             ) : (
-              data
-                .slice(0, visiblePatients) // ✅ only show visible
-                .map((patient, idx) => (
-                  <tr
-                    key={idx}
-                    className=" hover:bg-blue-100 
-           cursor-pointer transition"
-                    onClick={() => handleClick(patient)}
+              filteredPatients.slice(0, visiblePatients).map((patient, idx) => (
+                <tr key={idx} className="hover:bg-blue-50 transition border-b">
+                  {/* Name → clickable */}
+                  <td
+                    onClick={() => handlePatientClick(patient)}
+                    className="px-4 py-3 text-blue-600 font-medium cursor-pointer hover:underline flex items-center gap-2"
                   >
-                    <td className="px-4 py-3 text-gray-800 font-medium">
-                      {patient?.name || "Unknown"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-700 capitalize">
-                      {patient?.gender || "—"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-700">
-                      {patient?.date_of_birth
-                        ? new Date(patient.date_of_birth).toLocaleDateString()
+                    <User className="w-4 h-4 text-gray-500" />
+                    {patient?.name || "Unknown"}
+                  </td>
+
+                  <td className="px-4 py-3 text-gray-700 capitalize">
+                    {patient?.gender || "—"}
+                  </td>
+                  <td className="px-4 py-3 text-gray-700">
+                    {patient?.date_of_birth
+                      ? new Date(patient.date_of_birth).toLocaleDateString()
+                      : "—"}
+                  </td>
+                  <td className="px-4 py-3 text-gray-700">
+                    {patient?.date_of_birth
+                      ? getAge(patient.date_of_birth)
+                      : "—"}
+                  </td>
+                  {/* Last Visit */}
+                  <td className="px-4 py-3 text-gray-700">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-4 h-4 text-gray-500" />
+                      {patient?.lastVisit
+                        ? new Date(patient.lastVisit).toLocaleDateString()
                         : "—"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-700">
-                      {patient?.date_of_birth
-                        ? getAge(patient.date_of_birth)
-                        : "—"}
-                    </td>
-                  </tr>
-                ))
+                    </div>
+                  </td>
+
+                  {/* Appointment record → clickable */}
+                  <td
+                    onClick={() => handleAppointmentClick(patient._id)}
+                    className="px-4 py-3 text-blue-600 cursor-pointer hover:underline flex items-center gap-1"
+                  >
+                    <FileText className="w-4 h-4 text-blue-500" />
+                    View Records
+                  </td>
+                </tr>
+              ))
             )}
           </tbody>
         </table>
       </div>
 
-      {visiblePatients < data.length && (
-        <div className="flex justify-center mt-3">
+      {/* Pagination */}
+      {visiblePatients < filteredPatients.length && (
+        <div className="flex justify-center mt-4">
           <button
             onClick={() => setVisiblePatients((prev) => prev + 10)}
-            className="px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition"
           >
-            Show More
+            Load More
           </button>
         </div>
       )}
-    </div>
-  );
 
-  return (
-    <div className="bg-white p-4 rounded-lg shadow">
-      {/* 
-      <div className="flex gap-8 mb-4 border-b">
-        <button
-          className={`pb-2 flex items-center gap-2 ${
-            activeTab === "patients"
-              ? "text-blue-600 border-b-2 border-blue-600 font-semibold"
-              : "text-gray-600 hover:text-gray-800"
-          }`}
-          onClick={() => setActiveTab("patients")}
-        >
-          <User2 className="w-4 h-4" />
-          Patient List
-        </button>
-        <button
-          className={`pb-2 flex items-center gap-2 ${
-            activeTab === "appointments"
-              ? "text-blue-600 border-b-2 border-blue-600 font-semibold"
-              : "text-gray-600 hover:text-gray-800"
-          }`}
-          onClick={() => setActiveTab("appointments")}
-        >
-          <Clock className="w-4 h-4" />
-          Recent Appointments
-        </button>
-      </div> */}
+      {/* Appointment Modal */}
+      {selectedAppointments && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-11/12 md:w-5/6 lg:w-3/4 max-h-[80vh] overflow-y-auto relative">
+            {/* Close button */}
+            <button
+              onClick={closeModalParent}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            >
+              <X className="w-5 h-5" />
+            </button>
 
-      {activeTab === "appointments"
-        ? renderAppointmentsTable(filteredAppointments)
-        : renderPatientsTable(patients)}
+            {/* Header */}
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-gray-800">
+              <FileText className="w-6 h-6 text-blue-600" /> Appointment Records
+            </h2>
+
+            {/* Grid of cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {selectedAppointments.map((appt, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => {
+                    setSelectedAppointment(appt); // ✅ set selected appointment
+                    setShowModal(true); // ✅ open modal
+                  }}
+                  className="p-4 border rounded-xl shadow-sm hover:shadow-md hover:border-blue-400 transition cursor-pointer bg-white"
+                >
+                  {/* Header row */}
+                  <div className="flex items-center justify-between pb-2 mb-3 border-b">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-gray-500" />
+                      <span className="font-semibold text-gray-800">
+                        {new Date(appt.date).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-700 text-sm">
+                      👨‍⚕️ {appt?.doctor?.name || "N/A"}
+                    </div>
+                  </div>
+
+                  {/* Details in single-column layout */}
+                  <div className="space-y-2 text-sm text-gray-700">
+                    <p className="flex items-center gap-1">
+                      <span className="font-medium">Status:</span>{" "}
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          appt.status === "completed" || appt.status === "ready"
+                            ? "bg-green-100 text-green-700"
+                            : appt.status === "cancelled"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {capitalizeText(appt.status)}
+                      </span>
+                    </p>
+                    <p className="flex items-center gap-1">
+                      <span className="font-medium">Reason:</span>{" "}
+                      <span className="truncate max-w-[500px] inline-block">
+                        {appt?.reason || "—"}
+                      </span>
+                    </p>
+                    <p className="flex items-center gap-1">
+                      <span className="font-medium">Diagnosis:</span>{" "}
+                      <span className="truncate max-w-[500px] inline-block">
+                        {appt?.diagnosis || "—"}
+                      </span>
+                    </p>
+                    <p className="flex items-center gap-1">
+                      <span className="font-medium">Notes:</span>{" "}
+                      <span className="truncate max-w-[500px] inline-block">
+                        {appt?.notes || "—"}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modals */}
+      {showModal && selectedAppointment && (
+        <CalendarModalDetails
+          report={selectedAppointment} // ✅ pass the clicked appointment
+          isOpen={true}
+          onClose={closeModal}
+        />
+      )}
     </div>
   );
 }

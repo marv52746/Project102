@@ -92,10 +92,17 @@ export const medicationFormFields = [
       { label: "Every 4 hours", value: "Every 4 hours" },
       { label: "Every 6 hours", value: "Every 6 hours" },
       { label: "Every 8 hours", value: "Every 8 hours" },
+      { label: "Every 12 hours", value: "Every 12 hours" },
+      { label: "Every other day", value: "Every other day" },
+      { label: "Weekly", value: "Weekly" },
       { label: "As needed (PRN)", value: "As needed (PRN)" },
       { label: "Before meals", value: "Before meals" },
       { label: "After meals", value: "After meals" },
       { label: "Bedtime", value: "Bedtime" },
+      { label: "Morning", value: "Morning" },
+      { label: "Noon", value: "Noon" },
+      { label: "Evening", value: "Evening" },
+      { label: "Night", value: "Night" },
     ],
     placeholder: "Select frequency",
   },
@@ -108,7 +115,7 @@ export const medicationFormFields = [
   { name: "end_date", label: "End Date", type: "date" },
   {
     name: "notes",
-    label: "Notes",
+    label: "Instructions",
     type: "textarea",
     placeholder: "Instructions or additional info",
   },
@@ -247,6 +254,11 @@ export const pregnancyFormFields = [
     min: 0,
   },
   {
+    name: "code",
+    label: "Code",
+    type: "text",
+  },
+  {
     name: "lmp",
     label: "Last Menstrual Period (LMP)",
     type: "date",
@@ -256,30 +268,191 @@ export const pregnancyFormFields = [
     label: "Expected Due Date (EDD)",
     type: "date",
   },
-  {
-    name: "trimester",
-    label: "Trimester",
-    type: "select",
-    options: [
-      { label: "First", value: "First" },
-      { label: "Second", value: "Second" },
-      { label: "Third", value: "Third" },
-    ],
-    placeholder: "Select trimester",
-  },
+
+  // {
+  //   name: "trimester",
+  //   label: "Trimester",
+  //   type: "select",
+  //   options: [
+  //     { label: "First", value: "First" },
+  //     { label: "Second", value: "Second" },
+  //     { label: "Third", value: "Third" },
+  //   ],
+  //   placeholder: "Select trimester",
+  // },
   {
     name: "notes",
     label: "Notes",
     type: "textarea",
+    fullRow: true,
     placeholder: "Additional pregnancy-related notes or risks",
   },
 ];
 export const othersFormFields = [
   {
+    name: "diagnosis",
+    label: "Diagnosis",
+    type: "text",
+    placeholder: "Enter diagnosis",
+  },
+  {
     name: "notes",
     label: "Notes",
     type: "textarea",
-    placeholder: "Add notes here...",
+    placeholder: "Enter additional notes",
+  },
+];
+
+export const labRequestFormFields = [
+  {
+    name: "patient",
+    label: "Patient",
+    type: "reference",
+    ref: "users",
+    hidden: true,
+  },
+  {
+    name: "name",
+    label: "Test Name",
+    type: "select",
+    options: [
+      {
+        label: "Complete Blood Count (CBC)",
+        value: "Complete Blood Count (CBC)",
+      },
+      { label: "Urinalysis", value: "Urinalysis" },
+      { label: "Fecalysis", value: "Fecalysis" },
+      { label: "Blood Sugar (FBS/RBS)", value: "Blood Sugar (FBS/RBS)" },
+      { label: "Lipid Profile", value: "Lipid Profile" },
+      {
+        label: "Liver Function Test (LFT)",
+        value: "Liver Function Test (LFT)",
+      },
+      {
+        label: "Kidney Function Test (KFT)",
+        value: "Kidney Function Test (KFT)",
+      },
+      { label: "Electrolytes", value: "Electrolytes" },
+      { label: "Pregnancy Test (hCG)", value: "Pregnancy Test (hCG)" },
+      { label: "Chest X-Ray", value: "Chest X-Ray" },
+      { label: "Pap Smear", value: "Pap Smear" },
+      { label: "COVID-19 Antigen", value: "COVID-19 Antigen" },
+      { label: "COVID-19 RT-PCR", value: "COVID-19 RT-PCR" },
+      { label: "Others", value: "Others" },
+    ],
+
+    placeholder: "Select test",
+    required: true,
+    dynamic: true, // 👈 tells your form handler to allow switching type
+  },
+  // 👇 This extra field is hidden unless "Others" is chosen
+  {
+    name: "name_custom",
+    label: "Specify Test (if Others)",
+    type: "text",
+    placeholder: "Enter test name",
+    conditional: { field: "name", value: "Others" },
+  },
+
+  {
+    name: "requested_on",
+    label: "Requested Date",
+    type: "date",
+    default: new Date(),
+  },
+  {
+    name: "notes",
+    label: "Notes / Instructions",
+    type: "textarea",
+    placeholder: "Special instructions for the lab",
+  },
+  // {
+  //   name: "doctor",
+  //   label: "Requesting Doctor",
+  //   type: "reference",
+  //   ref: "users",
+  // },
+  {
+    name: "status",
+    label: "Status",
+    type: "select",
+    default: "Pending",
+    options: [
+      { label: "Pending", value: "Pending" },
+      { label: "Completed", value: "Completed" },
+    ],
+    placeholder: "Select status",
+  },
+  {
+    name: "result",
+    label: "Result",
+    type: "textarea",
+    placeholder: "Enter findings or result if available",
+  },
+];
+
+export const ultrasoundFormFields = [
+  {
+    name: "patient",
+    label: "Patient",
+    type: "reference",
+    ref: "users",
+    hidden: true,
+  },
+  {
+    name: "type",
+    label: "Ultrasound Type",
+    type: "select",
+    options: [
+      { label: "Abdominal", value: "Abdominal" },
+      { label: "Obstetric", value: "Obstetric" },
+      { label: "Pelvic", value: "Pelvic" },
+      { label: "Thyroid", value: "Thyroid" },
+      { label: "Breast", value: "Breast" },
+      { label: "Vascular", value: "Vascular" },
+      { label: "Kidney", value: "Kidney" },
+      { label: "Others", value: "Others" },
+    ],
+    placeholder: "Select ultrasound type",
+    required: true,
+    dynamic: true, // 👈 allow conditional rendering
+  },
+  {
+    name: "type_custom",
+    label: "Specify Ultrasound (if Others)",
+    type: "text",
+    placeholder: "Enter ultrasound type",
+    conditional: { field: "type", value: "Others" },
+  },
+  {
+    name: "date",
+    label: "Date",
+    type: "date",
+    default: new Date(),
+  },
+  {
+    name: "radiologist",
+    label: "Radiologist",
+    placeholder: "e.g. Dr. Cruz",
+  },
+  {
+    name: "findings",
+    label: "Findings",
+    type: "textarea",
+    placeholder: "Enter ultrasound findings",
+  },
+  {
+    name: "impression",
+    label: "Impression",
+    type: "textarea",
+    placeholder: "Enter impression/summary",
+  },
+
+  {
+    name: "notes",
+    label: "Additional Notes",
+    type: "textarea",
+    placeholder: "Any extra notes related to this ultrasound",
   },
 ];
 
@@ -291,5 +464,7 @@ export const clinicalFormFieldMap = {
   conditions: conditionFormFields,
   appointments: appointmentsFormFields,
   pregnancies: pregnancyFormFields,
+  labrequests: labRequestFormFields,
+  ultrasounds: ultrasoundFormFields,
   others: othersFormFields,
 };

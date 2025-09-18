@@ -65,6 +65,12 @@ export const appointmentFormFields = [
   },
 
   {
+    name: "diagnosis",
+    label: "Diagnosis",
+    type: "text",
+    showOn: "edit,view",
+  },
+  {
     name: "reason",
     label: "Reason",
     type: "textarea",

@@ -5,44 +5,63 @@ import apiService from "../../../core/services/apiService";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
+import { Search } from "lucide-react";
 
-export default function ConsultationHistoryTab() {
-  const { id, tablename } = useParams();
+export default function ConsultationHistoryTab({ data }) {
+  // console.log(data);
+  const { id } = useParams();
   const dispatch = useDispatch();
   const { refreshKey } = useSelector((state) => state.utils);
 
   const [appointments, setAppointments] = useState([]);
-  const [selectedReport, setSelectedReport] = useState(null); // 👈 track selected row
+  const [selectedReport, setSelectedReport] = useState(null);
+
+  // 🔍 search + pagination state
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 6;
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        let userType = tablename === "doctors" ? "doctor" : "patient";
         const userAppointments = await apiService.get(
           dispatch,
           "appointments",
           {
-            [userType]: id,
-            status: "completed",
+            [data.role]: data._id,
+            status: ["completed", "cancelled"],
           }
         );
 
-        // ✅ sort by date + time (latest first)
+        // ✅ sort by date
         const sortedAppointments = (userAppointments || []).sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
-          return dateB - dateA; // descending
+          return dateB - dateA;
         });
 
         setAppointments(sortedAppointments || []);
-        console.log("Consultation history:", sortedAppointments);
       } catch (error) {
         console.error("Error fetching appointment details:", error);
       }
     };
 
     fetchDetails();
-  }, [id, dispatch, refreshKey, tablename]);
+  }, [id, dispatch, refreshKey, data]);
+
+  // 🔍 Filtered + Paginated Data
+  const filteredAppointments = appointments.filter(
+    (app) =>
+      app.doctor?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.reason?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.notes?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredAppointments.length / rowsPerPage);
+  const paginatedAppointments = filteredAppointments.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
 
   if (!appointments.length) {
     return (
@@ -53,65 +72,123 @@ export default function ConsultationHistoryTab() {
   }
 
   return (
-    <div className="overflow-x-auto bg-white rounded-lg shadow border">
-      <table className="min-w-full divide-y divide-gray-200 text-sm">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-4 py-2 text-left font-medium text-gray-600">
-              Date
-            </th>
-            <th className="px-4 py-2 text-left font-medium text-gray-600">
-              Time
-            </th>
-            <th className="px-4 py-2 text-left font-medium text-gray-600">
-              Doctor
-            </th>
-            <th className="px-4 py-2 text-left font-medium text-gray-600">
-              Reason
-            </th>
-            <th className="px-4 py-2 text-left font-medium text-gray-600">
-              Status
-            </th>
-            <th className="px-4 py-2 text-left font-medium text-gray-600">
-              Doctor Notes
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {appointments.map((app) => (
-            <tr
-              key={app._id}
-              className="hover:bg-gray-50 cursor-pointer"
-              onClick={() => setSelectedReport(app)}
-            >
-              <td className="px-4 py-2">{formatDate(app.date)}</td>
-              <td className="px-4 py-2">{formatTime(app.time)}</td>
-              <td className="px-4 py-2">{app.doctor?.name || "N/A"}</td>
-              <td className="px-4 py-2">{app.reason || "-"}</td>
-              <td className="px-4 py-2">
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    app.status === "completed"
-                      ? "bg-green-100 text-green-700"
-                      : app.status === "cancelled"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-gray-100 text-gray-700"
-                  }`}
-                >
-                  {capitalizeText(app.status)}
-                </span>
-              </td>
-              <td className="px-4 py-2">{app.notes || "-"}</td>
+    <div className="bg-white rounded-lg shadow border p-4">
+      {/* 🔍 Search */}
+      <div className="mb-4 flex items-center">
+        <div className="relative w-1/3">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search doctor, reason, or notes..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+
+      {/* 📋 Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200 text-sm">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-2 text-left font-medium text-gray-600">
+                Date
+              </th>
+              <th className="px-4 py-2 text-left font-medium text-gray-600">
+                Time
+              </th>
+              <th className="px-4 py-2 text-left font-medium text-gray-600">
+                Doctor
+              </th>
+              <th className="px-4 py-2 text-left font-medium text-gray-600">
+                Reason
+              </th>
+              <th className="px-4 py-2 text-left font-medium text-gray-600">
+                Status
+              </th>
+              <th className="px-4 py-2 text-left font-medium text-gray-600">
+                Doctor Notes
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {paginatedAppointments.map((app) => (
+              <tr
+                key={app._id}
+                className="hover:bg-gray-50 cursor-pointer"
+                onClick={() => setSelectedReport(app)}
+              >
+                <td className="px-4 py-2">{formatDate(app.date)}</td>
+                <td className="px-4 py-2">{formatTime(app.time)}</td>
+                <td className="px-4 py-2">{app.doctor?.name || "N/A"}</td>
+                <td className="px-4 py-2 max-w-[200px] truncate">
+                  {app.reason || "-"}
+                </td>
+                <td className="px-4 py-2">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      app.status === "completed"
+                        ? "bg-green-100 text-green-700"
+                        : app.status === "cancelled"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-gray-100 text-gray-700"
+                    }`}
+                  >
+                    {capitalizeText(app.status)}
+                  </span>
+                </td>
+                <td className="px-4 py-2 max-w-[250px] truncate">
+                  {app.notes || "-"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 📑 Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center mt-4 text-sm">
+          <span className="text-gray-600">
+            Page {currentPage} of {totalPages}
+          </span>
+          <div className="flex gap-2">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
+              className={`px-3 py-1 rounded-lg border ${
+                currentPage === 1
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white hover:bg-gray-50"
+              }`}
+            >
+              Prev
+            </button>
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
+              className={`px-3 py-1 rounded-lg border ${
+                currentPage === totalPages
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white hover:bg-gray-50"
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Modal */}
       {selectedReport && (
         <CalendarModalDetails
           report={selectedReport}
           onClose={() => setSelectedReport(null)}
-          onRefresh={() => setSelectedReport(null)} // optional refresh
+          onRefresh={() => setSelectedReport(null)}
         />
       )}
     </div>

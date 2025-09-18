@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
 import {
   X,
   User,
@@ -14,6 +15,10 @@ import {
   Thermometer,
   Weight,
   Activity,
+  FlaskConical,
+  ImageIcon,
+  Syringe,
+  FileText,
 } from "lucide-react";
 
 import { formatDate, formatTime } from "../../utils/dateUtils";
@@ -23,31 +28,32 @@ import {
   AllergiesModal,
   ConditionsModal,
   FindingsModal,
+  LabRequestModal,
   PregnanciesModal,
   PrescriptionModal,
   SurgeriesModal,
+  UltrasoundModal,
   VitalsModal,
 } from "../modal/BaseModal";
 import { clinicalFormFieldMap } from "../../constants/medical/clinicalPresets";
 import { useDispatch, useSelector } from "react-redux";
 import { handleFormSubmit } from "../formActions/formSubmit";
 import apiService from "../../services/apiService";
-import Card from "../../../pages/private/FormDetails/Card";
 import VitalItem from "./VitalItem";
+import PrintActionButtons from "../documents/PrintCertificate";
 
 function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
   const [report, setReport] = useState(initialReport);
   const [activeModal, setActiveModal] = useState(null);
   const userInfo = useSelector((state) => state.user.userInfo);
 
+  console.log(report);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     setReport(initialReport);
   }, [initialReport]);
-
-  // console.log(userInfo);
-  // console.log(report);
 
   if (!report) return null;
 
@@ -66,6 +72,8 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
         return "pregnancy";
       case "vitals":
         return "vitals";
+      case "labrequest":
+        return "labrequest";
       default:
         return type;
     }
@@ -75,9 +83,49 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
     const records = Array.isArray(data) ? data : [data];
     const fields = (clinicalFormFieldMap[type] || []).filter((f) => f.name);
     // console.log(data);
+    // console.log(type);
 
     if (type === "appointments") {
-      await apiService.put(dispatch, "appointments", report._id, data[0]);
+      const appointmentData = records[0];
+
+      const updatedAppointment = await apiService.put(
+        dispatch,
+        "appointments",
+        report._id,
+        appointmentData
+      );
+      // If diagnosis is provided, also save condition
+      if (updatedAppointment.diagnosis) {
+        const conditionData = {
+          name: updatedAppointment.diagnosis,
+          notes: updatedAppointment.notes,
+          diagnosed_date: updatedAppointment.date,
+          appointment: updatedAppointment, // reference the appointment
+          patient: updatedAppointment.patient,
+        };
+
+        // 1. Check if condition exists for this appointment
+        const existingConditions = await apiService.get(
+          dispatch,
+          "conditions",
+          {
+            appointment: updatedAppointment._id,
+          }
+        );
+
+        if (existingConditions?.length > 0) {
+          // 2. Update existing condition
+          await apiService.put(
+            dispatch,
+            "conditions",
+            existingConditions[0]._id,
+            conditionData
+          );
+        } else {
+          // 3. Create new condition
+          await apiService.post(dispatch, "conditions", conditionData);
+        }
+      }
     }
 
     if (type !== "appointments") {
@@ -158,7 +206,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
   const getActionIconProps = (type) => {
     let hasRecord = report[mapTypeToAppointmentField(type)]?.length > 0;
     if (type === "findings") {
-      hasRecord = report.notes ? true : false;
+      hasRecord = !!report.notes || !!report.diagnosis ? true : false;
     }
     if (hasRecord)
       return {
@@ -171,15 +219,21 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
     switch (type) {
       case "prescription":
         return {
-          Icon: FilePlus2,
+          Icon: Syringe,
           bgColor: "bg-blue-100",
           iconColor: "text-blue-600",
           borderColor: "border-gray-200",
         };
       case "condition":
+        return {
+          Icon: Stethoscope,
+          bgColor: "bg-blue-100",
+          iconColor: "text-blue-600",
+          borderColor: "border-gray-200",
+        };
       case "allergy":
         return {
-          Icon: ClipboardList,
+          Icon: HeartPulse,
           bgColor: "bg-blue-100",
           iconColor: "text-blue-600",
           borderColor: "border-gray-200",
@@ -212,9 +266,23 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
           iconColor: "text-blue-600",
           borderColor: "border-gray-200",
         };
+      case "labrequest":
+        return {
+          Icon: FlaskConical,
+          bgColor: "bg-blue-100",
+          iconColor: "text-blue-600",
+          borderColor: "border-gray-200",
+        };
+      case "ultrasound":
+        return {
+          Icon: ImageIcon,
+          bgColor: "bg-blue-100",
+          iconColor: "text-blue-600",
+          borderColor: "border-gray-200",
+        };
       default:
         return {
-          Icon: FilePlus2,
+          Icon: FileText,
           bgColor: "bg-blue-100",
           iconColor: "text-blue-600",
           borderColor: "border-gray-200",
@@ -225,30 +293,50 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
   const actionTypes = [
     {
       type: "vitals",
-      title: "Add Vitals",
-      desc: "Record vitals",
+      title: "Vitals",
+      desc: "Record patient vital signs",
     },
     {
       type: "prescription",
-      title: "Add Prescription",
+      title: "Prescription",
       desc: "Record prescribed medicines",
     },
     {
-      type: "condition",
-      title: "Add Condition",
-      desc: "Record medical conditions",
+      type: "findings",
+      title: "Notes & Findings",
+      desc: "Add clinical notes and diagnosis",
     },
-    { type: "allergy", title: "Add Allergy", desc: "Record allergies" },
+    // {
+    //   type: "condition",
+    //   title: "Condition",
+    //   desc: "Record medical conditions and diagnosis",
+    // },
+
     {
       type: "pregnancy",
-      title: "Add Pregnancy",
+      title: "Pregnancy",
       desc: "Record pregnancy details",
     },
-    { type: "surgery", title: "Add Surgery", desc: "Record surgical history" },
+
     {
-      type: "findings",
-      title: "Add Notes",
-      desc: "Add notes to this appointment",
+      type: "labrequest",
+      title: "Laboratory Request",
+      desc: "Record requested laboratory tests",
+    },
+    {
+      type: "ultrasound",
+      title: "Ultrasound",
+      desc: "Record ultrasound results",
+    },
+    {
+      type: "surgery",
+      title: "Surgery",
+      desc: "Record surgical history",
+    },
+    {
+      type: "allergy",
+      title: "Allergy",
+      desc: "Record patient allergies",
     },
   ];
 
@@ -267,17 +355,27 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b">
+        <div className="flex justify-between p-4 border-b">
+          {/* Left side: Appointment */}
           <div>
             <h2 className="text-xl font-semibold text-gray-800">
               Appointment #{report.appointment_no}
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="px-6 pb-2 text-sm text-gray-500">
               {formatDate(report.date)} at {formatTime(report.time)}
             </p>
+
+            {/* Print buttons */}
+            <PrintActionButtons data={report} />
           </div>
-          <button onClick={onClose}>
-            <X className="w-5 h-5 text-gray-500 hover:text-black" />
+
+          {/* Right side: Close */}
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 text-gray-500 hover:text-black"
+            title="Close"
+          >
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -337,6 +435,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
               status={report.status}
             />
             <InfoCard label="Reason" value={report.reason || "N/A"} />
+            <InfoCard label="Diagnosis" value={report.diagnosis || "-"} />
             <InfoCard label="Notes" value={report.notes || "-"} />
           </div>
 
@@ -367,7 +466,6 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
             })}
           </div>
         </div>
-
         {/* Footer */}
         <div className="flex justify-end gap-3 border-t p-4 bg-gray-50">
           {(report.status === "scheduled" || report.status === "ready") && (
@@ -380,7 +478,6 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
             />
           )}
         </div>
-
         {/* Modals */}
         <PrescriptionModal
           status={report.status}
@@ -422,7 +519,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
           isOpen={activeModal === "findings"}
           onClose={() => setActiveModal(null)}
           onSave={(data) => handleSave("appointments", data)}
-          initialData={report.notes ? [{ notes: report.notes }] : [{}]}
+          initialData={report.notes || report.diagnosis ? [report] : [{}]}
         />
         <VitalsModal
           status={report.status}
@@ -430,6 +527,20 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
           onClose={() => setActiveModal(null)}
           onSave={(data) => handleSave("vitals", data)}
           initialData={report.vitals} // empty array
+        />
+        <LabRequestModal
+          status={report.status}
+          isOpen={activeModal === "labrequest"}
+          onClose={() => setActiveModal(null)}
+          onSave={(data) => handleSave("labrequest", data)}
+          initialData={report.labrequest} // empty array
+        />
+        <UltrasoundModal
+          status={report.status}
+          isOpen={activeModal === "ultrasound"}
+          onClose={() => setActiveModal(null)}
+          onSave={(data) => handleSave("ultrasound", data)}
+          initialData={report.ultrasound} // empty array
         />
       </div>
     </div>

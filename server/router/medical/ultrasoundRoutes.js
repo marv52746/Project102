@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../../controller/medical/LaboratoryRequestController");
+const controller = require("../../controller/medical/Ultrasound");
 const multer = require("multer");
 const upload = multer();
 

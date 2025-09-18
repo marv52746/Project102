@@ -27,6 +27,8 @@ const FormFormat = ({ data, fields }) => {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.userInfo);
 
+  // console.log(data);
+
   const hasUpdateDeletePermission =
     currentUser && adminOnlyRoles.includes(currentUser.role);
 

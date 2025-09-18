@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { X, Plus, Trash2 } from "lucide-react";
 import { clinicalFormFieldMap } from "../../constants/medical/clinicalPresets";
 import { getInputValue } from "../../utils/fieldUtils";
+import apiService from "../../services/apiService";
+import { useDispatch } from "react-redux";
 
 const BaseModal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
@@ -37,6 +39,15 @@ const ClinicalForm = ({ fields, formData, setFormData, type, readOnly }) => {
         .filter((f) => !f.hidden)
         .map((field) => {
           const value = formData[field.name] || "";
+
+          // ✅ Proper conditional logic
+          if (field.conditional) {
+            const { field: dependsOn, value: expectedValue } =
+              field.conditional;
+            if (formData[dependsOn] !== expectedValue) {
+              return null;
+            }
+          }
 
           return (
             // <div key={field.name} className={`col-span-2 sm:col-span-1`}>
@@ -149,18 +160,21 @@ const MultiEntryModal = ({
   columns,
   type,
   initialData = [],
+  tableName,
   status,
 }) => {
+  const dispatch = useDispatch();
   const [entries, setEntries] = useState(
     Array.isArray(initialData) && initialData.length > 0 ? initialData : [{}]
   );
+  const [toDelete, setToDelete] = useState([]); // 🆕 track deleted IDs
 
   // Reset entries when modal opens
   useEffect(() => {
     setEntries(
       Array.isArray(initialData) && initialData.length > 0 ? initialData : [{}]
     );
-  }, [initialData, isOpen]);
+  }, [JSON.stringify(initialData), isOpen]);
   // console.log(entries);
 
   const handleAddMore = () => setEntries([...entries, {}]);
@@ -171,15 +185,33 @@ const MultiEntryModal = ({
     setEntries(newEntries);
   };
 
-  const handleRemove = (index) => {
+  const handleRemove = (index, id) => {
     if (entries.length === 1) return; // at least one must remain
+
+    if (id) setToDelete((prev) => [...prev, id]); // mark for deletion
+
     setEntries(entries.filter((_, i) => i !== index));
   };
 
-  const handleSave = () => {
-    onSave(entries);
-    setEntries([{}]); // reset
-    onClose();
+  const handleSave = async () => {
+    try {
+      // console.log(entries);
+
+      // Delete marked items
+      for (const id of toDelete) {
+        await apiService.delete(dispatch, tableName, id);
+      }
+      setToDelete([]);
+
+      // Save updated entries
+      onSave(entries);
+
+      // Reset & close
+      setEntries([{}]); // reset
+      onClose();
+    } catch (error) {
+      console.error("Save failed:", error);
+    }
   };
 
   const readOnly = status !== "scheduled" && status !== "ready";
@@ -202,7 +234,7 @@ const MultiEntryModal = ({
               {/* Remove row button */}
               {entries.length > 1 && !readOnly && (
                 <button
-                  onClick={() => handleRemove(idx)}
+                  onClick={() => handleRemove(idx, formData._id)}
                   className="absolute top-2 right-2 p-1 rounded-full hover:bg-red-100"
                   title="Remove entry"
                 >
@@ -213,7 +245,7 @@ const MultiEntryModal = ({
               <ClinicalForm
                 fields={fields}
                 formData={formData}
-                setFormData={(data) => handleChange(idx, data)}
+                setFormData={(updated) => handleChange(idx, updated)}
                 columns={columns}
                 type={type}
                 readOnly={readOnly}
@@ -277,6 +309,7 @@ export const PrescriptionModal = ({
       onSave={onSave}
       columns={2}
       initialData={initialData}
+      tableName="medications"
     />
   );
 };
@@ -299,6 +332,7 @@ export const FindingsModal = ({
       onSave={onSave}
       type="appointment"
       initialData={initialData}
+      tableName="appointments"
     />
   );
 };
@@ -321,6 +355,7 @@ export const ConditionsModal = ({
       onSave={onSave}
       columns={2}
       initialData={initialData}
+      tableName="conditions"
     />
   );
 };
@@ -343,6 +378,7 @@ export const VitalsModal = ({
       onSave={onSave}
       columns={2}
       initialData={initialData}
+      tableName="vitals"
     />
   );
 };
@@ -365,6 +401,7 @@ export const SurgeriesModal = ({
       onSave={onSave}
       columns={2}
       initialData={initialData}
+      tableName="surgeries"
     />
   );
 };
@@ -387,6 +424,7 @@ export const AllergiesModal = ({
       onSave={onSave}
       columns={2}
       initialData={initialData}
+      tableName="allergies"
     />
   );
 };
@@ -409,6 +447,53 @@ export const PregnanciesModal = ({
       onSave={onSave}
       columns={2}
       initialData={initialData}
+      tableName="pregnancies"
+    />
+  );
+};
+
+// ✅ Laboratory Request Modal
+export const LabRequestModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+  status,
+}) => {
+  return (
+    <MultiEntryModal
+      status={status}
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Add Laboratory Request Tests"
+      fields={clinicalFormFieldMap.labrequests}
+      onSave={onSave}
+      columns={2}
+      initialData={initialData}
+      tableName="labrequest"
+    />
+  );
+};
+
+// ✅ Ultrasound Modal
+export const UltrasoundModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+  status,
+}) => {
+  return (
+    <MultiEntryModal
+      status={status}
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Add Ultrasound Results"
+      fields={clinicalFormFieldMap.ultrasounds}
+      onSave={onSave}
+      columns={2}
+      initialData={initialData}
+      tableName="ultrasound"
     />
   );
 };

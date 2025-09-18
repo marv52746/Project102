@@ -73,6 +73,7 @@ export const getParmsFromPath = (location) => {
     params.tablename = path[2];
     params.view = getFormattedView(path[2], path[3]);
     params.id = path[4];
+    params.type = path[1];
     return params;
   }
 

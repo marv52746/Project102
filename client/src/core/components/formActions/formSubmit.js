@@ -62,13 +62,31 @@ export const handleFormSubmit = async ({
     // If form uses file
     if (hasFile) {
       const formData = new FormData();
+      // for (const [key, value] of Object.entries(payload)) {
+      //   if (Array.isArray(value)) {
+      //     value.forEach((v) => formData.append(`${key}[]`, v));
+      //   } else if (typeof value === "object" && value !== null) {
+      //     formData.append(key, JSON.stringify(value));
+      //   } else {
+      //     formData.append(key, value);
+      //   }
+      // }
+
       for (const [key, value] of Object.entries(payload)) {
         if (Array.isArray(value)) {
-          value.forEach((v) => formData.append(`${key}[]`, v));
+          if (value.length > 0 && typeof value[0] === "object") {
+            // ✅ Array of objects → send as JSON
+            formData.append(key, JSON.stringify(value));
+          } else {
+            // ✅ Simple array → append individually
+            value.forEach((v) => formData.append(`${key}[]`, v));
+          }
+        } else if (value instanceof File) {
+          formData.append(key, value); // ✅ File
         } else if (typeof value === "object" && value !== null) {
-          formData.append(key, JSON.stringify(value));
-        } else {
-          formData.append(key, value);
+          formData.append(key, JSON.stringify(value)); // ✅ Single object
+        } else if (value !== undefined && value !== null) {
+          formData.append(key, value); // ✅ Primitive values
         }
       }
 

@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema({
   fullname: {
     type: String,
   },
+  clinic: [{ type: mongoose.Schema.Types.ObjectId, ref: "clinic" }],
   avatar: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "uploads.files",
@@ -38,6 +39,14 @@ const userSchema = new mongoose.Schema({
   },
   last_name: {
     type: String,
+  },
+  middle_initial: {
+    type: String, // e.g. "D."
+    maxlength: 5,
+  },
+  suffix: {
+    type: String, // e.g. "Jr.", "Sr.", "III"
+    maxlength: 10,
   },
   date_of_birth: {
     type: Date,
@@ -94,6 +103,10 @@ const userSchema = new mongoose.Schema({
   picture: {
     type: String,
   },
+  license: {
+    type: String,
+  },
+
   specialization: {
     type: [String],
     required: true,

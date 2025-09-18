@@ -33,6 +33,7 @@ export const doctorSpecializationOptions = [
   { label: "Rheumatologist", value: "Rheumatologist" },
   { label: "Hematologist", value: "Hematologist" },
   { label: "Allergist/Immunologist", value: "Allergist/Immunologist" },
+  { label: "General Surgery", value: "General Surgery" },
 ];
 
 export const inventoyCategoryOptions = [

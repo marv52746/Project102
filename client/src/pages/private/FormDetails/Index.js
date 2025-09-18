@@ -66,7 +66,7 @@ export default function UserDashboardPage({ data }) {
       case "doctor":
         return [
           { key: "overview", label: "Overview" },
-          { key: "schedule", label: "Schedule" },
+          // { key: "schedule", label: "Schedule" },
           { key: "calendar", label: "Calendar" },
           { key: "patients", label: "Patient List" },
           { key: "consultation-history", label: "Apppointment History" },

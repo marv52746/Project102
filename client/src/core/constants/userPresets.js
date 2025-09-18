@@ -16,9 +16,27 @@ export const userTableColumns = [
 export const userSettings = [
   { label: "First Name", name: "first_name", required: true },
   { label: "Last Name", name: "last_name", required: true },
+  { label: "Middle Initial", name: "middle_initial" },
+  { label: "Suffix", name: "suffix" },
   { label: "Phone Number", name: "phone_number", required: true },
   { label: "Email Address", name: "email", type: "email", required: true },
   { label: "Date of Birth", name: "date_of_birth", type: "date" },
+  { label: "Address", name: "address", type: "textarea" },
+  // {
+  //   name: "specialization",
+  //   label: "Specialization",
+  //   options: doctorSpecializationOptions,
+  //   condition: "doctor",
+  //   type: "multiselect",
+  //   required: true,
+  // },
+  // {
+  //   name: "license",
+  //   label: "License",
+  //   condition: "doctor",
+  //   required: true,
+  //   type: "text",
+  // },
   // { label: "Password", name: "password", type: "password" },
 ];
 
@@ -30,6 +48,25 @@ export const userFormFields = [
     label: "First Name",
     showOn: "all",
     required: true,
+    type: "text",
+  },
+  {
+    name: "last_name",
+    label: "Last Name",
+    showOn: "all",
+    required: true,
+    type: "text",
+  },
+  {
+    name: "middle_initial",
+    label: "Middle Initial",
+    showOn: "all",
+    type: "text",
+  },
+  {
+    name: "suffix",
+    label: "Suffix",
+    showOn: "all",
     type: "text",
   },
   {
@@ -108,6 +145,14 @@ export const userFormFields = [
     type: "multiselect",
     showOn: "all",
     required: true,
+  },
+  {
+    name: "license",
+    label: "License",
+    condition: "doctor",
+    showOn: "all",
+    required: true,
+    type: "text",
   },
   { type: "spacer", showOn: "all" },
   { name: "avatar", label: "Avatar", type: "file", showOn: "all" },

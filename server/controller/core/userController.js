@@ -24,7 +24,15 @@ class UserController extends BaseController {
   // CREATE USER
   create = async (req, res) => {
     try {
-      const { password, email, first_name, last_name, ...userData } = req.body;
+      const {
+        password,
+        email,
+        first_name,
+        middle_initial,
+        last_name,
+        suffix,
+        ...userData
+      } = req.body;
 
       if (!email || !password) {
         return res
@@ -35,13 +43,20 @@ class UserController extends BaseController {
       // 1. Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const fullName = `${first_name || ""} ${last_name || ""}`.trim();
+      // 2. Build full name
+      const fullName =
+        [first_name, middle_initial ? middle_initial + "." : null, last_name]
+          .filter(Boolean)
+          .join(" ")
+          .trim() + (suffix ? `, ${suffix}` : "");
 
       // 2. Create user without avatar first
       const user = new UserDb({
         ...userData,
         first_name,
+        middle_initial,
         last_name,
+        suffix,
         name: fullName,
         email,
         username: email,
@@ -92,7 +107,14 @@ class UserController extends BaseController {
   update = async (req, res) => {
     try {
       const userId = req.params.id;
-      const { email, first_name, last_name, ...updates } = req.body;
+      const {
+        email,
+        first_name,
+        middle_initial,
+        last_name,
+        suffix,
+        ...updates
+      } = req.body;
 
       if (email) {
         updates.email = email;
@@ -105,12 +127,20 @@ class UserController extends BaseController {
       }
 
       if (first_name !== undefined) updates.first_name = first_name;
+      if (middle_initial !== undefined) updates.middle_initial = middle_initial;
       if (last_name !== undefined) updates.last_name = last_name;
+      if (suffix !== undefined) updates.suffix = suffix;
 
-      // Set combined name field
+      // Build new name field
       const newFirst = first_name ?? user.first_name ?? "";
+      const newMI = middle_initial ?? user.middle_initial ?? "";
       const newLast = last_name ?? user.last_name ?? "";
-      updates.name = `${newFirst} ${newLast}`.trim();
+      const newSuffix = suffix ?? user.suffix ?? "";
+
+      updates.name =
+        [newFirst, newMI ? newMI + "." : null, newLast]
+          .filter(Boolean)
+          .join(" ") + (newSuffix ? `, ${newSuffix}` : "");
 
       // ✅ If new avatar is uploaded
       if (req.file && req.file.buffer) {
@@ -151,7 +181,11 @@ class UserController extends BaseController {
       res.status(201).json(updatedUser);
     } catch (error) {
       console.error("Update User Error:", error);
-      res.status(500).json({ error: error.message });
+      return res.status(500).json({
+        error: error.message,
+        stack: error.stack,
+        body: req.body,
+      });
     }
   };
 

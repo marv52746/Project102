@@ -144,67 +144,70 @@ export default function OverviewTab({ appointments }) {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Appointment Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {statCards.map((card, idx) => (
-          <div
-            key={idx}
-            className={`flex items-center gap-4 p-4 rounded-lg shadow bg-white border-l-4 ${card.color}`}
-          >
-            <div>{card.icon}</div>
-            <div>
-              <p className="text-sm">{card.label} Appointments</p>
-              <p className="text-2xl font-bold">{card.value}</p>
+    <>
+      <div className="space-y-6">
+        {/* Appointment Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {statCards.map((card, idx) => (
+            <div
+              key={idx}
+              className={`flex items-center gap-4 p-4 rounded-lg shadow bg-white border-l-4 ${card.color}`}
+            >
+              <div>{card.icon}</div>
+              <div>
+                <p className="text-sm">{card.label} Appointments</p>
+                <p className="text-2xl font-bold">{card.value}</p>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        {/* Upcoming Appointments */}
-        <div className="xl:col-span-2 space-y-4">
-          <UpcomingAppointments
-            title={"In Lobby"}
-            appointments={inLobbyAppointments}
-            onSelect={(app) => {
-              setViewType("appointments");
-              setViewData(app);
-              setOpenViewModal(true);
-            }}
-          />
-
-          <UpcomingAppointments
-            title={"Upcoming Appointments"}
-            appointments={upcomingAppointments}
-            onSelect={(app) => {
-              setViewType("appointments");
-              setViewData(app);
-              setOpenViewModal(true);
-            }}
-          />
+          ))}
         </div>
 
-        {/* Activity Timeline */}
-        <div className="space-y-4">
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-lg font-medium mb-4 text-gray-800">
-              Recent Activity
-            </h3>
-            <ul className="space-y-4 text-sm text-gray-700">
-              {doctor.recentActivities.map((item, idx) => (
-                <li key={idx} className="flex gap-3 items-start">
-                  <div className="mt-1">{item.icon}</div>
-                  <div>
-                    <p>{item.action}</p>
-                    <p className="text-xs text-gray-500 flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {item.time}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          {/* Upcoming Appointments */}
+          <div className="xl:col-span-2 space-y-4">
+            <UpcomingAppointments
+              title={"In Lobby"}
+              appointments={inLobbyAppointments}
+              scheduleAppointment={true}
+              onSelect={(app) => {
+                setViewType("appointments");
+                setViewData(app);
+                setOpenViewModal(true);
+              }}
+            />
+
+            <UpcomingAppointments
+              title={"Upcoming Appointments"}
+              appointments={upcomingAppointments}
+              onSelect={(app) => {
+                setViewType("appointments");
+                setViewData(app);
+                setOpenViewModal(true);
+              }}
+            />
+          </div>
+
+          {/* Activity Timeline */}
+          <div className="space-y-4">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-medium mb-4 text-gray-800">
+                Recent Activity
+              </h3>
+              <ul className="space-y-4 text-sm text-gray-700">
+                {doctor.recentActivities.map((item, idx) => (
+                  <li key={idx} className="flex gap-3 items-start">
+                    <div className="mt-1">{item.icon}</div>
+                    <div>
+                      <p>{item.action}</p>
+                      <p className="text-xs text-gray-500 flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {item.time}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -221,6 +224,6 @@ export default function OverviewTab({ appointments }) {
           onRefresh={() => setManualRefresh((prev) => prev + 1)}
         />
       )}
-    </div>
+    </>
   );
 }

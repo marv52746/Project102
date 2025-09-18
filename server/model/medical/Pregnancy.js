@@ -8,6 +8,7 @@ const pregnancySchema = new mongoose.Schema({
   is_pregnant: { type: Boolean, default: false },
   gravida: { type: Number, default: 0 }, // total pregnancies
   para: { type: Number, default: 0 }, // total births
+  code: { type: String },
   lmp: { type: Date }, // Last Menstrual Period
   edd: { type: Date }, // Expected Due Date
   trimester: { type: String, enum: ["First", "Second", "Third"] },

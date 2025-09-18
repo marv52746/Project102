@@ -17,7 +17,7 @@ export default function Sidebar({ children }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const userInfo = useSelector((state) => state.user.userInfo);
 
   const [showDropdown, setShowDropdown] = useState(false);
@@ -32,8 +32,6 @@ export default function Sidebar({ children }) {
       if (window.innerWidth <= 950) {
         // You can adjust this value for your needs
         setExpanded(false);
-      } else {
-        setExpanded(true);
       }
     };
 
@@ -154,7 +152,10 @@ export default function Sidebar({ children }) {
           {typeof children === "function" ? children(expanded) : children}
         </ul>
 
-        <div className="border-t flex p-3 relative">
+        <div
+          className="border-t flex p-3 relative cursor-pointer"
+          onClick={handleRedirect}
+        >
           <img
             // src={`${process.env.REACT_APP_BASE_URL_IMAGE}${userInfo.avatar}`}
             src={getAvatarUrl(userInfo.avatar)}
@@ -167,7 +168,7 @@ export default function Sidebar({ children }) {
               overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
           `}
           >
-            <button className="leading-4" onClick={handleRedirect}>
+            <button className="leading-4">
               <h4 className="font-semibold">{userInfo.name}</h4>
               <span className="text-xs text-text-primary">
                 {userInfo.email}

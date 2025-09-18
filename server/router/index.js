@@ -14,7 +14,7 @@ const appointmentRoutes = require("./medical/appointmentRoutes");
 const calendarRoute = require("./medical/calendarRoute");
 const birthReportRoutes = require("./medical/birthReportRoutes");
 const doctorActivityRoutes = require("./medical/doctorActivityRoutes");
-const laboratoryRoutes = require("./medical/laboratoryRoutes");
+
 const authRoutes = require("./core/authRoutes"); // ✅ ADD THIS LINE
 const billingRoutes = require("./finance/billingRoutes");
 const sendReminders = require("../jobs/appointmentReminder");
@@ -27,6 +27,9 @@ const inventoryLogRoutes = require("./inventory/inventoryLogRoutes");
 const activityRoutes = require("./core/activityRoutes");
 const pregnancyRoutes = require("./medical/pregnancyRoutes");
 const notificationRoutes = require("./notification/notifications");
+const laboratoryRoutes = require("./medical/laboratoryRoutes");
+const ultrasoundRoutes = require("./medical/ultrasoundRoutes");
+const clinicRoutes = require("./others/clinicRoutes");
 
 // Core routes
 router.use("/file", fileRoutes);
@@ -48,14 +51,18 @@ router.use("/medications", medicationRoutes); // ✅
 router.use("/allergies", allergyRoutes); // ✅
 router.use("/surgeries", surgicalRoutes); // ✅
 router.use("/pregnancies", pregnancyRoutes); // ✅
+router.use("/ultrasound", ultrasoundRoutes); // ✅
+router.use("/labrequest", laboratoryRoutes); // ✅
 
 // Management Routes
 router.use("/appointments", appointmentRoutes);
 router.use("/birthReport", birthReportRoutes);
 router.use("/doctorActivity", doctorActivityRoutes);
-router.use("/laboratory", laboratoryRoutes);
 router.use("/inventory", inventoryRoutes);
 router.use("/inventoryLogs", inventoryLogRoutes);
+
+// Clinic Route
+router.use("/clinic", clinicRoutes);
 
 // Finance domain routes
 router.use("/billings", billingRoutes);

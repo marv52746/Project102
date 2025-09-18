@@ -144,39 +144,40 @@ export default function ClinicalRecordTab({ patientId }) {
                   >
                     <div className="flex items-center gap-3 mb-2">
                       <Baby className="h-6 w-6 text-pink-500" />
-                      <h4 className="text-sm font-semibold text-pink-700">
+                      {/* <h4 className="text-sm font-semibold text-pink-700">
                         {p.is_pregnant ? "Pregnant" : "Not Pregnant"}
-                      </h4>
+                      </h4> */}
                     </div>
 
-                    {p.is_pregnant && (
-                      <>
+                    {/* {p.is_pregnant && ( */}
+                    <>
+                      <div className="text-xs text-pink-800 mb-1">
+                        <strong>Gravida:</strong> {p.gravida || "0"} |{" "}
+                        <strong>Para:</strong> {p.para || "0"} |{" "}
+                        <strong>Code:</strong> {p.code || "0"}
+                      </div>
+                      <div className="text-xs text-pink-800 mb-1">
+                        <strong>LMP:</strong> {formatFullDate(p.lmp) || "N/A"}
+                      </div>
+                      <div className="text-xs text-pink-800 mb-1">
+                        <strong>EDD:</strong> {formatFullDate(p.edd) || "N/A"}
+                      </div>
+                      {/* <div className="text-xs text-pink-800 mb-1">
+                        <strong>Trimester:</strong> {p.trimester || "N/A"}
+                      </div> */}
+                      {gestationalWeeks !== null && (
                         <div className="text-xs text-pink-800 mb-1">
-                          <strong>Gravida:</strong> {p.gravida || "0"} |{" "}
-                          <strong>Para:</strong> {p.para || "0"}
+                          <strong>Gestational Age:</strong> {gestationalWeeks}{" "}
+                          weeks
                         </div>
-                        <div className="text-xs text-pink-800 mb-1">
-                          <strong>LMP:</strong> {formatFullDate(p.lmp) || "N/A"}
-                        </div>
-                        <div className="text-xs text-pink-800 mb-1">
-                          <strong>EDD:</strong> {formatFullDate(p.edd) || "N/A"}
-                        </div>
-                        <div className="text-xs text-pink-800 mb-1">
-                          <strong>Trimester:</strong> {p.trimester || "N/A"}
-                        </div>
-                        {gestationalWeeks !== null && (
-                          <div className="text-xs text-pink-800 mb-1">
-                            <strong>Gestational Age:</strong> {gestationalWeeks}{" "}
-                            weeks
-                          </div>
-                        )}
-                        {p.notes && (
-                          <p className="text-xs text-pink-900 mt-2">
-                            <strong>Notes:</strong> {p.notes}
-                          </p>
-                        )}
-                      </>
-                    )}
+                      )}
+                      {p.notes && (
+                        <p className="text-xs text-pink-900 mt-2">
+                          <strong>Notes:</strong> {p.notes}
+                        </p>
+                      )}
+                    </>
+                    {/* )} */}
                   </div>
                 );
               })}

@@ -36,6 +36,9 @@ const appointmentSchema = new Schema(
       trim: true,
       maxlength: 500,
     },
+    diagnosis: {
+      type: String,
+    },
     notes: {
       type: String,
       trim: true,
@@ -61,6 +64,8 @@ const appointmentSchema = new Schema(
     condition: [{ type: Schema.Types.ObjectId, ref: "condition" }],
     surgical: [{ type: Schema.Types.ObjectId, ref: "surgical" }],
     pregnancy: [{ type: Schema.Types.ObjectId, ref: "pregnancy" }],
+    labrequest: [{ type: Schema.Types.ObjectId, ref: "labrequest" }],
+    ultrasound: [{ type: Schema.Types.ObjectId, ref: "ultrasound" }],
 
     created_by: {
       type: Schema.Types.ObjectId,
