@@ -6,15 +6,19 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
   CartesianGrid,
-  Legend,
 } from "recharts";
-import { Package, AlertTriangle, Clock, RefreshCcw } from "lucide-react";
+import {
+  Package,
+  AlertTriangle,
+  Clock,
+  RefreshCcw,
+  FileText,
+} from "lucide-react";
 import apiService from "../../../core/services/apiService";
 import { useDispatch } from "react-redux";
 import StatCard from "../../../core/components/dashboard/StatCard";
+import DataModal from "./DataModal";
 
 export default function InventoryDashboard() {
   const [stats, setStats] = useState({
@@ -25,8 +29,24 @@ export default function InventoryDashboard() {
   });
 
   const [recentTransactions, setRecentTransactions] = useState([]);
-  const [categoryData, setCategoryData] = useState([]);
+  const [categoryData, setCategoryData] = useState([]); // [{ name, count }]
   const [monthlyMovement, setMonthlyMovement] = useState([]);
+  const [monthlyItemTransactions, setMonthlyItemTransactions] = useState([]); // [{ name, category, stockIn, stockOut }]
+
+  const [allItems, setAllItems] = useState([]);
+  const [lowStockItems, setLowStockItems] = useState([]);
+  const [soonToExpireItems, setSoonToExpireItems] = useState([]);
+  const [monthlyTransactions, setMonthlyTransactions] = useState([]);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalData, setModalData] = useState([]);
+  const [modalType, setModalType] = useState("items");
+
+  const [categoryItemsMap, setCategoryItemsMap] = useState({}); // { category: [items...] }
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [transactionFilter, setTransactionFilter] = useState("All");
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -39,12 +59,12 @@ export default function InventoryDashboard() {
         const soonExpireLimit = new Date();
         soonExpireLimit.setDate(now.getDate() + 30);
 
-        const lowStockItems = items.filter((i) => i.quantity <= i.reorderLevel);
-        const soonToExpireItems = items.filter(
+        const lowStock = items.filter((i) => i.quantity <= i.reorderLevel);
+        const soonToExpire = items.filter(
           (i) => i.expiryDate && new Date(i.expiryDate) <= soonExpireLimit
         );
 
-        const transactionsThisMonth = transactions.filter((t) => {
+        const thisMonthTransactions = transactions.filter((t) => {
           const d = new Date(t.timestamp);
           return (
             d.getMonth() === now.getMonth() &&
@@ -52,205 +72,388 @@ export default function InventoryDashboard() {
           );
         });
 
-        const categoryCount = {};
-        items.forEach((item) => {
-          const category = item.category || "Uncategorized";
-          categoryCount[category] = (categoryCount[category] || 0) + 1;
+        // Group items by category
+        const categoryMap = {};
+        items.forEach((it) => {
+          const cat = it.category || "Uncategorized";
+          if (!categoryMap[cat]) categoryMap[cat] = [];
+          categoryMap[cat].push(it);
         });
-        const categoryChart = Object.entries(categoryCount).map(
-          ([name, count]) => ({ name, count })
+        const categoryChart = Object.entries(categoryMap).map(
+          ([name, arr]) => ({
+            name,
+            count: arr.length,
+          })
         );
 
+        // Build per-item monthly aggregation
+        const itemMonthlyMap = {};
+        items.forEach((it) => {
+          const nm = it.name || "Unknown";
+          itemMonthlyMap[nm] = {
+            name: nm,
+            category: it.category || "Uncategorized",
+            stockIn: 0,
+            stockOut: 0,
+          };
+        });
+        thisMonthTransactions.forEach((t) => {
+          const nm = t.item?.name || "Unknown";
+          if (!itemMonthlyMap[nm]) {
+            itemMonthlyMap[nm] = {
+              name: nm,
+              category: t.item?.category || "Uncategorized",
+              stockIn: 0,
+              stockOut: 0,
+            };
+          }
+          if (t.type === "Stock in") itemMonthlyMap[nm].stockIn += t.quantity;
+          if (t.type === "Stock out") itemMonthlyMap[nm].stockOut += t.quantity;
+        });
+        const itemChart = Object.values(itemMonthlyMap);
+
+        // Monthly movement (month totals)
         const monthMap = {};
         transactions.forEach((t) => {
           const ts = new Date(t.timestamp);
           const monthKey = `${ts.getFullYear()}-${String(
             ts.getMonth() + 1
           ).padStart(2, "0")}`;
-          if (!monthMap[monthKey]) {
+          if (!monthMap[monthKey])
             monthMap[monthKey] = {
               month: monthKey,
               stockIn: 0,
               stockOut: 0,
               adjustment: 0,
             };
-          }
           if (t.type === "Stock in") monthMap[monthKey].stockIn += t.quantity;
           if (t.type === "Stock out") monthMap[monthKey].stockOut += t.quantity;
           if (t.type === "Adjustment")
             monthMap[monthKey].adjustment += t.quantity;
         });
-
         const monthlyChart = Object.entries(monthMap)
           .map(([month, data]) => ({ ...data, month }))
           .sort((a, b) => new Date(a.month) - new Date(b.month));
 
+        // set states
         setStats({
           totalItems: items.length,
-          lowStock: lowStockItems.length,
-          soonToExpire: soonToExpireItems.length,
-          transactionsThisMonth: transactionsThisMonth.length,
+          lowStock: lowStock.length,
+          soonToExpire: soonToExpire.length,
+          transactionsThisMonth: thisMonthTransactions.length,
         });
 
         const sortedTransactions = [...transactions].sort(
           (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
         );
+
+        setAllItems(items);
+        setLowStockItems(lowStock);
+        setSoonToExpireItems(soonToExpire);
+        setMonthlyTransactions(thisMonthTransactions);
+
         setRecentTransactions(sortedTransactions.slice(0, 5));
         setCategoryData(categoryChart);
+        setCategoryItemsMap(categoryMap);
         setMonthlyMovement(monthlyChart);
+        setMonthlyItemTransactions(itemChart);
       } catch (error) {
         console.error(error);
       }
     };
+
     fetchDashboardData();
   }, [dispatch]);
 
-  return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <StatCard
-          icon={Package}
-          title="Total Items"
-          value={stats.totalItems}
-          color="#f97316"
-        />
-        <StatCard
-          icon={AlertTriangle}
-          title="Low Stock"
-          value={stats.lowStock}
-          color="#ef4444"
-        />
-        <StatCard
-          icon={Clock}
-          title="Soon to Expire"
-          value={stats.soonToExpire}
-          color="#eab308"
-        />
-        <StatCard
-          icon={RefreshCcw}
-          title="Transactions This Month"
-          value={stats.transactionsThisMonth}
-          color="#22c55e"
-        />
-      </div>
+  const filteredMonthlyTransactions = monthlyItemTransactions.filter((item) => {
+    if (transactionFilter === "All") return true;
+    if (transactionFilter === "Stock In") return item.stockIn > 0;
+    if (transactionFilter === "Stock Out") return item.stockOut > 0;
+    // Category filter
+    return item.category === transactionFilter;
+  });
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card title="Stock by Category">
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={categoryData} barSize={40}>
-              <defs>
-                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.9} />
-                  <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.4} />
-                </linearGradient>
-              </defs>
+  const openModal = (title, data, type = "items") => {
+    setModalTitle(title);
+    setModalData(data);
+    setModalOpen(true);
+    setModalType(type);
+  };
+
+  const handleGenerateReport = () => {
+    alert("Monthly report generation logic here!");
+  };
+
+  // Items to show when a category is selected
+  const itemsForSelectedCategory =
+    selectedCategory === "All"
+      ? []
+      : (categoryItemsMap[selectedCategory] || []).map((it) => ({
+          name: it.name,
+          quantity: it.quantity,
+        }));
+
+  const categoryList = ["All", ...categoryData.map((c) => c.name)];
+
+  return (
+    <>
+      <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+        {/* Generate Report Button */}
+        <div className="flex justify-end">
+          <button
+            onClick={handleGenerateReport}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition"
+          >
+            <FileText size={18} /> Generate Monthly Report
+          </button>
+        </div>
+
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div
+            className="cursor-pointer"
+            onClick={() => openModal("All Items", allItems)}
+          >
+            <StatCard
+              icon={Package}
+              title="Total Items"
+              value={stats.totalItems}
+              color="#f97316"
+            />
+          </div>
+          <div
+            className="cursor-pointer"
+            onClick={() => openModal("Low Stock Items", lowStockItems)}
+          >
+            <StatCard
+              icon={AlertTriangle}
+              title="Low Stock"
+              value={stats.lowStock}
+              color="#ef4444"
+            />
+          </div>
+          <div
+            className="cursor-pointer"
+            onClick={() => openModal("Soon to Expire Items", soonToExpireItems)}
+          >
+            <StatCard
+              icon={Clock}
+              title="Soon to Expire"
+              value={stats.soonToExpire}
+              color="#eab308"
+            />
+          </div>
+          <div
+            className="cursor-pointer"
+            onClick={() =>
+              openModal(
+                "This Month's Transactions",
+                monthlyTransactions,
+                "transactions"
+              )
+            }
+          >
+            <StatCard
+              icon={RefreshCcw}
+              title="Transactions"
+              value={stats.transactionsThisMonth}
+              color="#22c55e"
+            />
+          </div>
+        </div>
+
+        {/* Stock by Category Card */}
+        <Card
+          title={`Stock by Category ${
+            selectedCategory === "All" ? "" : ` — ${selectedCategory}`
+          }`}
+        >
+          <div className="mb-3 flex gap-2 items-center">
+            <div className="flex flex-wrap gap-2">
+              {categoryList.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-3 py-1 rounded-full text-sm border ${
+                    selectedCategory === cat
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-700 border-gray-200"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {selectedCategory !== "All" && (
+              <button
+                className="ml-auto text-sm px-2 py-1 text-gray-600 hover:text-gray-800"
+                onClick={() => setSelectedCategory("All")}
+              >
+                Show categories
+              </button>
+            )}
+          </div>
+
+          {selectedCategory === "All" ? (
+            // Category overview
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart
+                data={categoryData}
+                onClick={(e) => {
+                  if (e && e.activeLabel) setSelectedCategory(e.activeLabel);
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fill: "#6b7280", fontSize: 12 }}
+                />
+                <YAxis tick={{ fill: "#6b7280", fontSize: 12 }} />
+                <Tooltip />
+                <Bar dataKey="count" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : itemsForSelectedCategory.length === 0 ? (
+            <div className="p-6 text-center text-gray-600">
+              No items in this category.
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart data={itemsForSelectedCategory} barSize={25}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fill: "#6b7280", fontSize: 12 }}
+                />
+                <YAxis tick={{ fill: "#6b7280", fontSize: 12 }} />
+                <Tooltip />
+                <Bar
+                  dataKey="quantity"
+                  fill="#3b82f6"
+                  name="Current Quantity"
+                  radius={[6, 6, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </Card>
+
+        {/* Monthly Item Transactions */}
+        {/* <Card title="Monthly Item Transactions (This Month)">
+          <ResponsiveContainer width="100%" height={320}>
+            <BarChart data={monthlyItemTransactions} barSize={30}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="name" tick={{ fill: "#6b7280", fontSize: 12 }} />
               <YAxis tick={{ fill: "#6b7280", fontSize: 12 }} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#fff",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                }}
+              <Tooltip />
+              <Bar
+                dataKey="stockIn"
+                fill="#10b981"
+                name="Stock In"
+                radius={[6, 6, 0, 0]}
               />
               <Bar
-                dataKey="count"
-                fill="url(#barGradient)"
+                dataKey="stockOut"
+                fill="#ef4444"
+                name="Stock Out"
+                radius={[6, 6, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </Card> */}
+
+        <Card title="Monthly Item Transactions (This Month)">
+          <div className="mb-3 flex flex-wrap gap-2">
+            {["All", "Stock In", "Stock Out", ...categoryList.slice(1)].map(
+              (filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setTransactionFilter(filter)}
+                  className={`px-3 py-1 rounded-full text-sm border transition ${
+                    transactionFilter === filter
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
+                  }`}
+                >
+                  {filter}
+                </button>
+              )
+            )}
+          </div>
+
+          <ResponsiveContainer width="100%" height={320}>
+            <BarChart data={filteredMonthlyTransactions} barSize={30}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis dataKey="name" tick={{ fill: "#6b7280", fontSize: 12 }} />
+              <YAxis tick={{ fill: "#6b7280", fontSize: 12 }} />
+              <Tooltip />
+              <Bar
+                dataKey="stockIn"
+                fill="#10b981"
+                name="Stock In"
+                radius={[6, 6, 0, 0]}
+              />
+              <Bar
+                dataKey="stockOut"
+                fill="#ef4444"
+                name="Stock Out"
                 radius={[6, 6, 0, 0]}
               />
             </BarChart>
           </ResponsiveContainer>
         </Card>
 
-        <Card title="Monthly Stock Movement">
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={monthlyMovement}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="month" tick={{ fill: "#6b7280", fontSize: 12 }} />
-              <YAxis tick={{ fill: "#6b7280", fontSize: 12 }} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#fff",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                }}
-              />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="stockIn"
-                stroke="#10b981"
-                strokeWidth={2}
-                dot={{ r: 4 }}
-                activeDot={{ r: 6 }}
-                name="Stock In"
-              />
-              <Line
-                type="monotone"
-                dataKey="stockOut"
-                stroke="#ef4444"
-                strokeWidth={2}
-                dot={{ r: 4 }}
-                activeDot={{ r: 6 }}
-                name="Stock Out"
-              />
-              <Line
-                type="monotone"
-                dataKey="adjustment"
-                stroke="#f59e0b"
-                strokeWidth={2}
-                dot={{ r: 4 }}
-                activeDot={{ r: 6 }}
-                name="Adjustment"
-              />
-            </LineChart>
-          </ResponsiveContainer>
+        {/* Recent Transactions */}
+        <Card title="Recent Transactions">
+          <table className="w-full text-sm border border-gray-200 rounded overflow-hidden">
+            <thead>
+              <tr className="bg-gray-100 text-gray-700">
+                <th className="p-3 border">Item</th>
+                <th className="p-3 border">Type</th>
+                <th className="p-3 border">Quantity</th>
+                <th className="p-3 border">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentTransactions.map((t, i) => (
+                <tr key={i} className="hover:bg-gray-50 transition">
+                  <td className="p-3 border">{t.item?.name}</td>
+                  <td className="p-3 border">
+                    <span
+                      className={`px-2 py-1 text-xs rounded ${
+                        t.type === "Stock in"
+                          ? "bg-green-100 text-green-800"
+                          : t.type === "Stock out"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {t.type}
+                    </span>
+                  </td>
+                  <td className="p-3 border">
+                    {t.quantity} {t.unit}
+                  </td>
+                  <td className="p-3 border">
+                    {new Date(t.timestamp).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </Card>
       </div>
 
-      {/* Recent Transactions */}
-      <Card title="Recent Transactions">
-        <table className="w-full text-sm border border-gray-200 rounded overflow-hidden">
-          <thead>
-            <tr className="bg-gray-100 text-gray-700">
-              <th className="p-3 border">Item</th>
-              <th className="p-3 border">Type</th>
-              <th className="p-3 border">Quantity</th>
-              <th className="p-3 border">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentTransactions.map((t, i) => (
-              <tr key={i} className="hover:bg-gray-50 transition">
-                <td className="p-3 border">{t.item?.name}</td>
-                <td className="p-3 border">
-                  <span
-                    className={`px-2 py-1 text-xs rounded ${
-                      t.type === "Stock in"
-                        ? "bg-green-100 text-green-800"
-                        : t.type === "Stock out"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {t.type}
-                  </span>
-                </td>
-                <td className="p-3 border">
-                  {t.quantity} {t.unit}
-                </td>
-                <td className="p-3 border">
-                  {new Date(t.timestamp).toLocaleDateString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
-    </div>
+      {/* Modal */}
+      <DataModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={modalTitle}
+        data={modalData}
+        type={modalType}
+      />
+    </>
   );
 }
 

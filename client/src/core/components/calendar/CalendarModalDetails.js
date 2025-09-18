@@ -47,7 +47,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
   const [activeModal, setActiveModal] = useState(null);
   const userInfo = useSelector((state) => state.user.userInfo);
 
-  console.log(report);
+  // console.log(report);
 
   const dispatch = useDispatch();
 
@@ -428,6 +428,14 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
               value={report.doctor?.name || "N/A"}
               onClick={() => handleRedirect(report.doctor?._id, "doctors")}
               clickable
+            />
+            <InfoCard
+              label="Consultation Fee"
+              value={
+                report.amount
+                  ? `₱${Number(report.amount).toLocaleString()}`
+                  : "-"
+              }
             />
             <InfoCard
               label="Status"

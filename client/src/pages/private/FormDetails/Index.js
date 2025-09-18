@@ -12,6 +12,7 @@ import CalendarTab from "../Calendar/CalendarTab";
 import ClinicalRecordTab from "./ClinicalRecordTab";
 import ConsultationHistoryTab from "./ConsultationHistoryTab";
 import DashboardTabStaff from "./DashboardTabStaff";
+import PatientsList from "./PatientsList";
 
 export default function UserDashboardPage({ data }) {
   const { id } = useParams();
@@ -19,6 +20,7 @@ export default function UserDashboardPage({ data }) {
   const { refreshKey } = useSelector((state) => state.utils);
 
   const [appointments, setAppointments] = useState(null);
+  const [allAppointments, setAllAppointments] = useState(null);
   const [mainTab, setMainTab] = useState(null); // <== will be set dynamically
   const [loading, setLoading] = useState(true);
 
@@ -30,6 +32,12 @@ export default function UserDashboardPage({ data }) {
           "appointments",
           data._id ? { doctor: data._id } : {}
         );
+
+        const allUserAppointments = await apiService.get(
+          dispatch,
+          "appointments"
+        );
+        setAllAppointments(allUserAppointments);
 
         setAppointments(userAppointments);
 
@@ -126,7 +134,7 @@ export default function UserDashboardPage({ data }) {
       case "staff-dashboard":
         return <DashboardTabStaff appointments={appointments} />;
       case "patients-all":
-        return <PatientsTab data={data} />;
+        return <PatientsList appointments={allAppointments} />;
 
       default:
         return (

@@ -29,7 +29,7 @@ export default function ConsultationHistoryTab({ data }) {
           "appointments",
           {
             [data.role]: data._id,
-            status: ["completed", "cancelled"],
+            // status: ["completed", "cancelled"],
           }
         );
 
@@ -53,6 +53,8 @@ export default function ConsultationHistoryTab({ data }) {
   const filteredAppointments = appointments.filter(
     (app) =>
       app.doctor?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.patient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.reason?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.notes?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -105,6 +107,9 @@ export default function ConsultationHistoryTab({ data }) {
                 Doctor
               </th>
               <th className="px-4 py-2 text-left font-medium text-gray-600">
+                Patient
+              </th>
+              <th className="px-4 py-2 text-left font-medium text-gray-600">
                 Reason
               </th>
               <th className="px-4 py-2 text-left font-medium text-gray-600">
@@ -125,6 +130,7 @@ export default function ConsultationHistoryTab({ data }) {
                 <td className="px-4 py-2">{formatDate(app.date)}</td>
                 <td className="px-4 py-2">{formatTime(app.time)}</td>
                 <td className="px-4 py-2">{app.doctor?.name || "N/A"}</td>
+                <td className="px-4 py-2">{app.patient?.name || "N/A"}</td>
                 <td className="px-4 py-2 max-w-[200px] truncate">
                   {app.reason || "-"}
                 </td>

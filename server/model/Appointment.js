@@ -39,6 +39,9 @@ const appointmentSchema = new Schema(
     diagnosis: {
       type: String,
     },
+    amount: {
+      type: String,
+    },
     notes: {
       type: String,
       trim: true,

@@ -17,7 +17,7 @@ export default function Sidebar({ children }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const userInfo = useSelector((state) => state.user.userInfo);
 
   const [showDropdown, setShowDropdown] = useState(false);

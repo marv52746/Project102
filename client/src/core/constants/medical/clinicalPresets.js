@@ -301,6 +301,12 @@ export const othersFormFields = [
     type: "textarea",
     placeholder: "Enter additional notes",
   },
+  {
+    name: "amount",
+    label: "Consultation Fee",
+    type: "text",
+    placeholder: "Enter consultation fee (₱)",
+  },
 ];
 
 export const labRequestFormFields = [
