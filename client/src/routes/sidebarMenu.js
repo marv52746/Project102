@@ -144,14 +144,14 @@ export const iconMapping = [
         to: all_routes.calendar,
         table: "calendar",
       },
-      {
-        text: "Org Chart",
-        icon: <Network size={20} />,
-        alert: false,
-        iconText: "Org Chart",
-        to: all_routes.orgChart,
-        table: "organizational-structure-diagram",
-      },
+      // {
+      //   text: "Org Chart",
+      //   icon: <Network size={20} />,
+      //   alert: false,
+      //   iconText: "Org Chart",
+      //   to: all_routes.orgChart,
+      //   table: "organizational-structure-diagram",
+      // },
     ],
   },
   {

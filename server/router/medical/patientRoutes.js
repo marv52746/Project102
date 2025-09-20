@@ -5,6 +5,7 @@ const userController = require("../../controller/core/userController");
 const multer = require("multer");
 const upload = multer();
 const checkRole = require("../../middleware/checkRole");
+const authMiddleware = require("../../middleware/authMiddleware");
 
 // router.post(
 //   "/",
@@ -17,10 +18,15 @@ const checkRole = require("../../middleware/checkRole");
 // router.put("/:id", upload.none(), patientController.update);
 // router.delete("/:id", patientController.delete);
 
-router.post("/", upload.none(), patientController.createPatient);
-router.get("/", patientController.getAll);
-router.get("/:id", patientController.getById);
-router.put("/:id", upload.none(), patientController.update);
-router.delete("/:id", patientController.deletePatient);
+router.post(
+  "/",
+  authMiddleware,
+  upload.none(),
+  patientController.createPatient
+);
+router.get("/", authMiddleware, patientController.getAll);
+router.get("/:id", authMiddleware, patientController.getById);
+router.put("/:id", authMiddleware, upload.none(), patientController.update);
+router.delete("/:id", authMiddleware, patientController.deletePatient);
 
 module.exports = router;

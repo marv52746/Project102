@@ -12,6 +12,7 @@ import {
   CalendarDays,
   FileText,
   Baby,
+  Clock,
 } from "lucide-react";
 
 // Helper functions
@@ -37,8 +38,8 @@ const iconMap = {
 
 // Format each activity log
 const formatActivity = (log) => {
-  const { action, table, dataSnapshot } = log;
-  const date = log.createdAt;
+  const { action, table, dataSnapshot, userId } = log;
+  const date = log.created_on;
 
   const actVerb =
     action === "create"
@@ -53,61 +54,79 @@ const formatActivity = (log) => {
   let description = "";
 
   switch (table) {
-    case "medication":
-      title = `Medications Prescribed: ${dataSnapshot.name}`;
-      description = `${actVerb} medication "${dataSnapshot.name}" with dose ${
-        dataSnapshot.dose || "-"
-      } and frequency ${dataSnapshot.frequency || "-"} (${formatDateRange(
-        dataSnapshot.start_date,
-        dataSnapshot.end_date
-      )}).`;
+    case "appointment": {
+      const patientName = dataSnapshot.patient?.name || "Unknown Patient";
+      const status = dataSnapshot.status || "-";
+      // Better wording for appointment actions
+      if (status === "completed") {
+        title = `Completed check-up with ${patientName}`;
+      } else if (status === "cancelled") {
+        title = `Cancelled appointment with ${patientName}`;
+      } else {
+        title = `${actVerb} appointment with ${patientName}`;
+      }
+      description = `Reason: ${dataSnapshot.reason || "-"}, Status: ${status}`;
       break;
-    case "allergy":
-      title = `Allergy: ${dataSnapshot.name}`;
-      description = `${actVerb} allergy "${dataSnapshot.name}" — Reaction: ${
+    }
+    case "medication": {
+      const patientName = dataSnapshot.patient?.name || "Unknown Patient";
+      title = `Prescribed ${dataSnapshot.name || "medicine"} to ${patientName}`;
+      description = `Dose: ${dataSnapshot.dose || "-"}, Frequency: ${
+        dataSnapshot.frequency || "-"
+      } (${formatDateRange(dataSnapshot.start_date, dataSnapshot.end_date)})`;
+      break;
+    }
+    case "condition": {
+      const patientName = dataSnapshot.patient?.name || "Unknown Patient";
+      title = `Added clinical notes for ${patientName}`;
+      description = `${actVerb} condition "${
+        dataSnapshot.name || "-"
+      }" — Notes: ${dataSnapshot.notes || "-"}`;
+      break;
+    }
+    case "vitals": {
+      const patientName = dataSnapshot.patient?.name || "Unknown Patient";
+      title = `${actVerb} vitals for ${patientName}`;
+      description = `BP: ${dataSnapshot.blood_pressure || "-"}, HR: ${
+        dataSnapshot.heart_rate || "-"
+      }, Temp: ${dataSnapshot.temperature || "-"}, Weight: ${
+        dataSnapshot.weight || "-"
+      }`;
+      break;
+    }
+
+    case "surgical_history": {
+      const patientName = dataSnapshot.patient?.name || "Unknown Patient";
+      title = `${actVerb} surgical history for ${patientName}`;
+      description = `${dataSnapshot.name || "Surgery"} (${
+        dataSnapshot.year || "-"
+      }) — Surgeon: ${dataSnapshot.surgeon || "-"}`;
+      break;
+    }
+
+    case "allergy": {
+      const patientName = dataSnapshot.patient?.name || "Unknown Patient";
+      title = `${actVerb} allergy record for ${patientName}`;
+      description = `Allergen: ${dataSnapshot.name || "-"}, Reaction: ${
         dataSnapshot.reaction || "-"
-      }, Severity: ${dataSnapshot.severity || "-"}.`;
+      }`;
       break;
-    case "surgical":
-      title = `Surgical History: ${dataSnapshot.name}`;
-      description = `${actVerb} surgical record "${
-        dataSnapshot.name
-      }" — Year: ${dataSnapshot.year || "-"}, Surgeon: ${
-        dataSnapshot.surgeon || "-"
-      }.`;
+    }
+
+    case "document": {
+      const patientName = dataSnapshot.patient?.name || "Unknown Patient";
+      title = `${actVerb} document for ${patientName}`;
+      description = `${dataSnapshot.type || "File"} — ${
+        dataSnapshot.filename || "-"
+      }`;
       break;
-    case "vitals":
-      title = `Vitals`;
-      description = `${actVerb} vital record — BP: ${
-        dataSnapshot.blood_pressure || "-"
-      }, HR: ${dataSnapshot.heart_rate || "-"}, Temp: ${
-        dataSnapshot.temperature || "-"
-      }.`;
+    }
+
+    default: {
+      title = `${actVerb} ${capitalize(table)} record`;
+      description = log.description || "";
       break;
-    case "condition":
-      title = `Diagnosis / Conditions: ${dataSnapshot.name}`;
-      description = `${actVerb} condition "${dataSnapshot.name}" — Code: ${
-        dataSnapshot.code || "-"
-      }, Notes: ${dataSnapshot.notes || "-"}.`;
-      break;
-    case "appointment":
-      title = `Appointment`;
-      description = `${actVerb} appointment record — Reason: ${
-        dataSnapshot.reason || "-"
-      }, Status: ${dataSnapshot.status || "-"}.`;
-      break;
-    case "pregnancy":
-      title = `Pregnancy`;
-      description = `${actVerb} pregnancy record — LMP: ${
-        dataSnapshot.lmp ? new Date(dataSnapshot.lmp).toLocaleDateString() : "-"
-      }, EDD: ${
-        dataSnapshot.edd ? new Date(dataSnapshot.edd).toLocaleDateString() : "-"
-      }, Trimester: ${dataSnapshot.trimester || "-"}`;
-      break;
-    default:
-      title = capitalize(table);
-      description = `${actVerb} ${table} record.`;
-      break;
+    }
   }
 
   return {
@@ -119,7 +138,7 @@ const formatActivity = (log) => {
   };
 };
 
-export default function ActivitiesTimeline({ patientId }) {
+export default function ActivitiesTimeline({ patientId, userID }) {
   const { refreshKey } = useSelector((state) => state.utils);
   const dispatch = useDispatch();
   const [activities, setActivities] = useState([]);
@@ -128,10 +147,21 @@ export default function ActivitiesTimeline({ patientId }) {
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        if (!patientId) return;
-        const data = await apiService.get(dispatch, "activities", {
-          patient: patientId,
-        });
+        // Build query params dynamically
+        const params = {};
+        // if (patientId) params.patientId = patientId; // 👈 use patientId
+        if (userID) params.userId = userID; // 👈 use userId
+
+        // Call API
+        let data;
+        if (patientId) {
+          data = await apiService.get(dispatch, "activities", {
+            patient: patientId,
+          });
+        } else {
+          data = await apiService.get(dispatch, "activities", params);
+        }
+
         const formatted = (data || []).map(formatActivity);
         // console.log(data);
         setActivities(formatted);
@@ -140,9 +170,10 @@ export default function ActivitiesTimeline({ patientId }) {
       }
     };
     fetchActivities();
-  }, [dispatch, patientId, refreshKey]);
+  }, [dispatch, patientId, refreshKey, userID]);
 
   const visibleActivities = activities.slice(0, visibleCount);
+  // console.log(visibleActivities);
 
   return (
     <Card title="Activities Timeline">
@@ -154,13 +185,17 @@ export default function ActivitiesTimeline({ patientId }) {
                 <div className="absolute w-3 h-3 bg-blue-200 rounded-full -start-1.5 mt-1.5 border border-white"></div>
                 <div className="mt-1">{a.icon}</div>
                 <div>
-                  <time className="text-xs text-gray-500">
+                  {/* <time className="text-xs text-gray-500">
                     {formatFullDate(a.date)}
-                  </time>
+                  </time> */}
                   <div className="font-medium">{a.title}</div>
                   {a.description && (
                     <div className="text-gray-500 text-xs">{a.description}</div>
                   )}
+                  <p className="text-xs text-gray-500 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {formatFullDate(a.date)}
+                  </p>
                 </div>
               </li>
             ))

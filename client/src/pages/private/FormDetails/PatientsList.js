@@ -3,9 +3,9 @@ import { useDispatch } from "react-redux";
 import { getAge } from "../../../core/utils/tableUtils";
 import { useNavigate } from "react-router-dom";
 import { Search, Calendar, User, FileText, X } from "lucide-react";
-import AppointmentModal from "../FormDetails/AppointmentModal";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
 import { capitalizeText } from "../../../core/utils/stringUtils";
+import apiService from "../../../core/services/apiService"; // ✅ import to fetch users
 
 export default function PatientsList({ appointments }) {
   const dispatch = useDispatch();
@@ -15,7 +15,7 @@ export default function PatientsList({ appointments }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [visiblePatients, setVisiblePatients] = useState(5);
   const [selectedAppointments, setSelectedAppointments] = useState(null);
-  const [selectedAppointment, setSelectedAppointment] = useState(null); // ✅ new state
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
   const handlePatientClick = (record) => {
@@ -24,49 +24,42 @@ export default function PatientsList({ appointments }) {
     }
   };
 
-  //   console.log(appointments);
-
   const handleAppointmentClick = (patientId) => {
     const appts = (appointments || [])
       .filter((appt) => appt?.patient?._id === patientId)
-      .sort((a, b) => new Date(b.date) - new Date(a.date)); // ✅ sort latest first
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
     setSelectedAppointments(appts);
   };
 
-  const closeModal = () => {
-    setSelectedAppointment(null); // ✅ ensures CalendarModalDetails unmounts
-  };
-  const closeModalParent = () => {
-    setSelectedAppointments(null);
-  };
+  const closeModal = () => setSelectedAppointment(null);
+  const closeModalParent = () => setSelectedAppointments(null);
 
   useEffect(() => {
-    const fetchDetails = async () => {
+    const fetchPatients = async () => {
       try {
-        const patientMap = new Map();
-        (appointments || []).forEach((appt) => {
-          const patientId = appt?.patient?._id;
-          if (!patientId) return;
-          if (!patientMap.has(patientId)) {
-            patientMap.set(patientId, { ...appt.patient, appointments: [] });
-          }
-          patientMap.get(patientId).appointments.push(appt);
+        // ✅ Get all users with patient role
+        const users = await apiService.get(dispatch, "users?role=patient");
+
+        // ✅ Map each patient with their appointments
+        const patientsWithAppointments = users.map((p) => {
+          const appts = (appointments || [])
+            .filter((appt) => appt?.patient?._id === p._id)
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+          return {
+            ...p,
+            appointments: appts,
+            lastVisit: appts[0]?.date || null,
+          };
         });
 
-        const patientsWithVisits = Array.from(patientMap.values()).map((p) => {
-          const sortedAppts = p.appointments.sort(
-            (a, b) => new Date(b.date) - new Date(a.date)
-          );
-          return { ...p, lastVisit: sortedAppts[0]?.date || null };
-        });
-
-        setPatients(patientsWithVisits);
+        setPatients(patientsWithAppointments);
       } catch (error) {
-        console.error(`Error fetching appointments list:`, error);
+        console.error("Error fetching patients:", error);
       }
     };
 
-    fetchDetails();
+    fetchPatients();
   }, [appointments, dispatch]);
 
   const filteredPatients = patients.filter((p) =>
@@ -75,7 +68,7 @@ export default function PatientsList({ appointments }) {
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md">
-      {/* 🔍 Search bar */}
+      {/* 🔍 Search */}
       <div className="mb-4 flex items-center">
         <div className="relative w-1/3">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
@@ -120,7 +113,7 @@ export default function PatientsList({ appointments }) {
             ) : (
               filteredPatients.slice(0, visiblePatients).map((patient, idx) => (
                 <tr key={idx} className="hover:bg-blue-50 transition border-b">
-                  {/* Name → clickable */}
+                  {/* Name */}
                   <td
                     onClick={() => handlePatientClick(patient)}
                     className="px-4 py-3 text-blue-600 font-medium cursor-pointer hover:underline flex items-center gap-2"
@@ -128,7 +121,6 @@ export default function PatientsList({ appointments }) {
                     <User className="w-4 h-4 text-gray-500" />
                     {patient?.name || "Unknown"}
                   </td>
-
                   <td className="px-4 py-3 text-gray-700 capitalize">
                     {patient?.gender || "—"}
                   </td>
@@ -142,7 +134,6 @@ export default function PatientsList({ appointments }) {
                       ? getAge(patient.date_of_birth)
                       : "—"}
                   </td>
-                  {/* Last Visit */}
                   <td className="px-4 py-3 text-gray-700">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4 text-gray-500" />
@@ -151,8 +142,6 @@ export default function PatientsList({ appointments }) {
                         : "—"}
                     </div>
                   </td>
-
-                  {/* Appointment record → clickable */}
                   <td
                     onClick={() => handleAppointmentClick(patient._id)}
                     className="px-4 py-3 text-blue-600 cursor-pointer hover:underline flex items-center gap-1"
@@ -179,93 +168,87 @@ export default function PatientsList({ appointments }) {
         </div>
       )}
 
-      {/* Appointment Modal */}
+      {/* Appointment Records Modal */}
       {selectedAppointments && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-lg p-6 w-11/12 md:w-5/6 lg:w-3/4 max-h-[80vh] overflow-y-auto relative">
-            {/* Close button */}
             <button
               onClick={closeModalParent}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
             >
               <X className="w-5 h-5" />
             </button>
-
-            {/* Header */}
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-gray-800">
               <FileText className="w-6 h-6 text-blue-600" /> Appointment Records
             </h2>
 
-            {/* Grid of cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {selectedAppointments.map((appt, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => {
-                    setSelectedAppointment(appt); // ✅ set selected appointment
-                    setShowModal(true); // ✅ open modal
-                  }}
-                  className="p-4 border rounded-xl shadow-sm hover:shadow-md hover:border-blue-400 transition cursor-pointer bg-white"
-                >
-                  {/* Header row */}
-                  <div className="flex items-center justify-between pb-2 mb-3 border-b">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-gray-500" />
-                      <span className="font-semibold text-gray-800">
-                        {new Date(appt.date).toLocaleDateString()}
-                      </span>
+            {selectedAppointments.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {selectedAppointments.map((appt, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      setSelectedAppointment(appt);
+                      setShowModal(true);
+                    }}
+                    className="p-4 border rounded-xl shadow-sm hover:shadow-md hover:border-blue-400 transition cursor-pointer bg-white"
+                  >
+                    <div className="flex items-center justify-between pb-2 mb-3 border-b">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-gray-500" />
+                        <span className="font-semibold text-gray-800">
+                          {new Date(appt.date).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 text-gray-700 text-sm">
+                        👨‍⚕️ {appt?.doctor?.name || "N/A"}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 text-gray-700 text-sm">
-                      👨‍⚕️ {appt?.doctor?.name || "N/A"}
-                    </div>
-                  </div>
-
-                  {/* Details in single-column layout */}
-                  <div className="space-y-2 text-sm text-gray-700">
-                    <p className="flex items-center gap-1">
-                      <span className="font-medium">Status:</span>{" "}
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          appt.status === "completed" || appt.status === "ready"
-                            ? "bg-green-100 text-green-700"
-                            : appt.status === "cancelled"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-gray-100 text-gray-700"
-                        }`}
-                      >
-                        {capitalizeText(appt.status)}
-                      </span>
-                    </p>
-                    <p className="flex items-center gap-1">
-                      <span className="font-medium">Reason:</span>{" "}
-                      <span className="truncate max-w-[500px] inline-block">
+                    <div className="space-y-2 text-sm text-gray-700">
+                      <p>
+                        <span className="font-medium">Status:</span>{" "}
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            appt.status === "completed" ||
+                            appt.status === "ready"
+                              ? "bg-green-100 text-green-700"
+                              : appt.status === "cancelled"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {capitalizeText(appt.status)}
+                        </span>
+                      </p>
+                      <p>
+                        <span className="font-medium">Reason:</span>{" "}
                         {appt?.reason || "—"}
-                      </span>
-                    </p>
-                    <p className="flex items-center gap-1">
-                      <span className="font-medium">Diagnosis:</span>{" "}
-                      <span className="truncate max-w-[500px] inline-block">
+                      </p>
+                      <p>
+                        <span className="font-medium">Diagnosis:</span>{" "}
                         {appt?.diagnosis || "—"}
-                      </span>
-                    </p>
-                    <p className="flex items-center gap-1">
-                      <span className="font-medium">Notes:</span>{" "}
-                      <span className="truncate max-w-[500px] inline-block">
+                      </p>
+                      <p>
+                        <span className="font-medium">Notes:</span>{" "}
                         {appt?.notes || "—"}
-                      </span>
-                    </p>
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-gray-500 py-10">
+                📅 No appointment records found.
+              </p>
+            )}
           </div>
         </div>
       )}
 
-      {/* Modals */}
+      {/* Appointment Detail Modal */}
       {showModal && selectedAppointment && (
         <CalendarModalDetails
-          report={selectedAppointment} // ✅ pass the clicked appointment
+          report={selectedAppointment}
           isOpen={true}
           onClose={closeModal}
         />

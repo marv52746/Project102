@@ -27,6 +27,18 @@ const apiClient = axios.create({
 //   return { data: formData, headers: { "Content-Type": "multipart/form-data" } };
 // };
 
+// ✅ Interceptor to attach token automatically
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token"); // 👈 store token after login
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Shared handler
 const handleApiResponse = async (
   dispatch,

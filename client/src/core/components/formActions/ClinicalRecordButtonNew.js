@@ -23,6 +23,7 @@ import { clinicalFormFieldMap } from "../../constants/medical/clinicalPresets";
 import { useDispatch } from "react-redux";
 import { handleFormSubmit } from "../formActions/formSubmit";
 import apiService from "../../services/apiService";
+import { setRefreshKey } from "../../services/reducers/utilsReducer";
 
 function ClinicalRecordButtonNew({
   report: initialReport,
@@ -133,6 +134,8 @@ function ClinicalRecordButtonNew({
       `appointments/${report._id}`
     );
     setReport(updatedReport);
+
+    dispatch(setRefreshKey(Date.now())); // use timestamp so it's always new
 
     if (onRefresh) onRefresh();
     setActiveModal(null);

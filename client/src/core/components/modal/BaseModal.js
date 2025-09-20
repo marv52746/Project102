@@ -4,6 +4,7 @@ import { clinicalFormFieldMap } from "../../constants/medical/clinicalPresets";
 import { getInputValue } from "../../utils/fieldUtils";
 import apiService from "../../services/apiService";
 import { useDispatch } from "react-redux";
+import { setRefreshKey } from "../../services/reducers/utilsReducer";
 
 const BaseModal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
@@ -208,6 +209,7 @@ const MultiEntryModal = ({
 
       // Reset & close
       setEntries([{}]); // reset
+      dispatch(setRefreshKey(Date.now())); // use timestamp so it's always new
       onClose();
     } catch (error) {
       console.error("Save failed:", error);

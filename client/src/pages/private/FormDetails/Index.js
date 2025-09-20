@@ -76,7 +76,7 @@ export default function UserDashboardPage({ data }) {
           { key: "overview", label: "Overview" },
           // { key: "schedule", label: "Schedule" },
           { key: "calendar", label: "Calendar" },
-          { key: "patients", label: "Patient List" },
+          { key: "patients", label: "Recent Patients" },
           { key: "consultation-history", label: "Apppointment History" },
           // { key: "reviews", label: "Reviews" },
         ];

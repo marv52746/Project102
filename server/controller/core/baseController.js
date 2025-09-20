@@ -62,10 +62,15 @@ class BaseController {
 
   create = async (req, res) => {
     try {
-      const newItem = new this.model(req.body);
+      // const newItem = new this.model(req.body);
+      const newItem = new this.model({
+        ...req.body,
+        created_by: req.currentUser?._id || null, // ✅ auto-set creator
+        updated_by: req.currentUser?._id || null, // ✅ auto-set creator
+      });
       const savedItem = await newItem.save();
 
-      await this.logActivity("create", savedItem, req.user?._id);
+      await this.logActivity("create", savedItem, req.currentUser?._id);
 
       res.status(201).json(savedItem);
     } catch (error) {
@@ -75,15 +80,21 @@ class BaseController {
 
   update = async (req, res) => {
     try {
+      // console.log(req.params.id);
+      // console.log(req.currentUser?._id);
+      // console.log(req.body);
       const updatedItem = await this.model.findByIdAndUpdate(
         req.params.id,
-        req.body,
+        {
+          ...req.body,
+          updated_by: req.currentUser?._id || null, // only update this field
+        },
         { new: true, runValidators: true }
       );
       if (!updatedItem) {
         return res.status(404).json({ message: "Item not found" });
       }
-      await this.logActivity("update", updatedItem, req.user?._id);
+      await this.logActivity("update", updatedItem, req.currentUser?._id);
       res.json(updatedItem);
     } catch (error) {
       console.error("❌ Update Error:", error);
@@ -97,7 +108,7 @@ class BaseController {
       if (!deletedItem) {
         return res.status(404).json({ message: "Item not found" });
       }
-      await this.logActivity("delete", deletedItem, req.user?._id);
+      await this.logActivity("delete", deletedItem, req.currentUser?._id);
       res.json({ message: "Item deleted successfully", deletedItem });
     } catch (error) {
       res.status(500).json({ error: error.message });

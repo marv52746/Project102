@@ -76,15 +76,7 @@ const userSchema = new mongoose.Schema({
   additional_information: {
     type: String,
   },
-  created_on: {
-    type: Date,
-    default: Date.now,
-  },
-  created_by: { type: ObjectId, ref: "user" },
-  updated_on: {
-    type: Date,
-  },
-  updated_by: { type: ObjectId, ref: "user" },
+
   hire_date: {
     type: Date,
   },
@@ -137,6 +129,11 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
+
+  created_on: { type: Date, default: Date.now },
+  created_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+  updated_on: { type: Date, default: Date.now },
+  updated_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 });
 
 // // 🔐 Hash password before saving

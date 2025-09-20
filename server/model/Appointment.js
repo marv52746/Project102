@@ -70,14 +70,10 @@ const appointmentSchema = new Schema(
     labrequest: [{ type: Schema.Types.ObjectId, ref: "labrequest" }],
     ultrasound: [{ type: Schema.Types.ObjectId, ref: "ultrasound" }],
 
-    created_by: {
-      type: Schema.Types.ObjectId,
-      ref: "user",
-    },
-    updated_by: {
-      type: Schema.Types.ObjectId,
-      ref: "user",
-    },
+    created_on: { type: Date, default: Date.now },
+    created_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+    updated_on: { type: Date, default: Date.now },
+    updated_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
   },
   {
     timestamps: {

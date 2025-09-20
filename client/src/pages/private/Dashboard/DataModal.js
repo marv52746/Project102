@@ -46,6 +46,7 @@ export default function DataModal({ isOpen, onClose, title, data = [], type }) {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const start = (page - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(start, start + itemsPerPage);
+  // console.log(paginatedData);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -93,6 +94,12 @@ export default function DataModal({ isOpen, onClose, title, data = [], type }) {
                       <th className="px-4 py-2 border-b font-medium text-gray-600">
                         Expiry
                       </th>
+                      <th className="px-4 py-2 border-b font-medium text-gray-600">
+                        Created by
+                      </th>
+                      <th className="px-4 py-2 border-b font-medium text-gray-600">
+                        Updated by
+                      </th>
                     </>
                   ) : (
                     <>
@@ -107,6 +114,12 @@ export default function DataModal({ isOpen, onClose, title, data = [], type }) {
                       </th>
                       <th className="px-4 py-2 border-b font-medium text-gray-600">
                         Date
+                      </th>
+                      <th className="px-4 py-2 border-b font-medium text-gray-600">
+                        Created by
+                      </th>
+                      <th className="px-4 py-2 border-b font-medium text-gray-600">
+                        Updated by
                       </th>
                     </>
                   )}
@@ -131,6 +144,12 @@ export default function DataModal({ isOpen, onClose, title, data = [], type }) {
                             ? new Date(row.expiryDate).toLocaleDateString()
                             : "-"}
                         </td>
+                        <td className="px-4 py-2 border-b text-gray-700">
+                          {row.created_by.name}
+                        </td>
+                        <td className="px-4 py-2 border-b text-gray-700">
+                          {row.updated_by.name}
+                        </td>
                       </>
                     ) : (
                       <>
@@ -145,6 +164,12 @@ export default function DataModal({ isOpen, onClose, title, data = [], type }) {
                         </td>
                         <td className="px-4 py-2 border-b text-gray-700">
                           {new Date(row.timestamp).toLocaleDateString()}
+                        </td>
+                        <td className="px-4 py-2 border-b text-gray-700">
+                          {row.created_by.name}
+                        </td>
+                        <td className="px-4 py-2 border-b text-gray-700">
+                          {row.updated_by.name}
                         </td>
                       </>
                     )}

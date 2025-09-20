@@ -10,6 +10,11 @@ const laboratoryRecordSchema = new mongoose.Schema({
   date_requested: { type: Date, default: Date.now },
   date_completed: Date,
   file_attachment: String,
+
+  created_on: { type: Date, default: Date.now },
+  created_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+  updated_on: { type: Date, default: Date.now },
+  updated_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 });
 
 const LaboratoryRecordDb = mongoose.model(

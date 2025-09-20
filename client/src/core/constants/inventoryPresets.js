@@ -4,8 +4,8 @@ import { inventoryUnitOptions, inventoyCategoryOptions } from "./choices";
 export const inventoryTableColumns = [
   { name: "name", label: "Name" },
   { name: "category", label: "Category" },
-  { name: "unit", label: "Unit" },
   { name: "quantity", label: "Quantity" },
+  { name: "unit", label: "Unit" },
   { name: "reorderLevel", label: "Reorder Level" },
   { name: "expiryDate", label: "Expiry Date" },
   // { name: "supplier", label: "supplier" },
@@ -36,12 +36,12 @@ export const inventoryFormFields = [
     options: inventoryUnitOptions,
     showOn: "all",
   },
-  {
-    name: "quantity",
-    label: "Quantity",
-    type: "number",
-    showOn: "all",
-  },
+  // {
+  //   name: "quantity",
+  //   label: "Quantity",
+  //   type: "number",
+  //   showOn: "all",
+  // },
   {
     name: "reorderLevel",
     label: "Reorder Level",

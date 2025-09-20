@@ -143,7 +143,7 @@ export default function DashboardTab({ patientId, data }) {
         {/* TIMELINE + DOCUMENTS */}
         <div className="space-y-4">
           <ActivitiesTimeline patientId={patientId} />
-          <Card title="Documents">
+          {/* <Card title="Documents">
             <ul className="divide-y text-sm">
               {documentsSeed.map((d) => (
                 <li
@@ -168,7 +168,7 @@ export default function DashboardTab({ patientId, data }) {
                 </li>
               ))}
             </ul>
-          </Card>
+          </Card> */}
         </div>
       </div>
       {openViewModal && (

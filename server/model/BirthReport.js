@@ -11,6 +11,11 @@ const birthReportSchema = new mongoose.Schema({
   baby_length: Number,
   complications: String,
   notes: String,
+
+  created_on: { type: Date, default: Date.now },
+  created_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+  updated_on: { type: Date, default: Date.now },
+  updated_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 });
 
 const BirthReportDb = mongoose.model("birth_report", birthReportSchema);

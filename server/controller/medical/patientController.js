@@ -9,65 +9,7 @@ class PatientController extends BaseController {
   }
 
   // Custom create method linking Patient to a User
-  // createPatient = async (req, res) => {
-  //   try {
-  //     const { user, ...patientData } = req.body;
 
-  //     let userId;
-  //     let userPayload = {};
-
-  //     // If user is an object, extract data
-  //     if (typeof user === "object" && user._id) {
-  //       userId = user._id;
-  //       const { first_name, last_name, ...rest } = user;
-
-  //       userPayload = {
-  //         ...rest,
-  //         first_name,
-  //         last_name,
-  //         role: "patient",
-  //         name: `${first_name || ""} ${last_name || ""}`.trim(),
-  //       };
-
-  //       // Check if user exists
-  //       const existingUser = await UserDb.findById(userId);
-
-  //       if (existingUser) {
-  //         await UserDb.findByIdAndUpdate(userId, userPayload, {
-  //           new: true,
-  //           runValidators: true,
-  //         });
-  //       } else {
-  //         const newUser = new UserDb({ _id: userId, ...userPayload });
-  //         await newUser.save();
-  //       }
-  //     } else if (typeof user === "string") {
-  //       // Handle string ID only
-  //       userId = user;
-
-  //       const existingUser = await UserDb.findById(userId);
-  //       if (!existingUser) {
-  //         return res.status(400).json({ message: "User not found" });
-  //       }
-
-  //       // Optional: you can update user here if needed
-  //     } else {
-  //       return res.status(400).json({ message: "Invalid user input" });
-  //     }
-
-  //     // Create Patient with user link
-  //     const newPatient = new PatientDb({
-  //       ...patientData,
-  //       user: userId,
-  //     });
-
-  //     const savedPatient = await newPatient.save();
-  //     res.status(201).json(savedPatient);
-  //   } catch (error) {
-  //     console.error("Create Patient Error:", error);
-  //     res.status(500).json({ error: error.message });
-  //   }
-  // };
   createPatient = async (req, res) => {
     try {
       const { user, ...patientData } = req.body;
@@ -109,12 +51,14 @@ class PatientController extends BaseController {
       const newPatient = new PatientDb({
         ...patientData,
         user: savedUser._id,
+        created_by: req.currentUser?._id || null,
+        updated_by: req.currentUser?._id || null,
       });
 
       const savedPatient = await newPatient.save();
 
       // ✅ Log Activity
-      await this.logActivity("create", savedPatient, req.user?._id);
+      await this.logActivity("create", savedPatient, req.currentUser?._id);
 
       res.status(201).json(savedPatient);
     } catch (error) {
@@ -126,6 +70,9 @@ class PatientController extends BaseController {
   update = async (req, res) => {
     try {
       const { user, ...patientData } = req.body;
+
+      // ✅ track updater
+      patientData.updated_by = req.currentUser?._id || null;
 
       // Update Patient data
       const updatedPatient = await PatientDb.findByIdAndUpdate(
@@ -182,7 +129,7 @@ class PatientController extends BaseController {
       const deletedItem = await PatientDb.findByIdAndDelete(patientId);
 
       // ✅ Log Activity
-      await this.logActivity("delete", deletedItem, req.user?._id);
+      await this.logActivity("delete", deletedItem, req.currentUser?._id);
 
       res.json({ message: "Patient deleted successfully", deletedItem });
     } catch (error) {
@@ -190,27 +137,6 @@ class PatientController extends BaseController {
       res.status(500).json({ error: error.message });
     }
   };
-
-  // getAllPatient = async (req, res) => {
-  //   try {
-  //     const patients = await PatientDb.find().populate("user"); // ← Populates user info
-  //     res.json(patients);
-  //   } catch (error) {
-  //     res.status(500).json({ error: error.message });
-  //   }
-  // };
-
-  // getByIdPatient = async (req, res) => {
-  //   try {
-  //     const patient = await PatientDb.findById(req.params.id).populate("user");
-  //     if (!patient) {
-  //       return res.status(404).json({ message: "Patient not found" });
-  //     }
-  //     res.json(patient);
-  //   } catch (error) {
-  //     res.status(500).json({ error: error.message });
-  //   }
-  // };
 }
 
 module.exports = new PatientController();

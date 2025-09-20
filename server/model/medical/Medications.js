@@ -13,9 +13,9 @@ const medicationSchema = new mongoose.Schema({
   notes: String,
 
   created_on: { type: Date, default: Date.now },
-  created_by: { type: ObjectId, ref: "user" },
+  created_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
   updated_on: { type: Date, default: Date.now },
-  updated_by: { type: ObjectId, ref: "user" },
+  updated_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 });
 
 const MedicationDb = mongoose.model("medication", medicationSchema);

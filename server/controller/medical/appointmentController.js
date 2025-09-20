@@ -26,10 +26,14 @@ class AppointmentController extends BaseController {
   // Add appointment-specific methods here
   create = async (req, res) => {
     try {
-      const newItem = new this.model(req.body);
+      // const newItem = new this.model(req.body);
+      const newItem = new this.model({
+        ...req.body,
+        created_by: req.currentUser?._id || null, // ✅ auto-set creator
+      });
       const savedItem = await newItem.save();
 
-      await this.logActivity("create", savedItem, req.user?._id);
+      await this.logActivity("create", savedItem, req.currentUser?._id);
 
       // ✅ Notification conditions
 

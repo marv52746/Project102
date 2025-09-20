@@ -69,13 +69,6 @@ export const userFormFields = [
     showOn: "all",
     type: "text",
   },
-  {
-    name: "last_name",
-    label: "Last Name",
-    showOn: "all",
-    required: true,
-    type: "text",
-  },
   // { type: "half-spacer", showOn: "create" },
   {
     name: "email",

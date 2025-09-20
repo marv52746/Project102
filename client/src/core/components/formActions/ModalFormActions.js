@@ -40,6 +40,7 @@ export default function ModalFormActions({
   };
 
   const onReady = async () => {
+    // console.log(report);
     handleCompleteAppointment({
       dispatch,
       tablename: "appointments",

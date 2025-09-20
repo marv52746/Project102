@@ -67,6 +67,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
       case "conditions":
         return "condition";
       case "surgeries":
+      case "surgery":
         return "surgical";
       case "pregnancies":
         return "pregnancy";
@@ -204,6 +205,8 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
   };
 
   const getActionIconProps = (type) => {
+    // console.log(report);
+    // console.log(type);
     let hasRecord = report[mapTypeToAppointmentField(type)]?.length > 0;
     if (type === "findings") {
       hasRecord = !!report.notes || !!report.diagnosis ? true : false;

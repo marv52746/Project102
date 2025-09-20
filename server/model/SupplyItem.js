@@ -10,12 +10,11 @@ const supplyItemSchema = new mongoose.Schema({
   supplier: String,
   expiration_date: Date,
   last_restocked: Date,
+
   created_on: { type: Date, default: Date.now },
-  created_by: {
-    _id: { type: ObjectId, ref: "user" },
-    fullname: String,
-    email: String,
-  },
+  created_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+  updated_on: { type: Date, default: Date.now },
+  updated_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 });
 
 const SupplyItemDb = mongoose.model("supply_item", supplyItemSchema);

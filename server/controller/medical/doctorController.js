@@ -51,12 +51,14 @@ class DoctorController extends BaseController {
       const newDoctor = new DoctorDb({
         ...doctorData,
         user: savedUser._id,
+        created_by: req.currentUser?._id || null, // ✅ track creator
+        updated_by: req.currentUser?._id || null, // ✅ initialize updated_by too
       });
 
       const savedDoctor = await newDoctor.save();
 
       // ✅ Log Activity
-      await this.logActivity("create", savedDoctor, req.user?._id);
+      await this.logActivity("create", savedDoctor, req.currentUser?._id);
 
       res.status(201).json(savedDoctor);
     } catch (error) {
@@ -69,6 +71,9 @@ class DoctorController extends BaseController {
   update = async (req, res) => {
     try {
       const { user, ...doctorData } = req.body;
+
+      // Add updated_by
+      doctorData.updated_by = req.currentUser?._id || null;
 
       // Update Doctor record
       const updatedDoctor = await DoctorDb.findByIdAndUpdate(
@@ -124,7 +129,7 @@ class DoctorController extends BaseController {
       const deletedDoctor = await DoctorDb.findByIdAndDelete(doctorId);
 
       // ✅ Log Activity
-      await this.logActivity("delete", deletedDoctor, req.user?._id);
+      await this.logActivity("delete", deletedDoctor, req.currentUser?._id);
 
       res.json({ message: "Doctor deleted successfully", deletedDoctor });
     } catch (error) {

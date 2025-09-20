@@ -45,6 +45,7 @@ const Login = () => {
       });
 
       const appToken = backendResponse.token;
+      localStorage.setItem("token", appToken); // 👈 Save token
       const userObject = jwtDecode(appToken); // This now contains app role, etc.
 
       dispatch(loggedUserData({ ...userObject, token: appToken }));
@@ -105,6 +106,9 @@ const Login = () => {
 
       const token = response.token;
       const userObject = jwtDecode(token);
+
+      // 👇 Save token for interceptor
+      localStorage.setItem("token", token);
 
       dispatch(loggedUserData({ ...userObject, token }));
       dispatch(

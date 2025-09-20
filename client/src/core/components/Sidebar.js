@@ -44,6 +44,7 @@ export default function Sidebar({ children }) {
       window.removeEventListener("resize", updateExpandedState);
     };
   }, []);
+
   useEffect(() => {
     const fetchDetails = async () => {
       if (!userInfo) return;
@@ -69,7 +70,7 @@ export default function Sidebar({ children }) {
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    navigate("/");
+    // navigate("/");
   };
 
   const handleDropdownToggle = () => {
@@ -123,17 +124,37 @@ export default function Sidebar({ children }) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   return (
     <aside className="h-screen">
       <nav className="h-full inline-flex flex-col bg-background border-r shadow-sm">
         <div className="p-4 pb-4 flex justify-between items-center border-b ">
-          <img
-            src={process.env.PUBLIC_URL + "/assets/images/logo.svg"}
-            className={`overflow-hidden transition-all ${
-              expanded ? "w-32" : "w-0"
-            }`}
-            alt=""
-          />
+          <div
+            className={`
+              flex items-center gap-2
+              overflow-hidden transition-all text-sidetext-active
+              ${expanded ? "w-54 ml-3" : "w-0"}
+            `}
+          >
+            <img
+              src="/assets/images/logo.png"
+              className={`overflow-hidden transition-all ${
+                expanded ? "w-12 h-12" : "w-0"
+              }`}
+              alt="Bislig Premier Birthing Home Logo"
+            />
+            {expanded && (
+              <div className="flex flex-col leading-tight">
+                <span className="font-bold text-base text-blue-800">
+                  Bislig Premier
+                </span>
+                <span className="font-bold text-base text-blue-800">
+                  Birthing Home
+                </span>
+              </div>
+            )}
+          </div>
+
           <button
             aria-label="sidebarBtn"
             onClick={() => setExpanded((curr) => !curr)}
@@ -142,10 +163,6 @@ export default function Sidebar({ children }) {
             {expanded ? <ChevronFirst /> : <ChevronLast />}
           </button>
         </div>
-
-        {/* <SidebarContext.Provider value={{ expanded }}>
-          <ul className="flex-1 px-3">{children}</ul>
-        </SidebarContext.Provider> */}
 
         {/* Sidebar content via render prop */}
         <ul className="flex-1 px-3 pt-4">
@@ -157,7 +174,6 @@ export default function Sidebar({ children }) {
           onClick={handleRedirect}
         >
           <img
-            // src={`${process.env.REACT_APP_BASE_URL_IMAGE}${userInfo.avatar}`}
             src={getAvatarUrl(userInfo.avatar)}
             alt=""
             className="w-10 h-10 rounded-md"

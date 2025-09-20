@@ -7,6 +7,7 @@ router.get("/", async (req, res) => {
   try {
     const {
       userId,
+      patientId,
       table,
       action,
       recordId,
@@ -21,12 +22,13 @@ router.get("/", async (req, res) => {
     // Top-level filters
     if (recordId) filter.recordId = recordId;
     if (userId) filter.userId = userId;
+    if (patientId) filter["dataSnapshot.patient"] = patientId; // ✅ Fix here
     if (table) filter.table = table;
     if (action) filter.action = action;
     if (startDate || endDate) {
-      filter.createdAt = {};
-      if (startDate) filter.createdAt.$gte = new Date(startDate);
-      if (endDate) filter.createdAt.$lte = new Date(endDate);
+      filter.created_on = {};
+      if (startDate) filter.created_on.$gte = new Date(startDate);
+      if (endDate) filter.created_on.$lte = new Date(endDate);
     }
 
     // Filters for fields inside dataSnapshot
@@ -53,7 +55,8 @@ router.get("/", async (req, res) => {
 
     const activities = await ActivityDb.find(filter)
       .populate("userId", "name email")
-      .sort({ createdAt: -1 })
+      .populate("dataSnapshot.patient", "name") // ✅ Populate patient
+      .sort({ created_on: -1 })
       .limit(parseInt(limit));
 
     res.json(activities);

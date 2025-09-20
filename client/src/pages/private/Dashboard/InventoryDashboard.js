@@ -19,6 +19,8 @@ import apiService from "../../../core/services/apiService";
 import { useDispatch } from "react-redux";
 import StatCard from "../../../core/components/dashboard/StatCard";
 import DataModal from "./DataModal";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default function InventoryDashboard() {
   const [stats, setStats] = useState({
@@ -71,6 +73,8 @@ export default function InventoryDashboard() {
             d.getFullYear() === now.getFullYear()
           );
         });
+
+        // console.log(thisMonthTransactions);
 
         // Group items by category
         const categoryMap = {};
@@ -181,10 +185,105 @@ export default function InventoryDashboard() {
   };
 
   const handleGenerateReport = () => {
-    alert("Monthly report generation logic here!");
+    const doc = new jsPDF("p", "mm", "a4");
+
+    // Title
+    const now = new Date();
+    const monthName = now.toLocaleString("default", { month: "long" }); // e.g., "September"
+    const year = now.getFullYear();
+    doc.setFontSize(16);
+    doc.text(`${monthName} ${year} - Inventory Report`, 105, 15, {
+      align: "center",
+    });
+
+    // Date
+    doc.setFontSize(11);
+    doc.text(`Generated on: ${now.toLocaleDateString()}`, 14, 25);
+
+    // --- KPI Summary ---
+    doc.setFontSize(13);
+    doc.text("Key Metrics", 14, 35);
+
+    autoTable(doc, {
+      startY: 40,
+      head: [["Metric", "Value"]],
+      body: [
+        ["Total Items", stats.totalItems],
+        ["Low Stock Items", stats.lowStock],
+        ["Soon to Expire", stats.soonToExpire],
+        ["Transactions This Month", stats.transactionsThisMonth],
+      ],
+      theme: "grid",
+    });
+
+    // --- Stock by Category with Items ---
+    doc.setFontSize(13);
+    doc.text(
+      "Stock by Category (with Items)",
+      14,
+      doc.lastAutoTable.finalY + 15
+    );
+
+    categoryData.forEach((cat, index) => {
+      const itemsInCat = categoryItemsMap[cat.name] || [];
+
+      // Add category header below the last table
+      const yPos =
+        index === 0
+          ? doc.lastAutoTable.finalY + 25
+          : doc.lastAutoTable
+          ? doc.lastAutoTable.finalY + 10
+          : 45;
+      doc.setFontSize(12);
+      doc.text(`${cat.name} (${cat.count} items)`, 14, yPos);
+
+      // Table right below header
+      autoTable(doc, {
+        startY: yPos + 5,
+        head: [["Item", "Quantity", "Unit", "Reorder Level", "Expiry Date"]],
+        body: itemsInCat.map((item) => [
+          item.name,
+          item.quantity,
+          item.unit,
+          item.reorderLevel,
+          item.expiryDate
+            ? new Date(item.expiryDate).toLocaleDateString()
+            : "-",
+        ]),
+        theme: "grid",
+        margin: { left: 14, right: 14 },
+      });
+    });
+
+    // --- Current Month Item Transactions ---
+    doc.setFontSize(13);
+    doc.text(
+      "Current Month Item Transactions",
+      14,
+      doc.lastAutoTable.finalY + 15
+    );
+
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY + 20,
+      head: [
+        ["Item", "Category", "Type", "Quantity", "Units", "Updated By", "Date"],
+      ],
+      body: monthlyTransactions.map((t) => [
+        t.item?.name || "Unknown",
+        t.item?.category || "Uncategorized",
+        t.type,
+        t.quantity,
+        t.item?.unit || "-",
+        t.updated_by?.name || "N/A",
+        new Date(t.timestamp).toLocaleDateString(),
+      ]),
+      theme: "grid",
+    });
+
+    // Save
+    doc.save(`Inventory_Report_${now.getFullYear()}-${now.getMonth() + 1}.pdf`);
   };
 
-  // Items to show when a category is selected
   const itemsForSelectedCategory =
     selectedCategory === "All"
       ? []
@@ -202,14 +301,21 @@ export default function InventoryDashboard() {
         <div className="flex justify-end">
           <button
             onClick={handleGenerateReport}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition"
+            className="group flex items-center gap-2
+              bg-blue-50 text-blue-800 
+              hover:bg-blue-100 
+              px-5 py-2.5 rounded-2xl
+            
+              shadow-sm hover:shadow-md
+              transition-all duration-200"
           >
-            <FileText size={18} /> Generate Monthly Report
+            🖨️
+            <span className="font-medium">Generate Report</span>
           </button>
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div
             className="cursor-pointer"
             onClick={() => openModal("All Items", allItems)}
@@ -340,29 +446,6 @@ export default function InventoryDashboard() {
         </Card>
 
         {/* Monthly Item Transactions */}
-        {/* <Card title="Monthly Item Transactions (This Month)">
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={monthlyItemTransactions} barSize={30}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="name" tick={{ fill: "#6b7280", fontSize: 12 }} />
-              <YAxis tick={{ fill: "#6b7280", fontSize: 12 }} />
-              <Tooltip />
-              <Bar
-                dataKey="stockIn"
-                fill="#10b981"
-                name="Stock In"
-                radius={[6, 6, 0, 0]}
-              />
-              <Bar
-                dataKey="stockOut"
-                fill="#ef4444"
-                name="Stock Out"
-                radius={[6, 6, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card> */}
-
         <Card title="Monthly Item Transactions (This Month)">
           <div className="mb-3 flex flex-wrap gap-2">
             {["All", "Stock In", "Stock Out", ...categoryList.slice(1)].map(
@@ -383,7 +466,27 @@ export default function InventoryDashboard() {
           </div>
 
           <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={filteredMonthlyTransactions} barSize={30}>
+            <BarChart
+              data={filteredMonthlyTransactions}
+              barSize={30}
+              onClick={(e) => {
+                if (!e || !e.activeLabel) return;
+                const clickedName = e.activeLabel;
+
+                // get all transactions for this item
+                const itemTxns = monthlyTransactions.filter(
+                  (t) => t.item?.name === clickedName
+                );
+
+                if (itemTxns.length > 0) {
+                  openModal(
+                    `${clickedName} Transactions`,
+                    itemTxns,
+                    "transactions"
+                  );
+                }
+              }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="name" tick={{ fill: "#6b7280", fontSize: 12 }} />
               <YAxis tick={{ fill: "#6b7280", fontSize: 12 }} />

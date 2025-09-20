@@ -1,5 +1,6 @@
 // formHandlers.js
 import apiService from "../../services/apiService";
+import { setRefreshKey } from "../../services/reducers/utilsReducer";
 import { showNotification } from "../../services/slices/notificationSlice";
 import { setNestedValue } from "../../utils/setNestedValue";
 
@@ -99,6 +100,9 @@ export const handleCompleteAppointment = async ({
   data,
 }) => {
   try {
+    // console.log(data);
+    // console.log(tablename);
+    // console.log(id);
     await apiService.put(dispatch, tablename, id, data, true);
 
     dispatch(
@@ -107,6 +111,8 @@ export const handleCompleteAppointment = async ({
         type: "success",
       })
     );
+
+    dispatch(setRefreshKey(Date.now())); // use timestamp so it's always new
   } catch (error) {
     dispatch(
       showNotification({

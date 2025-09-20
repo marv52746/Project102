@@ -14,3 +14,8 @@ export default function utilsReducer(state = initialState, action) {
       return state;
   }
 }
+
+export const setRefreshKey = (value) => ({
+  type: "SET_REFRESH_KEY",
+  payload: value,
+});

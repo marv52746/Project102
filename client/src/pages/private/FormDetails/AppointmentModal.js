@@ -17,6 +17,8 @@ export default function AppointmentModal({
   data,
   fields,
   patientData,
+  tablename,
+  setManualRefresh,
 }) {
   const [inputData, setInputData] = useState(data || {});
   const [fileData, setFileData] = useState(null);
@@ -55,22 +57,23 @@ export default function AppointmentModal({
 
     handleFormSubmit({
       dispatch,
-      tablename: "appointments",
+      tablename: tablename,
       // id: patient._id,
       data: inputData,
       fields,
       fileData,
     });
+    setManualRefresh((prev) => prev + 1);
     onClose();
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 relative">
-        <div className="flex justify-between items-center mb-4 sticky top-0 bg-white z-10">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 pt-0 relative">
+        <div className="flex justify-between items-center pb-4 pt-6 sticky top-0 bg-white z-10">
           <h2 className="text-lg font-semibold">
             {mode === "view" ? "View" : "Add"}{" "}
-            {capitalizeText(type?.replace("_", " "))} Record
+            {capitalizeText(type?.replace("_", " "))}
           </h2>
 
           <button onClick={onClose}>

@@ -6,7 +6,7 @@ export const inventoryLogsTableColumns = [
   { name: "type", label: "Type" },
   { name: "quantity", label: "Quantity" },
   { name: "reason", label: "Reason" },
-  { name: "performedBy.name", label: "Performed By" },
+  { name: "created_by.name", label: "Created By" },
   { name: "timestamp", label: "Date" },
 ];
 
@@ -20,14 +20,14 @@ export const inventoryLogsFormFields = [
     showOn: "create,view",
     required: true,
   },
-  {
-    name: "performedBy",
-    label: "Performed By",
-    type: "reference",
-    ref: "users", // table/endpoint to call
-    showOn: "create,view",
-    required: true,
-  },
+  // {
+  //   name: "created_by",
+  //   label: "Created By",
+  //   type: "reference",
+  //   ref: "users", // table/endpoint to call
+  //   showOn: "create,view",
+  //   required: true,
+  // },
   // { type: "spacer", showOn: "all" },
   {
     name: "type",
@@ -35,12 +35,15 @@ export const inventoryLogsFormFields = [
     type: "select",
     options: inventoyTypeOptions,
     showOn: "create,view",
+    // default: "Stock out",
+    required: true,
   },
   {
     name: "quantity",
     label: "Quantity",
     type: "number",
     showOn: "create,view",
+    required: true,
   },
 
   {
@@ -49,10 +52,10 @@ export const inventoryLogsFormFields = [
     type: "textarea",
     showOn: "create,view",
   },
-  {
-    name: "timestamp",
-    label: "Timestamp",
-    type: "date-time",
-    showOn: "create,view",
-  },
+  // {
+  //   name: "timestamp",
+  //   label: "Timestamp",
+  //   type: "date-time",
+  //   showOn: "create,view",
+  // },
 ];

@@ -19,6 +19,11 @@ const billingSchema = new mongoose.Schema({
   payment_method: String,
   date_issued: { type: Date, default: Date.now },
   date_paid: Date,
+
+  created_on: { type: Date, default: Date.now },
+  created_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+  updated_on: { type: Date, default: Date.now },
+  updated_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 });
 
 const BillingDb = mongoose.model("billing", billingSchema);

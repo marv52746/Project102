@@ -11,8 +11,15 @@ const activitySchema = new mongoose.Schema({
   recordId: { type: mongoose.Schema.Types.ObjectId, required: true }, // ID of the affected document
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "user" }, // who did it
   description: { type: String },
-  dataSnapshot: { type: Object }, // optional: store old/new data
-  createdAt: { type: Date, default: Date.now },
+  dataSnapshot: {
+    patient: { type: mongoose.Schema.Types.ObjectId, ref: "user" }, // ✅ tell Mongoose this is a ref
+    // any other fields you expect
+  },
+
+  created_on: { type: Date, default: Date.now },
+  created_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+  updated_on: { type: Date, default: Date.now },
+  updated_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 });
 
 const ActivityDb = mongoose.model("activity", activitySchema);

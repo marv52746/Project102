@@ -1,4 +1,5 @@
 import apiService from "../../services/apiService";
+import { setRefreshKey } from "../../services/reducers/utilsReducer";
 import { showNotification } from "../../services/slices/notificationSlice";
 import { loggedUserData } from "../../services/slices/userSlice";
 
@@ -138,6 +139,7 @@ export const handleFormSubmit = async ({
         console.error("Failed to refresh current user info:", err);
       }
     }
+    dispatch(setRefreshKey(Date.now())); // use timestamp so it's always new
 
     if (navigate) {
       navigate(`/list/${tablename}`);

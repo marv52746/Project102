@@ -47,7 +47,7 @@ export const inventoyCategoryOptions = [
 export const inventoyTypeOptions = [
   { label: "Stock in", value: "Stock in" },
   { label: "Stock out", value: "Stock out" },
-  { label: "Adjustment", value: "Adjustment" },
+  // { label: "Adjustment", value: "Adjustment" },
 ];
 
 export const inventoryUnitOptions = [

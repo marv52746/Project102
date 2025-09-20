@@ -14,7 +14,11 @@ const inventoryItemSchema = new mongoose.Schema({
   supplier: { type: String },
   batchNumber: { type: String },
   notes: { type: String },
-  createdAt: { type: Date, default: Date.now },
+
+  created_on: { type: Date, default: Date.now },
+  created_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+  updated_on: { type: Date, default: Date.now },
+  updated_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 });
 
 const InventoryItemDb = mongoose.model("InventoryItem", inventoryItemSchema);

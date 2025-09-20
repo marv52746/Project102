@@ -86,15 +86,19 @@ class UserController extends BaseController {
         await savedUser.save();
       }
 
-      // res.status(201).json({
-      //   ...savedUser.toObject(),
-      //   avatarUrl: savedUser.avatar
-      //     ? `${process.env.BASE_URL}/api/file/${savedUser.avatar}`
-      //     : null,
-      // });
+      // ✅ Handle created_by / updated_by
+      if (req.currentUser?._id) {
+        savedUser.created_by = req.currentUser._id;
+        savedUser.updated_by = req.currentUser._id;
+      } else {
+        // Signup case: self-reference
+        savedUser.created_by = savedUser._id;
+        savedUser.updated_by = savedUser._id;
+      }
+      await savedUser.save();
 
       // ✅ Log Activity
-      await this.logActivity("create", savedUser, req.user?._id);
+      await this.logActivity("create", savedUser, req.currentUser?._id);
 
       res.status(201).json(savedUser);
     } catch (error) {
@@ -171,6 +175,9 @@ class UserController extends BaseController {
         });
       }
 
+      // ✅ Track updater
+      updates.updated_by = req.currentUser?._id || user.updated_by;
+
       // Update user record
       const updatedUser = await UserDb.findByIdAndUpdate(
         userId,
@@ -207,12 +214,16 @@ class UserController extends BaseController {
         email,
         username: email,
         password: hashedPassword,
+        created_by: req.currentUser?._id || null,
+        updated_by: req.currentUser?._id || null,
       });
       const savedUser = await user.save();
 
       const patient = new PatientDb({
         user: savedUser._id,
         medical_notes,
+        created_by: req.currentUser?._id || null,
+        updated_by: req.currentUser?._id || null,
       });
 
       const savedPatient = await patient.save();
@@ -257,7 +268,7 @@ class UserController extends BaseController {
       await UserDb.findByIdAndDelete(userId);
 
       // ✅ Log Activity
-      await this.logActivity("delete", user, req.user?._id);
+      await this.logActivity("delete", user, req.currentUser?._id);
 
       res.status(200).json({ message: "User and related records deleted." });
     } catch (error) {

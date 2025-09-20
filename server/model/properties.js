@@ -26,18 +26,11 @@ const propertySchema = new Schema({
   description: {
     type: String,
   },
-  created_on: {
-    type: Date,
-    default: Date.now,
-  },
-  updated_on: {
-    type: Date,
-    default: Date.now,
-  },
-  updated_by: {
-    _id: { type: Schema.Types.ObjectId, ref: "user" },
-    fullname: String,
-  },
+
+  created_on: { type: Date, default: Date.now },
+  created_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+  updated_on: { type: Date, default: Date.now },
+  updated_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 });
 
 // Middleware to update the lastUpdated field before saving
