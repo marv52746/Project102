@@ -185,7 +185,7 @@ export default function Sidebar({ children }) {
           `}
           >
             <button className="leading-4">
-              <h4 className="font-semibold">{userInfo.name}</h4>
+              <h4 className="font-semibold">{userInfo.fullname}</h4>
               <span className="text-xs text-text-primary">
                 {userInfo.email}
               </span>

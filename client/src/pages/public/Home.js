@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { User, Mail, Phone } from "lucide-react";
+import { User, Mail, Phone, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import { all_routes } from "../../routes/all_routes";
 import ThingsToKnow from "./components/ThingsToKnow";
@@ -15,9 +15,8 @@ export default function Home() {
     name: "",
     email: "",
     phone: "",
-    month: "",
-    day: "",
-    year: "",
+    appointmentDate: "",
+    appointmentTime: "", // ⏰ new field
   });
   const [submitted, setSubmitted] = useState(false);
 
@@ -123,86 +122,96 @@ export default function Home() {
           <div className="relative z-10 w-full max-w-6xl mx-auto flex flex-col md:flex-row px-6 md:px-8">
             {/* Appointment Form on Left */}
             <div className="w-full md:w-1/2">
-              <div className="bg-white/90 shadow-xl rounded-xl p-8">
+              <div className="bg-white/95 backdrop-blur-sm shadow-2xl rounded-2xl p-8">
                 <h2 className="text-3xl font-bold text-pink-700">
-                  Fix an Appointment
+                  Book Your Appointment
                 </h2>
                 <p className="mt-2 text-gray-600">
-                  Where Every Birth is Nurtured, Every Woman's Health,
-                  Cherished.
+                  Where women’s wellness and motherhood are nurtured with care.
                 </p>
 
-                <form onSubmit={handleSubmit} className="mt-6">
+                <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                   {submitted ? (
                     <p className="text-green-600 font-semibold text-center">
-                      Appointment booked successfully!
+                      ✅ Your appointment has been scheduled! Our staff will
+                      reach out to confirm the details.
                     </p>
                   ) : (
                     <>
-                      <div className="mb-3 flex items-center border rounded px-2">
-                        <User className="w-4 h-4 text-gray-500 mr-2" />
+                      {/* Full Name */}
+                      <div className="flex items-center border rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-pink-400">
+                        <User className="w-5 h-5 text-gray-400 mr-2" />
                         <input
                           type="text"
                           name="name"
                           placeholder="Full Name"
-                          className="flex-1 p-2 outline-none"
+                          className="flex-1 outline-none text-sm"
                           value={formData.name}
                           onChange={handleChange}
+                          required
                         />
                       </div>
-                      <div className="mb-3 flex items-center border rounded px-2">
-                        <Mail className="w-4 h-4 text-gray-500 mr-2" />
+
+                      {/* Email */}
+                      <div className="flex items-center border rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-pink-400">
+                        <Mail className="w-5 h-5 text-gray-400 mr-2" />
                         <input
                           type="email"
                           name="email"
-                          placeholder="Email"
-                          className="flex-1 p-2 outline-none "
+                          placeholder="Email Address"
+                          className="flex-1 outline-none text-sm"
                           value={formData.email}
                           onChange={handleChange}
+                          required
                         />
                       </div>
-                      <div className="mb-3 flex items-center border rounded px-2">
-                        <Phone className="w-4 h-4 text-gray-500 mr-2" />
+
+                      {/* Phone */}
+                      <div className="flex items-center border rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-pink-400">
+                        <Phone className="w-5 h-5 text-gray-400 mr-2" />
                         <input
                           type="tel"
                           name="phone"
-                          placeholder="Phone"
-                          className="flex-1 p-2 outline-none"
+                          placeholder="Phone Number"
+                          className="flex-1 outline-none text-sm"
                           value={formData.phone}
                           onChange={handleChange}
+                          required
                         />
                       </div>
-                      <div className="grid grid-cols-3 gap-2 mb-3">
+
+                      {/* Date Picker */}
+                      <div className="flex items-center border rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-pink-400">
+                        <Calendar className="w-5 h-5 text-gray-400 mr-2" />
                         <input
-                          type="text"
-                          name="month"
-                          placeholder="MM"
-                          className="border rounded p-2 text-center"
-                          value={formData.month}
+                          type="date"
+                          name="appointmentDate"
+                          className="flex-1 outline-none text-sm text-gray-700"
+                          value={formData.appointmentDate}
                           onChange={handleChange}
-                        />
-                        <input
-                          type="text"
-                          name="day"
-                          placeholder="DD"
-                          className="border rounded p-2 text-center"
-                          value={formData.day}
-                          onChange={handleChange}
-                        />
-                        <input
-                          type="text"
-                          name="year"
-                          placeholder="YYYY"
-                          className="border rounded p-2 text-center"
-                          value={formData.year}
-                          onChange={handleChange}
+                          required
                         />
                       </div>
+
+                      {/* Time Picker */}
+                      <div className="flex items-center border rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-pink-400">
+                        <Calendar className="w-5 h-5 text-gray-400 mr-2" />
+                        <input
+                          type="time"
+                          name="appointmentTime"
+                          className="flex-1 outline-none text-sm text-gray-700"
+                          value={formData.appointmentTime}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      {/* Submit */}
                       <button
                         type="submit"
-                        className="w-full bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 transition"
+                        className="w-full bg-gradient-to-r from-pink-600 to-pink-500 text-white py-3 rounded-lg shadow-md hover:shadow-lg hover:from-pink-700 hover:to-pink-600 transition-all duration-300 font-semibold"
                       >
-                        Book Appointment
+                        Confirm Appointment
                       </button>
                     </>
                   )}
@@ -210,7 +219,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right side empty (background doctor shows here) */}
+            {/* Right side empty (doctor background image) */}
             <div className="hidden md:block md:w-1/2"></div>
           </div>
         </section>

@@ -3,7 +3,7 @@ import { genderOptions, roleOptions } from "./formFieldPresets";
 
 export const doctorTableColumns = [
   // { name: "avatar", label: "Avatar" },
-  { name: "name", label: "Name" },
+  { name: "fullname", label: "Name" },
   { name: "gender", label: "Gender" },
   { name: "date_of_birth", label: "Date of Birth" },
   { name: "phone_number", label: "Phone Number" },

@@ -145,10 +145,10 @@ export default function DataModal({ isOpen, onClose, title, data = [], type }) {
                             : "-"}
                         </td>
                         <td className="px-4 py-2 border-b text-gray-700">
-                          {row.created_by.name}
+                          {row.created_by.fullname}
                         </td>
                         <td className="px-4 py-2 border-b text-gray-700">
-                          {row.updated_by.name}
+                          {row.updated_by.fullname}
                         </td>
                       </>
                     ) : (
@@ -166,10 +166,10 @@ export default function DataModal({ isOpen, onClose, title, data = [], type }) {
                           {new Date(row.timestamp).toLocaleDateString()}
                         </td>
                         <td className="px-4 py-2 border-b text-gray-700">
-                          {row.created_by.name}
+                          {row.created_by.fullname}
                         </td>
                         <td className="px-4 py-2 border-b text-gray-700">
-                          {row.updated_by.name}
+                          {row.updated_by.fullname}
                         </td>
                       </>
                     )}

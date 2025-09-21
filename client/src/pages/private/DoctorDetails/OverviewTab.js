@@ -105,6 +105,8 @@ export default function OverviewTab({ appointments }) {
           if (a.status === "cancelled") cancelledCount++;
         });
 
+        // console.log(upcomingAppointmentsArr);
+
         setStats({
           upcoming: upcomingCount,
           completed: completedCount,
@@ -249,7 +251,7 @@ export default function OverviewTab({ appointments }) {
             <UpcomingAppointments
               title={"In Lobby"}
               appointments={inLobbyAppointments}
-              scheduleAppointment={true}
+              // scheduleAppointment={true}
               onSelect={(app) => {
                 setViewType("appointments");
                 setViewData(app);
@@ -257,7 +259,7 @@ export default function OverviewTab({ appointments }) {
               }}
             />
 
-            {/* <UpcomingAppointments
+            <UpcomingAppointments
               title={"Upcoming Appointments"}
               appointments={upcomingAppointments}
               onSelect={(app) => {
@@ -265,7 +267,7 @@ export default function OverviewTab({ appointments }) {
                 setViewData(app);
                 setOpenViewModal(true);
               }}
-            /> */}
+            />
           </div>
 
           {/* Activity Timeline */}

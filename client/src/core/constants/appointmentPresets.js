@@ -1,9 +1,9 @@
 // Table columns for Appointment list view
 export const appointmentTableColumns = [
   { name: "appointment_no", label: "No." },
-  { name: "patient.name", label: "Patient Name" },
+  { name: "patient.fullname", label: "Patient Name" },
   { name: "reason", label: "Reason" },
-  { name: "doctor.name", label: "Doctor Name" },
+  { name: "doctor.fullname", label: "Doctor Name" },
   { name: "date", label: "Appointment Date" },
   { name: "time", label: "Time" },
   { name: "status", label: "Status" },
@@ -52,7 +52,7 @@ export const appointmentFormFields = [
     label: "Date",
     type: "date",
     showOn: "all",
-    default: new Date(),
+    default: new Date().toLocaleString("en-PH", { timeZone: "Asia/Manila" }),
     required: true,
   },
   {
@@ -60,7 +60,9 @@ export const appointmentFormFields = [
     label: "Time",
     type: "time",
     showOn: "all",
-    default: new Date().toTimeString().slice(0, 5),
+    default: new Date()
+      .toTimeString("en-PH", { timeZone: "Asia/Manila" })
+      .slice(0, 5),
     required: true,
   },
 

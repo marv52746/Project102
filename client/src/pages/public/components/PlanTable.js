@@ -6,8 +6,8 @@ const tabs = [
     image: "/assets/images/tabs1.png",
     hoverImage: "/assets/images/tabs1-hover.png",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas id est sed lacus volutpat lobortis. Lorem ipsum dolor sit amet. Going to use a passage of Lorem Ipsum, you need to be sure there isn’t anything embarrassing hidden in the middle of text.",
-    note: "Going to use a passage of Lorem Ipsum, you need to be sure there isn’t anything embarrassing hidden in the middle of text.",
+      "Preparing for pregnancy is an important first step toward a healthy journey. We provide guidance on nutrition, lifestyle, and prenatal vitamins to help you get ready physically and emotionally.",
+    note: "Our doctors can help assess your overall health and answer questions before you start trying.",
     imgRight: "/assets/images/9.png",
   },
   {
@@ -15,15 +15,13 @@ const tabs = [
     image: "/assets/images/tabs4.png",
     hoverImage: "/assets/images/tabs4-hover.png",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas id est sed lacus volutpat lobortis. Lorem ipsum dolor sit amet. Going to use a passage of Lorem Ipsum...",
+      "Welcoming your baby is one of life’s most special moments. Our birthing team is here to ensure safe, compassionate care during labor and delivery.",
     list: [
-      "Aenean posuere sem imperdiet",
-      "Sed semper lorem sit amet ultrices mollis.",
-      "Vivamus vehicula diam ut velit lacinia",
-      "Curabitur porta nibh id velit feugiat",
-      "Proin condimentum nibh ut orci rutrum convallis.",
-      "Pellentesque sed mi in ipsum tempus pharetra",
-      "Aenean posuere sem imperdiet, viverra quam",
+      "Comfortable and supportive birthing environment",
+      "Skilled obstetric and midwife care",
+      "Options for pain management",
+      "Emergency readiness and monitoring",
+      "Family-centered approach to delivery",
     ],
     imgRight: "/assets/images/7.png",
   },
@@ -32,20 +30,17 @@ const tabs = [
     image: "/assets/images/tabs2.png",
     hoverImage: "/assets/images/tabs2-hover.png",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas id est sed lacus volutpat lobortis. Lorem ipsum dolor sit amet...",
+      "Your first ultrasound is an exciting milestone. It allows you to see your baby for the first time and helps us monitor development and overall health.",
     list: [
-      "Pregnancy Care",
-      "NICU Facilities",
-      "Trisemester Care",
-      "Maternal Practise",
-      "Things to Know",
+      "Confirming pregnancy",
+      "Checking baby’s heartbeat",
+      "Estimating due date",
+      "Early screening for health concerns",
     ],
     list2: [
-      "Are you Pregnant?",
-      "Symptom Checker",
-      "About Lab Tests you need",
-      "Medical Treatment",
-      "About Getting Emergency",
+      "Discuss your symptoms",
+      "Understand recommended lab tests",
+      "Know when to seek urgent care",
     ],
     imgRight: "/assets/images/surr-vector.png",
   },
@@ -54,8 +49,8 @@ const tabs = [
     image: "/assets/images/tabs3.png",
     hoverImage: "/assets/images/tabs3-hover.png",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas id est sed lacus volutpat lobortis. Lorem ipsum dolor sit amet...",
-    note: "Going to use a passage of Lorem Ipsum, you need to be sure there isn’t anything embarrassing hidden in the middle of text.",
+      "Pregnancy is a journey filled with changes. Regular checkups, proper nutrition, and emotional support are essential for both mother and baby.",
+    note: "We provide trimester-based guidance so you know what to expect at every stage.",
     imgRight: "/assets/images/8.png",
   },
   {
@@ -63,7 +58,7 @@ const tabs = [
     image: "/assets/images/tabs5.png",
     hoverImage: "/assets/images/tabs5-hover.png",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas id est sed lacus volutpat lobortis. Lorem ipsum dolor sit amet...",
+      "Caring for a newborn can feel overwhelming. Our team provides support on everything from safe sleep and bathing to immunizations and growth monitoring.",
     imgRight: "/assets/images/child-vector.png",
   },
   {
@@ -71,8 +66,8 @@ const tabs = [
     image: "/assets/images/tabs6.png",
     hoverImage: "/assets/images/tabs6-hover.png",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas id est sed lacus volutpat lobortis. Lorem ipsum dolor sit amet...",
-    note: "Going to use a passage of Lorem Ipsum, you need to be sure there isn’t anything embarrassing hidden in the middle of text.",
+      "Feeding is one of the most important ways to bond with your baby. Whether you choose breastfeeding, bottle-feeding, or both, we’re here to guide you with safe and healthy practices.",
+    note: "Lactation support and nutrition counseling are available for all new mothers.",
     imgRight: "/assets/images/9.png",
   },
 ];
@@ -85,8 +80,9 @@ const PlanTable = () => {
       <div className="max-w-6xl mx-auto px-4 text-center">
         <h2 className="text-3xl font-bold text-pink-600">Plan Table</h2>
         <p className="mt-2 text-gray-600">
-          Similique sunt in culpa qui officia deserunt mollitia animi, id est
-          laborum et dolorum fuga.
+          From getting pregnant to caring for your little one, our plan table
+          gives you clear insights and practical tips for every step of the
+          journey.
         </p>
 
         {/* Tabs */}

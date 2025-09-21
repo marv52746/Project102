@@ -4,10 +4,10 @@ export const all_routes = {
   singin: "/signin",
   login: "/login",
   signup: "/signup",
-  portal: "/portal",
   create_appointment: "/create_appointment",
 
   // internal
+  portal: "/portal",
   dashboard: "/",
   list: "/list/:tablename",
   form: "/form/:tablename/:view/:id?",

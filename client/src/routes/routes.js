@@ -34,7 +34,7 @@ const InternalLayout = () => {
         {(expanded) => (
           <>
             {iconMapping.map((group, idx) => (
-              <div key={idx} className="mb-8">
+              <div key={idx} className="mb-6">
                 {expanded && (
                   <div className="text-xs font-semibold text-muted px-3 mb-1">
                     {group.section}
@@ -67,6 +67,7 @@ const InternalLayout = () => {
       >
         {parms.tablename !== "calendar" &&
           parms.tablename !== "settings" &&
+          parms.tablename !== "portal" &&
           !hideHeader && <Header parms={parms} />}
         <Routes>
           {authRoute.map((route) => (

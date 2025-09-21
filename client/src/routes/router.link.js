@@ -32,11 +32,7 @@ export const publicRoutesArray = [
     name: "signup",
     element: <SignUp />,
   },
-  {
-    path: routes.portal,
-    name: "portal",
-    element: <Portal />,
-  },
+
   {
     path: routes.create_appointment,
     name: "create_appointment",
@@ -67,6 +63,11 @@ const routesArray = [
     path: routes.settings,
     name: "settings",
     element: <SettingsPage />,
+  },
+  {
+    path: routes.portal,
+    name: "portal",
+    element: <Portal />,
   },
   {
     path: routes.testPage,

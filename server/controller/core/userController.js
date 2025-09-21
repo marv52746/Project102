@@ -50,6 +50,14 @@ class UserController extends BaseController {
           .join(" ")
           .trim() + (suffix ? `, ${suffix}` : "");
 
+      const fullNameOnly = [
+        first_name,
+        middle_initial ? middle_initial + "." : null,
+        last_name,
+      ]
+        .filter(Boolean)
+        .join(" ");
+
       // 2. Create user without avatar first
       const user = new UserDb({
         ...userData,
@@ -58,6 +66,7 @@ class UserController extends BaseController {
         last_name,
         suffix,
         name: fullName,
+        fullname: fullNameOnly,
         email,
         username: email,
         password: hashedPassword,
@@ -145,6 +154,10 @@ class UserController extends BaseController {
         [newFirst, newMI ? newMI + "." : null, newLast]
           .filter(Boolean)
           .join(" ") + (newSuffix ? `, ${newSuffix}` : "");
+
+      updates.fullname = [newFirst, newMI ? newMI + "." : null, newLast]
+        .filter(Boolean)
+        .join(" ");
 
       // ✅ If new avatar is uploaded
       if (req.file && req.file.buffer) {

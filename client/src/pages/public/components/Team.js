@@ -1,7 +1,7 @@
-// import { Facebook, Twitter, Pinterest } from "lucide-react";
-
+import { useState } from "react";
 import { ContactUs } from "./ContactUs";
 import DoctorDetails from "./DoctorDetails";
+import { X } from "lucide-react";
 
 const teamMembers = [
   {
@@ -9,34 +9,34 @@ const teamMembers = [
     qualification: "M B B S",
     role: "Family Practitioner",
     image: "/assets/images/do8.jpg",
+    bio: "Mary Johnson has 10 years of experience in family practice.",
   },
   {
     name: "Dev Dixit",
     qualification: "M B B S",
     role: "Family Practitioner",
     image: "/assets/images/team1.jpg",
+    bio: "Dev Dixit specializes in preventive care and wellness.",
   },
   {
     name: "Jeniffer Anis",
     qualification: "M B B S",
     role: "Family Practitioner",
     image: "/assets/images/do15.jpg",
+    bio: "Jeniffer Anis focuses on women’s health and pediatrics.",
   },
   {
     name: "Marco Polo",
     qualification: "M B B S",
     role: "Family Practitioner",
     image: "/assets/images/do17.jpg",
+    bio: "Marco Polo is passionate about patient-centered healthcare.",
   },
-  //   {
-  //     name: "Peter Leo",
-  //     qualification: "M B B S",
-  //     role: "Family Practitioner",
-  //     image: "/assets/images/do20.jpg",
-  //   },
 ];
 
 export default function Team() {
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+
   return (
     <>
       <section className="py-16 bg-gray-50 pt-24">
@@ -47,9 +47,10 @@ export default function Team() {
           </h2>
 
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam sed
-            sagittis nisi. Curabitur eget sagittis dui. In dignissim mauris
-            augue.
+            Our dedicated team of doctors and healthcare professionals is here
+            to provide compassionate care and trusted medical expertise. With
+            diverse specialties and years of experience, we work together to
+            ensure the best care for you and your family.
           </p>
 
           {/* Team Grid */}
@@ -68,12 +69,12 @@ export default function Team() {
                   />
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-pink-500 bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                    <a
-                      href="#"
+                    <button
+                      onClick={() => setSelectedDoctor(member)}
                       className="bg-white text-pink-600 font-medium px-4 py-2 rounded shadow hover:bg-pink-50"
                     >
                       View Details
-                    </a>
+                    </button>
                   </div>
                 </div>
 
@@ -86,27 +87,36 @@ export default function Team() {
                     </span>
                   </h4>
                   <h5 className="text-sm text-pink-600">{member.role}</h5>
-
-                  {/* Social Icons */}
-                  {/* <div className="flex justify-center gap-4 mt-3 text-gray-500">
-                  <a href="#" className="hover:text-pink-600">
-                    <Pinterest className="w-4 h-4" />
-                  </a>
-                  <a href="#" className="hover:text-pink-600">
-                    <Twitter className="w-4 h-4" />
-                  </a>
-                  <a href="#" className="hover:text-pink-600">
-                    <Facebook className="w-4 h-4" />
-                  </a>
-                </div> */}
                 </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+      {/* Modal for Doctor Details */}
 
-      <DoctorDetails />
+      {selectedDoctor && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+          onClick={() => setSelectedDoctor(null)} // close on backdrop click
+        >
+          <div
+            className="bg-white rounded-xl shadow-lg p-6 w-11/12 md:w-2/3 lg:w-2/3 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedDoctor(null)}
+              className="absolute top-4 right-4 bg-gray-100 hover:bg-gray-200 
+                   text-gray-700 hover:text-black rounded-full p-2 shadow-md transition"
+            >
+              <X size={20} />
+            </button>
+
+            <DoctorDetails doctor={selectedDoctor} />
+          </div>
+        </div>
+      )}
       <ContactUs />
     </>
   );

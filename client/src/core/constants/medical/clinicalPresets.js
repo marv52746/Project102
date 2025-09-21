@@ -364,7 +364,7 @@ export const labRequestFormFields = [
     name: "requested_on",
     label: "Requested Date",
     type: "date",
-    default: new Date(),
+    default: new Date().toLocaleString("en-PH", { timeZone: "Asia/Manila" }),
   },
   {
     name: "notes",

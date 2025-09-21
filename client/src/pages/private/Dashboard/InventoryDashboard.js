@@ -274,7 +274,7 @@ export default function InventoryDashboard() {
         t.type,
         t.quantity,
         t.item?.unit || "-",
-        t.updated_by?.name || "N/A",
+        t.updated_by?.fullname || "N/A",
         new Date(t.timestamp).toLocaleDateString(),
       ]),
       theme: "grid",

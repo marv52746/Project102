@@ -64,7 +64,8 @@ export function Profile() {
             {/* Edit Avatar Button */}
             <label
               htmlFor="avatar-upload"
-              className="absolute bottom-4 right-10 bg-pink-600 text-white p-2 rounded-full cursor-pointer shadow hover:bg-pink-700 transition"
+              style={{ right: "4rem" }}
+              className="absolute bottom-2 right-10 bg-pink-600 text-white p-2 rounded-full cursor-pointer shadow hover:bg-pink-700 transition"
             >
               <Camera size={18} />
               <input
@@ -88,8 +89,7 @@ export function Profile() {
                 { label: "Last Name", key: "last_name" },
                 { label: "Email", key: "email" },
                 { label: "Phone", key: "phone" },
-                { label: "Address", key: "address" },
-                { label: "About Me", key: "about", textarea: true },
+                { label: "Address", key: "address", textarea: true },
               ].map((field) => (
                 <div
                   key={field.key}

@@ -26,7 +26,7 @@ const login = async (req, res) => {
       {
         id: user._id,
         email: user.email,
-        name: user.name,
+        name: user.fullname,
         role: user.role,
         avatar: user.avatar,
       },
@@ -70,7 +70,7 @@ const googleLogin = async (req, res) => {
         last_name: family_name,
         username: email,
         googleId: sub,
-        name: name,
+        fullname: name,
         // avatar: picture,
       });
       await user.save();
@@ -82,7 +82,7 @@ const googleLogin = async (req, res) => {
         id: user._id,
         email: user.email,
         role: user.role,
-        name: user.name,
+        fullname: user.fullname,
         avatar: user.avatar,
       },
       process.env.JWT_SECRET,
@@ -129,7 +129,7 @@ const signup = async (req, res) => {
         id: savedUser._id,
         email: savedUser.email,
         role: savedUser.role,
-        name: savedUser.name,
+        fullname: savedUser.fullname,
         avatar: savedUser.avatar,
       },
       JWT_SECRET,

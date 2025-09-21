@@ -4,7 +4,7 @@ import { genderOptions, roleOptions } from "./formFieldPresets";
 // Columns used in the table list
 export const userTableColumns = [
   // { name: "avatar", label: "Avatar" },
-  { name: "name", label: "Name" },
+  { name: "fullname", label: "Name" },
   { name: "email", label: "Email" },
   { name: "phone_number", label: "Phone" },
   // { name: "gender", label: "Gender" },

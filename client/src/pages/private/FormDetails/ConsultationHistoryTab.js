@@ -33,6 +33,8 @@ export default function ConsultationHistoryTab({ data }) {
           }
         );
 
+        // console.log(userAppointments);
+
         // ✅ sort by date
         const sortedAppointments = (userAppointments || []).sort((a, b) => {
           const dateA = new Date(a.date);
