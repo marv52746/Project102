@@ -10,7 +10,7 @@ router.post(
   upload.single("avatar"), // handles one file upload from field named 'avatar'
   userController.create
 ); // POST /user
-router.get("/", authMiddleware, userController.getAll); // GET /user
+router.get("/", userController.getAll); // GET /user
 router.get("/:id", authMiddleware, userController.getById); // GET /user/:id
 router.put(
   "/:id",

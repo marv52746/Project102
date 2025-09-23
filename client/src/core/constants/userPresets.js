@@ -20,8 +20,13 @@ export const userSettings = [
   { label: "Suffix", name: "suffix" },
   { label: "Phone Number", name: "phone_number", required: true },
   { label: "Email Address", name: "email", type: "email", required: true },
-  { label: "Date of Birth", name: "date_of_birth", type: "date" },
-  { label: "Address", name: "address", type: "textarea" },
+  {
+    label: "Date of Birth",
+    name: "date_of_birth",
+    type: "date",
+    required: true,
+  },
+  { label: "Address", name: "address", type: "textarea", required: true },
   // {
   //   name: "specialization",
   //   label: "Specialization",

@@ -71,6 +71,7 @@ const googleLogin = async (req, res) => {
         username: email,
         googleId: sub,
         fullname: name,
+        name: name,
         // avatar: picture,
       });
       await user.save();

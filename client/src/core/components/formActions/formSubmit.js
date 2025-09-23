@@ -12,6 +12,7 @@ export const handleFormSubmit = async ({
   fileData,
   navigate,
   userInfo,
+  notificationMessage,
 }) => {
   try {
     // console.log(data);
@@ -121,7 +122,9 @@ export const handleFormSubmit = async ({
 
     dispatch(
       showNotification({
-        message: id
+        message: notificationMessage
+          ? notificationMessage
+          : id
           ? "Record updated successfully!"
           : "Record created successfully!",
         type: "success",

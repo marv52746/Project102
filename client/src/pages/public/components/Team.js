@@ -2,39 +2,9 @@ import { useState } from "react";
 import { ContactUs } from "./ContactUs";
 import DoctorDetails from "./DoctorDetails";
 import { X } from "lucide-react";
+import { getAvatarUrl } from "../../../core/utils/avatarURL";
 
-const teamMembers = [
-  {
-    name: "Mary Johnson",
-    qualification: "M B B S",
-    role: "Family Practitioner",
-    image: "/assets/images/do8.jpg",
-    bio: "Mary Johnson has 10 years of experience in family practice.",
-  },
-  {
-    name: "Dev Dixit",
-    qualification: "M B B S",
-    role: "Family Practitioner",
-    image: "/assets/images/team1.jpg",
-    bio: "Dev Dixit specializes in preventive care and wellness.",
-  },
-  {
-    name: "Jeniffer Anis",
-    qualification: "M B B S",
-    role: "Family Practitioner",
-    image: "/assets/images/do15.jpg",
-    bio: "Jeniffer Anis focuses on women’s health and pediatrics.",
-  },
-  {
-    name: "Marco Polo",
-    qualification: "M B B S",
-    role: "Family Practitioner",
-    image: "/assets/images/do17.jpg",
-    bio: "Marco Polo is passionate about patient-centered healthcare.",
-  },
-];
-
-export default function Team() {
+export default function Team({ doctors }) {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
 
   return (
@@ -54,18 +24,21 @@ export default function Team() {
           </p>
 
           {/* Team Grid */}
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-12">
-            {teamMembers.map((member, i) => (
+          <div className="flex flex-wrap justify-center gap-8 mt-12">
+            {doctors.map((member, i) => (
               <div
                 key={i}
-                className="group relative bg-white shadow-md rounded-lg overflow-hidden"
+                className="w-70 group relative bg-white shadow-md rounded-lg overflow-hidden"
               >
                 {/* Image */}
                 <div className="relative">
                   <img
-                    src={member.image}
+                    src={
+                      getAvatarUrl(member?.avatar || "") ||
+                      "/assets/images/default-male.jpg"
+                    }
                     alt={member.name}
-                    className="w-full h-72 object-cover"
+                    className="w-full h-80 object-cover"
                   />
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-pink-500 bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
@@ -81,12 +54,14 @@ export default function Team() {
                 {/* Details */}
                 <div className="p-4 text-center">
                   <h4 className="font-bold text-lg">
-                    {member.name}{" "}
+                    {member.first_name} {member.last_name}{" "}
                     <span className="text-sm font-normal text-gray-500">
-                      {member.qualification}
+                      {member.suffix}
                     </span>
                   </h4>
-                  <h5 className="text-sm text-pink-600">{member.role}</h5>
+                  <h5 className="text-sm text-pink-600">
+                    {member.specialization}
+                  </h5>
                 </div>
               </div>
             ))}
@@ -97,7 +72,7 @@ export default function Team() {
 
       {selectedDoctor && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-20"
           onClick={() => setSelectedDoctor(null)} // close on backdrop click
         >
           <div
