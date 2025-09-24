@@ -19,7 +19,7 @@ async function sendEmailReminders() {
       service: "gmail",
       auth: {
         type: "OAuth2",
-        user: process.env.EMAIL_USER, // your Gmail address
+        user: process.env.CLINIC_EMAIL, // your Gmail address
         clientId: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
         refreshToken: process.env.REFRESH_TOKEN,
@@ -28,7 +28,7 @@ async function sendEmailReminders() {
     });
 
     const mailOptions = {
-      from: `"Clinic Reminder" <${process.env.EMAIL_USER}>`,
+      from: `"Clinic Reminder" <${process.env.CLINIC_EMAIL}>`,
       to: "marv52746@gmail.com", // can be dynamic from DB
       subject: "Daily Reminder",
       text: "This is your daily appointment reminder!",

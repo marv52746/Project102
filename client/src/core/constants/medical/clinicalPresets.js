@@ -170,11 +170,11 @@ export const conditionFormFields = [
     placeholder: "e.g. Hypertension",
     required: true,
   },
-  {
-    name: "code",
-    label: "ICD Code",
-    placeholder: "e.g. I10",
-  },
+  // {
+  //   name: "code",
+  //   label: "ICD Code",
+  //   placeholder: "e.g. I10",
+  // },
   {
     name: "diagnosed_date",
     label: "Diagnosed Date",
@@ -294,18 +294,21 @@ export const othersFormFields = [
     label: "Diagnosis",
     type: "text",
     placeholder: "Enter diagnosis",
+    required: true,
   },
   {
     name: "notes",
     label: "Notes",
     type: "textarea",
     placeholder: "Enter additional notes",
+    required: true,
   },
   {
     name: "amount",
     label: "Consultation Fee",
     type: "text",
     placeholder: "Enter consultation fee (₱)",
+    required: true,
   },
 ];
 

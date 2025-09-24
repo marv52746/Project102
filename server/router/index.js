@@ -30,6 +30,7 @@ const notificationRoutes = require("./notification/notifications");
 const laboratoryRoutes = require("./medical/laboratoryRoutes");
 const ultrasoundRoutes = require("./medical/ultrasoundRoutes");
 const clinicRoutes = require("./others/clinicRoutes");
+const contactRoutes = require("./notification/contactRoutes");
 
 // Core routes
 router.use("/file", fileRoutes);
@@ -38,7 +39,9 @@ router.use("/properties", propertyRoutes);
 router.use("/auth", authRoutes); // ✅ REGISTER AUTH ROUTE HERE
 router.use("/activities", activityRoutes);
 
+// Notifications, Emails
 router.use("/send", notificationRoutes);
+router.use("/contact", contactRoutes);
 
 router.use("/calendar", calendarRoute);
 

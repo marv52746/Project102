@@ -18,7 +18,7 @@ async function sendNotificationEmail(notification) {
       service: "gmail",
       auth: {
         type: "OAuth2",
-        user: process.env.EMAIL_USER,
+        user: process.env.CLINIC_EMAIL,
         clientId: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
         refreshToken: process.env.REFRESH_TOKEN,
@@ -28,7 +28,7 @@ async function sendNotificationEmail(notification) {
 
     const mailOptions = {
       from:
-        notification.from || `"Clinic Reminder" <${process.env.EMAIL_USER}>`,
+        notification.from || `"Clinic Reminder" <${process.env.CLINIC_EMAIL}>`,
       to: notification.to,
       subject: notification.subject,
       text: notification.text,

@@ -5,12 +5,13 @@ async function sendEmail(notification) {
     const transporter = await createTransporter();
     const mailOptions = {
       from:
-        notification.from || `"Clinic Reminder" <${process.env.EMAIL_USER}>`,
+        notification.from || `"Clinic Reminder" <${process.env.CLINIC_EMAIL}>`,
       to: notification.to,
       cc: notification.cc || undefined,
       bcc: notification.bcc || undefined,
       subject: notification.subject,
       html: notification.html,
+      replyTo: notification.replyTo || process.env.CLINIC_EMAIL,
       // html: "<h1>Welcome</h1><p>That was easy!</p>",
       // text: notification.text || "Your email client does not support HTML.", // fallback
     };

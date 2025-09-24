@@ -107,6 +107,21 @@ const notificationTemplates = {
       }),
     }),
   },
+  contact: {
+    message: (data) => {
+      return {
+        subject: `New Contact Message from ${data.name || "Someone"}`,
+        html: baseEmailTemplate({
+          title: "New Contact Message",
+          message: `
+            <strong>Name:</strong> ${data.name || "N/A"}<br>
+            <strong>Email:</strong> ${data.email || "N/A"}<br>
+            <strong>Message:</strong><br>${data.message || ""}
+          `,
+        }),
+      };
+    },
+  },
 };
 
 async function createNotificationService({
@@ -126,20 +141,10 @@ async function createNotificationService({
       text: "You have a new notification.",
     };
 
-    // // ✅ Create notifications for each recipient
-    // const notifications = recipients.map((email) => ({
-    //   from: process.env.EMAIL_USER,
-    //   to: email,
-    //   subject: template.subject,
-    //   text: template.text,
-    //   status,
-    //   sendAt: new Date(),
-    // }));
-    // console.log(template);
-
     // ✅ Build notification with CC and BCC
     const notification = {
-      from: process.env.EMAIL_USER,
+      from: process.env.CLINIC_EMAIL, // default clinic email
+      replyTo: category === "contact" && data.email ? data.email : undefined,
       to: recipients.join(","), // multiple recipients
       cc: cc.length ? cc.join(",") : undefined, // add only if provided
       bcc: bcc.length ? bcc.join(",") : undefined,

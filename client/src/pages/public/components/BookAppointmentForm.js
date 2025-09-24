@@ -5,6 +5,9 @@ import { appointmentFormFields } from "../../../core/constants/appointmentPreset
 import { handleFormSubmit } from "../../../core/components/formActions/formSubmit";
 import CustomDatePicker from "../../../core/components/custom/DatePicker";
 
+import { Link } from "react-router-dom";
+import { all_routes } from "../../../routes/all_routes";
+
 export default function BookAppointmentForm({
   doctor,
   userInfo,
@@ -28,6 +31,7 @@ export default function BookAppointmentForm({
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // ✅ Load doctors + update user info if needed
   useEffect(() => {
@@ -79,6 +83,13 @@ export default function BookAppointmentForm({
   // ✅ Handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 🚫 Block if not logged in
+    if (!userInfo?.id) {
+      setShowLoginModal(true);
+      return;
+    }
+
     setLoading(true);
 
     const payload = {
@@ -279,152 +290,184 @@ export default function BookAppointmentForm({
   //   );
 
   return (
-    <div className="bg-white/95 backdrop-blur-sm shadow-2xl rounded-2xl p-6 sm:p-8">
-      <h2 className="text-2xl sm:text-3xl font-bold text-pink-700">{title}</h2>
-      <p className="mt-2 text-gray-600 text-sm sm:text-base">{description}</p>
+    <>
+      <div className="bg-white/95 backdrop-blur-sm shadow-2xl rounded-2xl p-6 sm:p-8">
+        <h2 className="text-2xl sm:text-3xl font-bold text-pink-700">
+          {title}
+        </h2>
+        <p className="mt-2 text-gray-600 text-sm sm:text-base">{description}</p>
 
-      <form onSubmit={handleSubmit} className="mt-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Full Name */}
-          <div
-            className="flex items-center border rounded-lg px-3 py-2 bg-white 
+        <form onSubmit={handleSubmit} className="mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Full Name */}
+            <div
+              className="flex items-center border rounded-lg px-3 py-2 bg-white 
   focus-within:ring-2 focus-within:ring-pink-400 col-span-1"
-          >
-            <User className="w-5 h-5 text-gray-400 mr-2 shrink-0" />
-            <input
-              type="text"
-              name="fullname"
-              placeholder="Full Name"
-              className="w-full min-w-0 outline-none text-sm"
-              value={formData.fullname}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            >
+              <User className="w-5 h-5 text-gray-400 mr-2 shrink-0" />
+              <input
+                type="text"
+                name="fullname"
+                placeholder="Full Name"
+                className="w-full min-w-0 outline-none text-sm"
+                value={formData.fullname}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* Email */}
-          <div
-            className="flex items-center border rounded-lg px-3 py-2 bg-white 
+            {/* Email */}
+            <div
+              className="flex items-center border rounded-lg px-3 py-2 bg-white 
   focus-within:ring-2 focus-within:ring-pink-400 col-span-1"
-          >
-            <Mail className="w-5 h-5 text-gray-400 mr-2 shrink-0" />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email Address"
-              className="w-full min-w-0 outline-none text-sm"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            >
+              <Mail className="w-5 h-5 text-gray-400 mr-2 shrink-0" />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                className="w-full min-w-0 outline-none text-sm"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* Phone */}
-          <div className="flex items-center border rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-pink-400 col-span-1">
-            <Phone className="w-5 h-5 text-gray-400 mr-2 shrink-0" />
-            <input
-              type="number"
-              name="phone"
-              placeholder="Phone Number"
-              className="flex-1 outline-none text-sm sm:text-base"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            {/* Phone */}
+            <div className="flex items-center border rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-pink-400 col-span-1">
+              <Phone className="w-5 h-5 text-gray-400 mr-2 shrink-0" />
+              <input
+                type="number"
+                name="phone"
+                placeholder="Phone Number"
+                className="flex-1 outline-none text-sm sm:text-base"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* Doctor */}
-          <div className="relative col-span-1">
-            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <select
-              name="doctor"
-              className="w-full pl-10 pr-8 py-2 border rounded-lg text-sm sm:text-base text-gray-700 
+            {/* Doctor */}
+            <div className="relative col-span-1">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <select
+                name="doctor"
+                className="w-full pl-10 pr-8 py-2 border rounded-lg text-sm sm:text-base text-gray-700 
              bg-white appearance-none outline-none focus:ring-2 focus:ring-pink-400
              transition-all"
-              value={formData.doctor}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select Doctor</option>
-              {doctorOptions.map((doc) => (
-                <option key={doc.id} value={doc.id}>
-                  {doc.name}
-                </option>
-              ))}
-            </select>
-            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400">
-              ▼
-            </span>
-          </div>
+                value={formData.doctor}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Doctor</option>
+                {doctorOptions.map((doc) => (
+                  <option key={doc.id} value={doc.id}>
+                    {doc.name}
+                  </option>
+                ))}
+              </select>
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400">
+                ▼
+              </span>
+            </div>
 
-          {/* Date */}
-          <div className="relative col-span-1">
-            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="date"
-              name="date"
-              className="w-full pl-10 pr-3 py-2 border rounded-lg text-sm sm:text-base text-gray-700
+            {/* Date */}
+            <div className="relative col-span-1">
+              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="date"
+                name="date"
+                className="w-full pl-10 pr-3 py-2 border rounded-lg text-sm sm:text-base text-gray-700
              bg-white outline-none focus:ring-2 focus:ring-pink-400
              transition-all"
-              value={formData.date}
-              onChange={handleChange}
-              required
-            />
-          </div>
+                value={formData.date}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* Time */}
-          <div className="relative col-span-1">
-            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="time"
-              name="time"
-              className="w-full pl-10 pr-3 py-2 border rounded-lg text-sm sm:text-base text-gray-700
+            {/* Time */}
+            <div className="relative col-span-1">
+              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="time"
+                name="time"
+                className="w-full pl-10 pr-3 py-2 border rounded-lg text-sm sm:text-base text-gray-700
              bg-white outline-none focus:ring-2 focus:ring-pink-400
              transition-all"
-              value={formData.time}
-              onChange={handleChange}
-              required
-            />
-          </div>
+                value={formData.time}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* Reason */}
-          <div className="col-span-1 sm:col-span-2">
-            <textarea
-              name="reason"
-              placeholder="Reason for Appointment"
-              className="w-full border rounded-lg px-3 py-2 text-sm sm:text-base outline-none focus:ring-2 focus:ring-pink-400"
-              rows="3"
-              value={formData.reason}
-              onChange={handleChange}
-              required
-            ></textarea>
-          </div>
+            {/* Reason */}
+            <div className="col-span-1 sm:col-span-2">
+              <textarea
+                name="reason"
+                placeholder="Reason for Appointment"
+                className="w-full border rounded-lg px-3 py-2 text-sm sm:text-base outline-none focus:ring-2 focus:ring-pink-400"
+                rows="3"
+                value={formData.reason}
+                onChange={handleChange}
+                required
+              ></textarea>
+            </div>
 
-          {/* Submit */}
-          <div className="col-span-1 sm:col-span-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className={`w-full py-3 rounded-lg shadow-md font-semibold transition-all duration-300 flex items-center justify-center gap-2
+            {/* Submit */}
+            <div className="col-span-1 sm:col-span-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full py-3 rounded-lg shadow-md font-semibold transition-all duration-300 flex items-center justify-center gap-2
               ${
                 submitted
                   ? "bg-green-600 text-white hover:bg-green-700"
                   : "bg-gradient-to-r from-pink-600 to-pink-500 text-white hover:from-pink-700 hover:to-pink-600 hover:shadow-lg"
               }`}
-            >
-              {submitted ? (
-                <>
-                  <Check size={18} /> Appointment Booked
-                </>
-              ) : loading ? (
-                "Booking..."
-              ) : (
-                "Confirm Appointment"
-              )}
-            </button>
+              >
+                {submitted ? (
+                  <>
+                    <Check size={18} /> Appointment Booked
+                  </>
+                ) : loading ? (
+                  "Booking..."
+                ) : (
+                  "Confirm Appointment"
+                )}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      {/* ✅ Login Required Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full text-center">
+            <h2 className="text-lg font-bold text-gray-800 mb-2">
+              Login Required
+            </h2>
+            <p className="text-gray-600 mb-4">
+              You need to log in to book an appointment.
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+                onClick={() => setShowLoginModal(false)}
+              >
+                Cancel
+              </button>
+              <Link
+                to={all_routes.login}
+                className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700"
+              >
+                Go to Login
+              </Link>
+            </div>
           </div>
         </div>
-      </form>
-    </div>
+      )}
+    </>
   );
 }

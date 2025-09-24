@@ -57,60 +57,6 @@ export default function Home() {
   return (
     <div className="font-sans scroll-smooth">
       {/* Navbar */}
-      {/* <nav className="fixed top-0 w-full bg-white/50 backdrop-blur-md shadow z-40">
-        <div className="max-w-6xl mx-auto flex justify-between items-center p-4">
-
-          <Link to="/" className="flex items-center space-x-3 hover:opacity-90">
-            <img
-              src="/assets/images/logo.png"
-              alt="Logo"
-              className="h-10 w-10 object-contain"
-            />
-            <h1 className="text-pink-600 font-bold text-xl">
-              Bislig Premier Birthing Home
-            </h1>
-          </Link>
-
-
-          <div className="flex space-x-6 items-center">
-            {tabs.map((tab) => {
-
-              if (tab.id === "login" && authState) return null;
-
-
-              if (tab.id === "profile" && !authState) return null;
-
-
-              if (tab.id === "login") {
-                return (
-                  <Link
-                    className="pb-2 px-2 "
-                    key={tab.id}
-                    to={all_routes.login}
-                  >
-                    {tab.label}
-                  </Link>
-                );
-              }
-
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`pb-2 px-2 border-b-2 transition ${
-                    activeTab === tab.id
-                      ? "border-pink-600 text-pink-600 font-semibold"
-                      : "border-transparent hover:border-pink-400 hover:text-pink-600"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </nav> */}
-
       <nav className="fixed top-0 w-full bg-white/50 backdrop-blur-md shadow z-40">
         <div className="max-w-6xl mx-auto flex justify-between items-center p-4">
           {/* Logo + Title */}

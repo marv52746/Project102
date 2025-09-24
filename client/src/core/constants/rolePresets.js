@@ -4,3 +4,5 @@ export const appointmentCreators = ["doctor", "staff"];
 
 export const transactionTables = [""];
 // export const transactionTables = ["inventoryLogs"];
+
+export const canEditForms = ["admin", "doctor"];

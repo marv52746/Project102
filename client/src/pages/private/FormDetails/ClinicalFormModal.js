@@ -77,7 +77,7 @@ export default function ClinicalFormModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit}>
           {/* {type !== "appointments" && (
             <div>
               <label className="block text-sm font-medium text-gray-700">
@@ -100,59 +100,61 @@ export default function ClinicalFormModal({
               </select>
             </div>
           )} */}
+          <div className="grid grid-cols-2 gap-4">
+            {currentFields.map((field, idx) => {
+              if (!field.name) return null;
+              const value = formData[field.name] || "";
 
-          {currentFields.map((field, idx) => {
-            if (!field.name) return null;
-            const value = formData[field.name] || "";
+              // 👇 If hidden, render a hidden input field
+              if (field.hidden) {
+                return (
+                  <input
+                    key={idx}
+                    type="hidden"
+                    name={field.name}
+                    value={value}
+                    required={field.required}
+                    onChange={handleChange}
+                  />
+                );
+              }
 
-            // 👇 If hidden, render a hidden input field
-            if (field.hidden) {
+              if (field.type === "textarea") {
+                return (
+                  <div key={idx}>
+                    <label className="block text-sm font-medium text-gray-700">
+                      {field.label}
+                    </label>
+                    <textarea
+                      name={field.name}
+                      value={getInputValue(formData, field)}
+                      onChange={handleChange}
+                      rows={field.rows || 3}
+                      placeholder={field.placeholder}
+                      required={field.required}
+                      disabled={mode === "view"}
+                      className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm"
+                    ></textarea>
+                  </div>
+                );
+              }
+
               return (
-                <input
+                <InputField
                   key={idx}
-                  type="hidden"
+                  label={field.label}
                   name={field.name}
-                  value={value}
+                  type={field.type || "text"}
+                  value={getInputValue(formData, field)}
                   onChange={handleChange}
+                  placeholder={field.placeholder}
+                  required={field.required}
+                  disabled={mode === "view"}
+                  options={field.options || []} // Pass select options if any
                 />
               );
-            }
-
-            if (field.type === "textarea") {
-              return (
-                <div key={idx}>
-                  <label className="block text-sm font-medium text-gray-700">
-                    {field.label}
-                  </label>
-                  <textarea
-                    name={field.name}
-                    value={getInputValue(formData, field)}
-                    onChange={handleChange}
-                    rows={field.rows || 3}
-                    placeholder={field.placeholder}
-                    required={field.required}
-                    disabled={mode === "view"}
-                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm"
-                  ></textarea>
-                </div>
-              );
-            }
-
-            return (
-              <InputField
-                key={idx}
-                label={field.label}
-                name={field.name}
-                type={field.type || "text"}
-                value={getInputValue(formData, field)}
-                onChange={handleChange}
-                placeholder={field.placeholder}
-                required={field.required}
-                disabled={mode === "view"}
-                options={field.options || []} // Pass select options if any
-              />
-            );
-          })}
+            })}
+          </div>
 
           {mode !== "view" && (
             <div className="flex justify-end sticky bottom-0 pt-4 gap-2">

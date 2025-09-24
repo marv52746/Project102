@@ -5,11 +5,14 @@ const NotificationSchema = new mongoose.Schema(
     from: {
       type: String,
       required: true,
-      default: process.env.EMAIL_USER, // fallback to system email
+      default: process.env.CLINIC_EMAIL, // fallback to system email
     },
     to: {
       type: [String],
       required: true,
+    },
+    replyTo: {
+      type: [String],
     },
     cc: {
       type: [String],

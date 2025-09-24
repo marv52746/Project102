@@ -3,8 +3,9 @@ import { X, Plus, Trash2 } from "lucide-react";
 import { clinicalFormFieldMap } from "../../constants/medical/clinicalPresets";
 import { getInputValue } from "../../utils/fieldUtils";
 import apiService from "../../services/apiService";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setRefreshKey } from "../../services/reducers/utilsReducer";
+import { canEditForms } from "../../constants/rolePresets";
 
 const BaseModal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
@@ -169,6 +170,7 @@ const MultiEntryModal = ({
     Array.isArray(initialData) && initialData.length > 0 ? initialData : [{}]
   );
   const [toDelete, setToDelete] = useState([]); // 🆕 track deleted IDs
+  const userInfo = useSelector((state) => state.user.userInfo);
 
   // Reset entries when modal opens
   useEffect(() => {
@@ -216,9 +218,10 @@ const MultiEntryModal = ({
     }
   };
 
-  const readOnly = status !== "scheduled" && status !== "ready";
-  // console.log(status);
-  // console.log(readOnly);
+  const readOnly =
+    status !== "scheduled" &&
+    status !== "ready" &&
+    !canEditForms.includes(userInfo.role);
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} title={title}>

@@ -53,7 +53,7 @@ export function Profile({ user }) {
     <>
       <section
         id="profile"
-        className="py-16 bg-gray-50 min-h-screen flex items-center pt-24"
+        className="py-16 bg-gray-50 min-h-screen flex items-center pt-14"
       >
         <form
           onSubmit={(e) => {
