@@ -107,55 +107,6 @@ export default function PrintActionButtons({ data }) {
     }).format(date);
   };
 
-  // Generic print handler
-  // const handlePrint = (ref, title, orientation = "portrait") => {
-  //   if (!ref.current) return;
-
-  //   const printContent = ref.current.innerHTML;
-
-  //   const pageSize = "210mm 148mm"; // keep paper A4
-  //   const contentTransform =
-  //     orientation === "landscape" ? "rotate(-90deg) translate(-100%)" : "none";
-  //   const contentWidth = orientation === "landscape" ? "148mm" : "210mm";
-  //   const contentHeight = orientation === "landscape" ? "210mm" : "148mm";
-
-  //   const win = window.open("", "", "width=1000,height=600");
-  //   win.document.write(`
-  //   <html>
-  //     <head>
-  //       <title>${title} - ${patientName}</title>
-  //       <link rel="stylesheet" href="/output.css" />
-  //       <style>
-  //         @page { size: ${pageSize}; margin: 5mm; }
-  //         body {
-  //           margin: 5mm;
-  //           padding: 0;
-  //             box-sizing: border-box;
-  //             display: flex;
-  //             justify-content: center; /* horizontal center */
-  //             align-items: center;    /* vertical center */
-  //             height: 100vh;          /* full viewport height */
-  //           }
-  //         #print-container {
-  //           width: ${contentWidth};
-  //           height: ${contentHeight};
-  //           transform: ${contentTransform};
-  //           transform-origin: top left;
-  //         }
-  //       </style>
-  //     </head>
-  //     <body>
-  //       <div id="print-container">${printContent}</div>
-  //     </body>
-  //   </html>
-  // `);
-
-  //   win.document.close();
-  //   win.focus();
-  //   win.print();
-  //   win.close();
-  // };
-
   const handlePrint = (ref, title, orientation = "portrait") => {
     if (!ref.current) return;
 

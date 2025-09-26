@@ -80,9 +80,6 @@ class BaseController {
 
   update = async (req, res) => {
     try {
-      // console.log(req.params.id);
-      // console.log(req.currentUser?._id);
-      // console.log(req.body);
       const updatedItem = await this.model.findByIdAndUpdate(
         req.params.id,
         {

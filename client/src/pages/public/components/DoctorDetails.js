@@ -1,5 +1,13 @@
 // src/components/DoctorDetails.js
-import { Twitter, Facebook, Mail, X } from "lucide-react";
+import {
+  Twitter,
+  Facebook,
+  Mail,
+  X,
+  Instagram,
+  Linkedin,
+  Youtube,
+} from "lucide-react";
 import { getAvatarUrl } from "../../../core/utils/avatarURL";
 import { useState } from "react";
 import BookAppointmentForm from "./BookAppointmentForm";
@@ -54,30 +62,73 @@ const DoctorDetails = ({ doctor }) => {
                   </h2>
                   <p className="text-sm text-gray-500">{doctor.suffix}</p>
                   <p className="text-pink-600 font-medium mt-1">
-                    {doctor.specialization}
+                    {Array.isArray(doctor.specialization) &&
+                    doctor.specialization.length > 0
+                      ? doctor.specialization.join(", ")
+                      : "Not specified"}
                   </p>
                 </div>
 
                 {/* Socials */}
                 <div className="flex space-x-3">
-                  <a
-                    href="#"
-                    className="p-2 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 transition"
-                  >
-                    <Twitter size={18} />
-                  </a>
-                  <a
-                    href="#"
-                    className="p-2 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 transition"
-                  >
-                    <Facebook size={18} />
-                  </a>
-                  <a
-                    href="#"
-                    className="p-2 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 transition"
-                  >
-                    <Mail size={18} />
-                  </a>
+                  {doctor.twitter && (
+                    <a
+                      href={doctor.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 transition"
+                    >
+                      <Twitter size={18} />
+                    </a>
+                  )}
+                  {doctor.facebook && (
+                    <a
+                      href={doctor.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 transition"
+                    >
+                      <Facebook size={18} />
+                    </a>
+                  )}
+                  {doctor.instagram && (
+                    <a
+                      href={doctor.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 transition"
+                    >
+                      <Instagram size={18} />
+                    </a>
+                  )}
+                  {doctor.linkedin && (
+                    <a
+                      href={doctor.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 transition"
+                    >
+                      <Linkedin size={18} />
+                    </a>
+                  )}
+                  {doctor.youtube && (
+                    <a
+                      href={doctor.youtube}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 transition"
+                    >
+                      <Youtube size={18} />
+                    </a>
+                  )}
+                  {doctor.email && (
+                    <a
+                      href={`mailto:${doctor.email}`}
+                      className="p-2 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 transition"
+                    >
+                      <Mail size={18} />
+                    </a>
+                  )}
                 </div>
               </div>
 
@@ -86,32 +137,42 @@ const DoctorDetails = ({ doctor }) => {
 
               {/* Details */}
               <div className="grid md:grid-cols-2 gap-6 text-left">
-                <div>
-                  <h4 className="font-semibold text-gray-700 mb-1">
-                    Qualification
-                  </h4>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {doctor.qualification || "Not specified"}
-                  </p>
-                </div>
+                {doctor.qualification && doctor.qualification.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-700 mb-1">
+                      Qualification
+                    </h4>
+                    <ul className="list-disc list-inside text-gray-600 text-sm space-y-1">
+                      {doctor.qualification.map((cert, i) => (
+                        <li key={i}>{cert}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-                <div>
-                  <h4 className="font-semibold text-gray-700 mb-1">
-                    Certification
-                  </h4>
-                  <ul className="list-disc list-inside text-gray-600 text-sm space-y-1">
-                    <li>General Medical License</li>
-                    <li>Specialist Certification</li>
-                  </ul>
-                </div>
+                {doctor.certifications && doctor.certifications.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-700 mb-1">
+                      Certifications
+                    </h4>
+                    <ul className="list-disc list-inside text-gray-600 text-sm space-y-1">
+                      {doctor.certifications.map((cert, i) => (
+                        <li key={i}>{cert}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-                <div>
-                  <h4 className="font-semibold text-gray-700 mb-1">Awards</h4>
-                  <ul className="list-disc list-inside text-gray-600 text-sm space-y-1">
-                    <li>Outstanding Service Award</li>
-                    <li>Top Medical Practitioner</li>
-                  </ul>
-                </div>
+                {doctor.awards && doctor.awards.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-700 mb-1">Awards</h4>
+                    <ul className="list-disc list-inside text-gray-600 text-sm space-y-1">
+                      {doctor.awards.map((award, i) => (
+                        <li key={i}>{award}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 {doctor.bio && (
                   <div className="md:col-span-2">

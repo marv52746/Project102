@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { CheckCircle, AlertCircle } from "lucide-react";
 import apiService from "../../../core/services/apiService";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 /* Contact Us */
 export function ContactUs() {
+  const userInfo = useSelector((state) => state.user?.userInfo);
   const [form, setForm] = useState({
-    name: "",
-    email: "",
+    name: userInfo?.fullname || "",
+    email: userInfo?.email || "",
     phone: "",
     message: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(null); // { type: "success" | "error", msg: "" }
   const dispatch = useDispatch();
@@ -46,7 +48,7 @@ export function ContactUs() {
   };
 
   return (
-    <section id="contact" className="py-16 bg-pink-50 pb-6">
+    <section id="contact" className="py-16 bg-pink-50">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-10">
@@ -86,19 +88,11 @@ export function ContactUs() {
               </p>
 
               <div className="flex items-center space-x-2 text-gray-700">
-                <span className="text-pink-600">⏰</span>
-                <span>
-                  <span className="font-medium text-pink-600">Schedule:</span>{" "}
-                  Monday – Saturday, 9:00 AM – 5:00 PM
-                </span>
+                <span>Monday – Saturday, 9:00 AM – 5:00 PM</span>
               </div>
 
               <div className="flex items-center space-x-2 text-gray-700">
-                <span className="text-pink-600">📞</span>
-                <span>
-                  <span className="font-medium text-pink-600">Phone:</span> 0917
-                  113 5187
-                </span>
+                <span>0917 113 5187</span>
               </div>
             </div>
 

@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 app.use("/api", require("./router/index"));
 
 // ✅ Static file serving
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/assets", express.static(path.join(__dirname, "assets")));
 
 // ✅ Start the server
 app.listen(PORT, () => {

@@ -29,6 +29,16 @@ export const inventoryLogsFormFields = [
   //   required: true,
   // },
   // { type: "spacer", showOn: "all" },
+
+  {
+    name: "item.quantity",
+    label: "Current stock",
+    type: "number",
+    showOn: "create,view",
+    required: true,
+    disabled: true,
+    condition: "",
+  },
   {
     name: "type",
     label: "Type",

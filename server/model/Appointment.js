@@ -84,7 +84,7 @@ const appointmentSchema = new Schema(
 );
 
 // Compound index to prevent double-booking
-appointmentSchema.index({ doctor: 1, date: 1, time: 1 }, { unique: true });
+// appointmentSchema.index({ doctor: 1, date: 1, time: 1 }, { unique: true });
 
 // Auto-generate appointment_no before saving
 appointmentSchema.pre("validate", async function (next) {

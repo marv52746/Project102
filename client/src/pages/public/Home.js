@@ -9,10 +9,11 @@ import { useDispatch, useSelector } from "react-redux";
 import apiService from "../../core/services/apiService";
 import BookAppointmentForm from "./components/BookAppointmentForm";
 import { Menu, X } from "lucide-react";
+import Login from "../main/login";
 
 export default function Home() {
-  const userInfo = useSelector((state) => state.user.userInfo);
-  const authState = useSelector((state) => state.user.authState);
+  const userInfo = useSelector((state) => state.user?.userInfo);
+  const authState = useSelector((state) => state.user?.authState);
   const dispatch = useDispatch();
 
   // console.log(userInfo);
@@ -37,22 +38,24 @@ export default function Home() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        if (userInfo.id) {
+        const res = await apiService.get(dispatch, "users", { role: "doctor" });
+        setDoctors(res);
+
+        if (userInfo && userInfo.id) {
           const currentUser = await apiService.get(
             dispatch,
             `users/${userInfo?.id}`
           );
           setUser(currentUser);
         }
-
-        const res = await apiService.get(dispatch, "users", { role: "doctor" });
-        setDoctors(res);
       } catch (err) {
         console.error("Error fetching doctors:", err);
       }
     };
     fetchUsers();
   }, [dispatch, userInfo]);
+
+  // console.log(user);
 
   return (
     <div className="font-sans scroll-smooth">
@@ -77,17 +80,17 @@ export default function Home() {
               if (tab.id === "login" && authState) return null;
               if (tab.id === "profile" && !authState) return null;
 
-              if (tab.id === "login") {
-                return (
-                  <Link
-                    className="pb-2 px-2"
-                    key={tab.id}
-                    to={all_routes.login}
-                  >
-                    {tab.label}
-                  </Link>
-                );
-              }
+              // if (tab.id === "login") {
+              //   return (
+              //     <Link
+              //       className="pb-2 px-2"
+              //       key={tab.id}
+              //       to={all_routes.login}
+              //     >
+              //       {tab.label}
+              //     </Link>
+              //   );
+              // }
 
               return (
                 <button
@@ -122,18 +125,18 @@ export default function Home() {
                 if (tab.id === "login" && authState) return null;
                 if (tab.id === "profile" && !authState) return null;
 
-                if (tab.id === "login") {
-                  return (
-                    <Link
-                      key={tab.id}
-                      to={all_routes.login}
-                      onClick={() => setMobileOpen(false)}
-                      className="text-gray-700 hover:text-pink-600"
-                    >
-                      {tab.label}
-                    </Link>
-                  );
-                }
+                // if (tab.id === "login") {
+                //   return (
+                //     <Link
+                //       key={tab.id}
+                //       to={all_routes.login}
+                //       onClick={() => setMobileOpen(false)}
+                //       className="text-gray-700 hover:text-pink-600"
+                //     >
+                //       {tab.label}
+                //     </Link>
+                //   );
+                // }
 
                 return (
                   <button
@@ -193,7 +196,8 @@ export default function Home() {
 
       {activeTab === "things" && <ThingsToKnow />}
       {activeTab === "about" && <Team doctors={doctors} />}
-      {activeTab === "contact" && <ContactUs />}
+      {activeTab === "contact" && <ContactUs user={user} />}
+      {activeTab === "login" && <Login />}
       {activeTab === "profile" && authState && <Profile user={user} />}
     </div>
   );

@@ -1,38 +1,180 @@
 const { NotificationDb } = require("../model/notifications/Notification");
 
+const DEFAULT_CLINIC_NAME = "Bislig Premier Birthing Home";
+
 function baseEmailTemplate({
   title,
   message,
-  clinicName = "Your Clinic",
-  logoUrl,
+  data,
+  clinicName = DEFAULT_CLINIC_NAME,
 }) {
   return `
-  <table align="center" cellpadding="0" cellspacing="0" width="100%" 
-    style="max-width:600px;margin:auto;background:#ffffff;
-           border-radius:8px;overflow:hidden;
-           box-shadow:0 2px 8px rgba(0,0,0,0.1);font-family:Arial,sans-serif;">
-    <tr>
-      <td style="background:#1976d2;color:#ffffff;padding:20px;text-align:center;">
-        ${
-          logoUrl
-            ? `<img src="${logoUrl}" alt="${clinicName}" style="max-height:40px;margin-bottom:5px;display:block;margin:auto;" />`
-            : ""
-        }
-        <div style="font-size:20px;font-weight:bold;margin:0;">${clinicName}</div>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding:20px;font-size:16px;line-height:1.5;color:#333;">
-        <h2 style="margin:0 0 10px;font-size:18px;color:#1976d2;">${title}</h2>
-        <div style="margin:0;">${message}</div>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding:15px;background:#f9f9f9;text-align:center;font-size:12px;color:#777;">
-        &copy; ${new Date().getFullYear()} ${clinicName}. All rights reserved.
-      </td>
-    </tr>
-  </table>`;
+ <!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${title}</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background: #f3f4f6;
+      font-family: Arial, sans-serif;
+    "
+  >
+    <table
+      role="presentation"
+      cellspacing="0"
+      cellpadding="0"
+      border="0"
+      width="100%"
+    >
+      <tr>
+        <td align="center" style="padding: 30px 15px">
+          <!-- Card Container -->
+          <table
+            role="presentation"
+            cellspacing="0"
+            cellpadding="0"
+            border="0"
+            width="100%"
+            style="
+              max-width: 600px;
+              background: #ffffff;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                style="background: #ffffff; padding: 20px; text-align: center"
+              >
+                <table
+                  role="presentation"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                  align="center"
+                  style="margin: 0 auto"
+                >
+                  <tr>
+                    <td style="padding-right: 10px">
+                      <img
+                        src="cid:clinicLogo"
+                        alt="${clinicName}"
+                        style="
+                          max-height: 40px;
+                          display: block;
+                          background: #fff;
+                        "
+                      />
+                    </td>
+                    <td style="text-align: left; vertical-align: middle">
+                      <h1
+                        style="
+                          margin: 0;
+                          font-size: 22px;
+                          font-weight: bold;
+                          line-height: 1.2;
+                          color: #ec4899;
+                        "
+                      >
+                        ${clinicName}
+                      </h1>
+                      <p
+                        style="margin: 4px 0 0; font-size: 13px; color: #6b7280"
+                      >
+                        Women’s wellness and motherhood, nurtured with care
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Divider -->
+            <tr>
+              <td style="padding: 0">
+                <hr
+                  style="border: none; border-top: 1px solid #e5e7eb; margin: 0"
+                />
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td
+                style="
+                  padding: 30px 25px;
+                  color: #333333;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                <h2 style="margin: 0 0 15px; font-size: 20px; color: #ec4899">
+                  ${title}
+                </h2>
+                <p style="margin: 0 0 20px">
+                  Hello ${data.greetingName || "there"},
+                </p>
+
+                <p style="margin: 0 0 20px">
+                ${message.appointmentScheduled}
+                </p>
+
+                <!-- Appointment Details Card -->
+                <table
+                  role="presentation"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  width="100%"
+                  style="
+                    background: #f9fafb;
+                    border-radius: 8px;
+                    padding: 15px;
+                    margin: 20px 0;
+                  "
+                >
+                  ${message.details}
+                </table>
+
+                <p style="margin: 20px 0 0">
+                ${message.pleaseArrive}
+                </p>
+
+                <p style="margin: 20px 0 0">
+                ${message.lookForward}
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                style="
+                  background: #f9fafb;
+                  padding: 20px;
+                  text-align: center;
+                  font-size: 12px;
+                  color: #6b7280;
+                "
+              >
+                &copy; ${new Date().getFullYear()} ${clinicName}. All rights
+                reserved.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+`;
 }
 
 function formatTimeToAMPM(timeStr) {
@@ -52,72 +194,184 @@ const notificationTemplates = {
   patient: {
     create: (data) => {
       return {
-        subject: "Clinic - Appointment Created",
+        subject: "Birthing Home - Appointment Created",
         html: baseEmailTemplate({
-          title: "Appointment Created",
-          message: `Hello ${
-            data.patient.name || "Patient"
-          }! Your appointment has been created.
-                    <br><br><strong>Date:</strong> ${new Date(
-                      data.date
-                    ).toDateString()}
-                    <br><strong>Time:</strong> ${formatTimeToAMPM(data.time)}
-                    <br><strong>Doctor:</strong> ${data.doctor.name}
-                    <br><strong>Reason:</strong> ${data.reason}`,
+          title: "Appointment Confirmed",
+          data: {
+            ...data,
+            greetingName: data.patient.first_name,
+          },
+          message: {
+            appointmentScheduled:
+              "Your appointment has been successfully scheduled. Here are the details:",
+            lookForward: "We look forward to seeing you! 💖",
+            pleaseArrive: `Please arrive 10–15 minutes early to allow time for
+                  check-in.<br />If you need to reschedule, kindly contact us at
+                  least 24 hours in advance.`,
+            details: `<tr>
+                    <td style="font-size: 15px; padding: 5px 0">
+                      📅 <strong>Date:</strong> ${new Date(
+                        data.date
+                      ).toDateString()}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 15px; padding: 5px 0">
+                      ⏰ <strong>Time:</strong> ${formatTimeToAMPM(data.time)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 15px; padding: 5px 0">
+                      👩‍⚕️ <strong>Doctor:</strong> ${data.doctor.name}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 15px; padding: 5px 0">
+                      📝 <strong>Reason:</strong> ${data.reason}
+                    </td>
+                  </tr>`,
+          },
         }),
       };
     },
     appointmentReminder: (data) => {
       return {
-        subject: "Clinic - Appointment Reminder",
+        subject: "Birthing Home - Appointment Reminder (Today)",
         html: baseEmailTemplate({
           title: "Appointment Reminder",
-          message: `Hello ${data.patient.name || "Patient"},<br>
-                    This is a friendly reminder of your appointment:
-                    <br><br><strong>Date:</strong> ${new Date(
-                      data.date
-                    ).toDateString()}
-                    <br><strong>Time:</strong> ${formatTimeToAMPM(data.time)}
-                    <br><strong>Doctor:</strong> ${data.doctor.name}
-                    <br><strong>Reason:</strong> ${data.reason}
-                    <br><br>Please arrive 10–15 minutes early.`,
+          data: {
+            ...data,
+            greetingName: data.patient.first_name,
+          },
+          message: {
+            appointmentScheduled:
+              "This is a reminder that your appointment is scheduled for today. Here are the details:",
+            lookForward: "We look forward to seeing you! 💖",
+            pleaseArrive: `Please arrive 10–15 minutes early to allow time for
+                  check-in.<br />If you need to reschedule, kindly contact us at
+                  least 24 hours in advance.`,
+            details: `<tr>
+                    <td style="font-size: 15px; padding: 5px 0">
+                      📅 <strong>Date:</strong> ${new Date(
+                        data.date
+                      ).toDateString()}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 15px; padding: 5px 0">
+                      ⏰ <strong>Time:</strong> ${formatTimeToAMPM(data.time)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 15px; padding: 5px 0">
+                      👩‍⚕️ <strong>Doctor:</strong> ${data.doctor.name}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 15px; padding: 5px 0">
+                      📝 <strong>Reason:</strong> ${data.reason}
+                    </td>
+                  </tr>`,
+          },
         }),
       };
     },
   },
   staff: {
     stockAlerts: (data) => ({
-      subject: "Clinic - Stock Alert",
+      subject: "Birthing Home - Stock Alert",
       html: baseEmailTemplate({
         title: "Stock Alert",
-        message: `Low stock detected:
-                  <br><strong>Name:</strong> ${data.name}
-                  <br><strong>Category:</strong> ${data.category}
-                  <br><strong>Quantity:</strong> ${data.quantity}
-                  <br><strong>Unit:</strong> ${data.unit}`,
+        data: {
+          ...data,
+          greetingName: "Team",
+        },
+        message: {
+          appointmentScheduled: "A stock item has reached a low quantity:",
+          details: `
+          <tr>
+            <td style="font-size: 15px; padding: 5px 0">
+              📦 <strong>Name:</strong> ${data.name}
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size: 15px; padding: 5px 0">
+              🗂 <strong>Category:</strong> ${data.category}
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size: 15px; padding: 5px 0">
+              🔢 <strong>Quantity:</strong> ${data.quantity}
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size: 15px; padding: 5px 0">
+              ⚖️ <strong>Unit:</strong> ${data.unit}
+            </td>
+          </tr>`,
+          pleaseArrive: "",
+          lookForward: "",
+        },
       }),
     }),
   },
   emergency: {
     alert: (data) => ({
-      subject: "Clinic - 🚨 Emergency Alert",
+      subject: "Birthing Home - 🚨 Emergency Alert",
       html: baseEmailTemplate({
         title: "🚨 Emergency Alert",
-        message: `${data.message}`,
+        data: {
+          ...data,
+          greetingName: "All",
+        },
+        message: {
+          appointmentScheduled: "An emergency alert has been issued:",
+          details: `
+          <tr>
+            <td style="font-size: 15px; padding: 5px 0; color: #dc2626;">
+              ⚠️ ${data.message}
+            </td>
+          </tr>`,
+          pleaseArrive: "",
+          lookForward: "",
+        },
       }),
     }),
   },
   contact: {
     message: (data) => {
       return {
-        subject: `New Contact Message from ${data.name || "Someone"}`,
+        subject: `Birthing Home - New Contact Message from ${
+          data.name || "Someone"
+        }`,
         html: baseEmailTemplate({
           title: "New Contact Message",
-          message: `
-            <strong>Name:</strong> ${data.name || "N/A"}<br>
-            <strong>Email:</strong> ${data.email || "N/A"}<br>
-            <strong>Message:</strong><br>${data.message || ""}
-          `,
+          data: {
+            ...data,
+            greetingName: "Team",
+          },
+          message: {
+            appointmentScheduled:
+              "You have received a new inquiry via the contact form:",
+            details: `
+            <tr>
+              <td style="font-size: 15px; padding: 5px 0">
+                👤 <strong>Name:</strong> ${data.name || "N/A"}
+              </td>
+            </tr>
+            <tr>
+              <td style="font-size: 15px; padding: 5px 0">
+                📧 <strong>Email:</strong> ${data.email || "N/A"}
+              </td>
+            </tr>
+            <tr>
+              <td style="font-size: 15px; padding: 5px 0">
+                💬 <strong>Message:</strong><br>${data.message || ""}
+              </td>
+            </tr>`,
+            pleaseArrive: "",
+            lookForward: "",
+          },
         }),
       };
     },
@@ -134,7 +388,7 @@ async function createNotificationService({
   status = "pending",
 }) {
   try {
-    console.log("createNotificationService");
+    // console.log("createNotificationService");
     // ✅ Resolve template
     const template = notificationTemplates?.[category]?.[type]?.(data) || {
       subject: "Notification",
@@ -155,7 +409,7 @@ async function createNotificationService({
       sendAt: data.date || new Date(),
     };
 
-    console.log(notification);
+    // console.log(notification);
 
     // Save to DB
     const saved = await NotificationDb.create(notification);

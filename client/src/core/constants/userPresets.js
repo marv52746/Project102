@@ -27,6 +27,7 @@ export const userSettings = [
     required: true,
   },
   { label: "Address", name: "address", type: "textarea", required: true },
+  { label: "About me", name: "bio", type: "textarea", required: true },
   // {
   //   name: "specialization",
   //   label: "Specialization",

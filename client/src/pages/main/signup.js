@@ -48,12 +48,8 @@ const SignUp = () => {
         })
       );
 
-      const allowedRoles = ["admin", "doctor", "staff", "owner"];
-      if (allowedRoles.includes(userObject.role)) {
-        navigate("/dashboard");
-      } else {
-        navigate("/portal");
-      }
+      navigate("/");
+      window.location.reload();
     } catch (err) {
       console.error("Signup failed", err);
     }

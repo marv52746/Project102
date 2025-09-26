@@ -57,7 +57,7 @@ class AppointmentController extends BaseController {
           doctor: doctor,
         },
         recipients: [patientEmail],
-        cc: [doctorEmail, "marv52746@gmail.com"],
+        cc: [doctorEmail],
         status: "immediate",
       });
 
@@ -82,7 +82,7 @@ class AppointmentController extends BaseController {
             doctor: doctor,
           },
           recipients: [patientEmail],
-          cc: [doctorEmail, "marv52746@gmail.com"],
+          cc: [doctorEmail],
           status: "pending",
         });
       }

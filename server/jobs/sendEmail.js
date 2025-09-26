@@ -14,6 +14,13 @@ async function sendEmail(notification) {
       replyTo: notification.replyTo || process.env.CLINIC_EMAIL,
       // html: "<h1>Welcome</h1><p>That was easy!</p>",
       // text: notification.text || "Your email client does not support HTML.", // fallback
+      attachments: [
+        {
+          filename: "logo.png",
+          path: "assets/images/logo.png", // absolute or relative path to your logo
+          cid: "clinicLogo", // same as used in html <img src="cid:clinicLogo" />
+        },
+      ],
     };
 
     await transporter.sendMail(mailOptions);

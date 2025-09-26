@@ -95,15 +95,41 @@ const userSchema = new mongoose.Schema({
   picture: {
     type: String,
   },
-  license: {
+
+  bio: {
     type: String,
   },
 
+  license: {
+    type: String,
+  },
   specialization: {
     type: [String],
-    required: true,
     default: [],
   },
+  qualification: {
+    type: [String],
+    default: [],
+  },
+  certifications: {
+    type: [String],
+    default: [],
+  },
+  awards: {
+    type: [String],
+    default: [],
+  },
+  years_experience: {
+    type: String,
+  },
+
+  facebook: { type: String },
+  linkedin: { type: String },
+  twitter: { type: String },
+  instagram: { type: String },
+  website: { type: String },
+  youtube: { type: String },
+
   schedule: [
     {
       day: {

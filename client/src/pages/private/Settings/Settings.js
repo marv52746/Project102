@@ -10,6 +10,8 @@ import { handleFormDelete } from "../../../core/components/formActions/formHandl
 import ConfirmDeleteModal from "../../../core/components/modal/ConfirmDeleteModal";
 import ClinicForm from "./ClinicForm";
 import { userClinicSettings } from "../../../core/constants/settings";
+import QualificationForm from "./QualificationForm";
+import LinkAccountForm from "./LinkAccountForm";
 
 export default function SettingsPage() {
   const dispatch = useDispatch();
@@ -76,44 +78,20 @@ export default function SettingsPage() {
     }
   }, [dispatch, userInfo, refresh]);
 
+  // console.log(data);
+
   const handleSubmit = async () => {
     await handleFormSubmit({
       dispatch,
       tablename: "users",
       id: userInfo.id,
       data,
-      fields: userSettings,
+      fields: [],
       fileData,
       userInfo: userInfo,
       // navigate: optional if needed
     });
   };
-
-  // const handleSubmitClinic = async () => {
-  //   for (const clinic of clinics) {
-  //     if (clinic._status === "deleted" && clinic._id) {
-  //       // delete only if it exists in DB
-  //       await handleFormDelete({
-  //         dispatch,
-  //         tablename: "clinic",
-  //         id: clinic._id,
-  //       });
-  //     } else if (clinic._status === "new" || clinic._status === "updated") {
-  //       await handleFormSubmit({
-  //         dispatch,
-  //         tablename: "clinic",
-  //         data: clinic,
-  //         fields: userClinicSettings,
-  //       });
-  //     }
-  //   }
-
-  //   // refetch updated clinics after save
-  //   const clinicRecords = await apiService.get(dispatch, "clinic", {
-  //     doctors: { $in: [userInfo.id] },
-  //   });
-  //   setClinics(clinicRecords);
-  // };
 
   const handleSubmitClinic = async () => {
     for (const clinic of clinics) {
@@ -140,10 +118,6 @@ export default function SettingsPage() {
     }
 
     setRefresh(true);
-
-    // ✅ refetch updated clinics after save
-    // const clinicRecords = await apiService.get(dispatch, "clinic");
-    // setClinics(clinicRecords.filter((c) => c.doctors?.includes(userInfo.id)));
   };
 
   const handleDeleteConfirm = () => {
@@ -161,13 +135,9 @@ export default function SettingsPage() {
 
   const tabs = [
     "Account",
+    "Qualifications",
     "Clinic Information",
-    "Plan & Pricing",
-    "Payment & Billings",
     "Link Account",
-    "Language",
-    "Preferences",
-    "Push Notifications",
   ];
 
   return (
@@ -327,14 +297,32 @@ export default function SettingsPage() {
             </>
           )}
 
-          {/* Placeholder for other tabs */}
-          {activeTab !== "Account" && activeTab !== "Clinic Information" && (
-            <div>
-              <h3 className="text-lg font-semibold mb-4">{activeTab}</h3>
-              <p className="text-gray-600">
-                Content for <strong>{activeTab}</strong> will go here.
-              </p>
-            </div>
+          {activeTab === "Qualifications" && (
+            <>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold">Qualifications</h3>
+              </div>
+
+              <QualificationForm
+                data={data}
+                setData={setData}
+                handleSubmit={handleSubmit}
+              />
+            </>
+          )}
+
+          {activeTab === "Link Account" && (
+            <>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold">Link Account</h3>
+              </div>
+
+              <LinkAccountForm
+                data={data}
+                setData={setData}
+                handleSubmit={handleSubmit}
+              />
+            </>
           )}
         </div>
       </div>

@@ -254,7 +254,11 @@ const Prescription = forwardRef(
               <tbody>
                 {labRequests.map((item, idx) => (
                   <tr key={idx}>
-                    <td style={styles.labTableCell}>{item.name}</td>
+                    <td style={styles.labTableCell}>
+                      {item.name === "Others"
+                        ? `Others > ${item.name_custom || ""}`
+                        : item.name}
+                    </td>
                     <td style={styles.labTableCell}>{item.notes}</td>
                   </tr>
                 ))}

@@ -7,6 +7,7 @@ import { loggedUserData } from "../../core/services/slices/userSlice";
 import { showNotification } from "../../core/services/slices/notificationSlice";
 import { all_routes } from "../../routes/all_routes";
 import apiService from "../../core/services/apiService";
+import { internalRoles } from "../../core/constants/rolePresets";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -15,25 +16,6 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  // const handleCredentialResponse = (response) => {
-  //   const userObject = jwtDecode(response.credential); // Decode JWT if needed
-  //   const token = response.credential; // This is the JWT token
-
-  //   // Dispatch action to store user data in Redux and session storage
-  //   dispatch(loggedUserData({ ...userObject, token }));
-
-  //   dispatch(
-  //     showNotification({
-  //       message: "Login Successfully!",
-  //       type: "success",
-  //     })
-  //   );
-
-  //   if (token) {
-  //     navigate("/");
-  //   }
-  // };
 
   const handleCredentialResponse = async (response) => {
     try {
@@ -57,12 +39,8 @@ const Login = () => {
         })
       );
 
-      const allowedRoles = ["admin", "doctor", "staff", "owner"];
-      if (allowedRoles.includes(userObject.role)) {
-        navigate("/dashboard");
-      } else {
-        navigate("/");
-      }
+      navigate("/");
+      window.location.reload();
     } catch (err) {
       console.error("Google login failed", err);
       dispatch(
@@ -118,13 +96,8 @@ const Login = () => {
         })
       );
 
-      // Check user's role and redirect accordingly
-      const allowedRoles = ["admin", "doctor", "staff", "owner"];
-      if (allowedRoles.includes(userObject.role)) {
-        navigate("/dashboard"); // Internal users
-      } else {
-        navigate("/portal"); // External users without access
-      }
+      navigate("/");
+      window.location.reload();
     } catch (err) {
       console.error("Login failed", err);
       // Error is already handled in apiService with showNotification
