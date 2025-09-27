@@ -137,7 +137,7 @@ export default function Sidebar({ children }) {
             `}
           >
             <img
-              src="/assets/images/logo.png"
+              src="/assets/images/Logo.png"
               className={`overflow-hidden transition-all ${
                 expanded ? "w-12 h-12" : "w-0"
               }`}

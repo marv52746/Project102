@@ -17,7 +17,7 @@ async function sendEmail(notification) {
       attachments: [
         {
           filename: "logo.png",
-          path: "assets/images/logo.png", // absolute or relative path to your logo
+          path: "assets/images/Logo.png", // absolute or relative path to your logo
           cid: "clinicLogo", // same as used in html <img src="cid:clinicLogo" />
         },
       ],
