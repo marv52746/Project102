@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User, Stethoscope, Boxes } from "lucide-react";
+import { User, Boxes } from "lucide-react";
 import InventoryDashboard from "./InventoryDashboard";
 import Dashboard from "./Dashboard";
 

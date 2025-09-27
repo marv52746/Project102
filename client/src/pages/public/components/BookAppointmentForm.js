@@ -3,7 +3,6 @@ import { User, Mail, Phone, Calendar, Check } from "lucide-react";
 import apiService from "../../../core/services/apiService";
 import { appointmentFormFields } from "../../../core/constants/appointmentPresets";
 import { handleFormSubmit } from "../../../core/components/formActions/formSubmit";
-import CustomDatePicker from "../../../core/components/custom/DatePicker";
 
 import { Link } from "react-router-dom";
 import { all_routes } from "../../../routes/all_routes";
@@ -30,7 +29,6 @@ export default function BookAppointmentForm({
   const [doctorOptions, setDoctorOptions] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   // ✅ Load doctors + update user info if needed

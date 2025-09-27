@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  User,
-  BarChart,
-  DollarSign,
-  CalendarCheck2,
-  CalendarClock,
-} from "lucide-react";
+import { User, CalendarCheck2, CalendarClock } from "lucide-react";
 import StatCard from "../../../core/components/dashboard/StatCard";
 import AppointmentsTable from "../../../core/components/appoinment/AppointmentsTable";
 import ComboChart2 from "../../../core/components/dashboard/ComboChart2";
@@ -128,23 +122,6 @@ function Dashboard() {
     completedAppointmentsThisMonth,
     completedAppointmentsLastMonth
   );
-
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const currentMonthName = monthNames[currentMonth];
 
   return (
     <div className="mx-auto p-4">

@@ -163,29 +163,6 @@ export default function PrintActionButtons({ data }) {
     win.close();
   };
 
-  const sampleLabRequests = [
-    {
-      name: "Complete Blood Count (CBC)",
-      remarks: "Fasting not required",
-    },
-    {
-      name: "Blood Glucose",
-      remarks: "Fasting 8 hours required",
-    },
-    {
-      name: "Urinalysis",
-      remarks: "Collect midstream sample",
-    },
-    {
-      name: "Lipid Profile",
-      remarks: "Fasting 12 hours required",
-    },
-    {
-      name: "Thyroid Function Test (TFT)",
-      remarks: "No special preparation needed",
-    },
-  ];
-
   return (
     <>
       <div className="flex gap-2 mt-2">

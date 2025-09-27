@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { all_routes } from "../../routes/all_routes";
 import ThingsToKnow from "./components/ThingsToKnow";
 import { ContactUs } from "./components/ContactUs";
 import Team from "./components/Team";

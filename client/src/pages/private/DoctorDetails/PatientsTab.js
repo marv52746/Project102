@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { getAge } from "../../../core/utils/tableUtils";
 import { useNavigate } from "react-router-dom";
 import { Search, Calendar, User, FileText, X } from "lucide-react";
-import AppointmentModal from "../FormDetails/AppointmentModal";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
 import { capitalizeText } from "../../../core/utils/stringUtils";
 

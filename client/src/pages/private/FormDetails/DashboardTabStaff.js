@@ -1,23 +1,17 @@
 import React, { useEffect, useState } from "react";
 import {
   ClipboardList,
-  Clock,
-  Stethoscope,
   FileText,
   CalendarClock,
   CalendarCheck2,
-  CalendarX2,
   UserPlus,
   CalendarPlus,
-  Pill,
-  Receipt,
   FlaskConical,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
 import UpcomingAppointments from "../FormDetails/UpcomingAppointments";
 import apiService from "../../../core/services/apiService";
-import UpcomingAppointmentsList from "./UpcomingAppointmentsList";
 import AppointmentModal from "./AppointmentModal";
 import { formConfigMap } from "../../../core/constants/FieldConfigMap";
 import NewPatientModal from "./NewPatientModal";

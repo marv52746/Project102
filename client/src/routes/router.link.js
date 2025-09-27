@@ -2,7 +2,6 @@ import React from "react";
 import { Route } from "react-router-dom";
 import { all_routes } from "./all_routes";
 import Home from "../pages/public/Home";
-import Dashboard from "../pages/private/Dashboard/Dashboard";
 import List from "../pages/private/List";
 import Form from "../pages/private/Form";
 import OrganizationChart from "../pages/private/OrganizationChart";

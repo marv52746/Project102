@@ -1,12 +1,4 @@
-import {
-  Video,
-  Download,
-  Rocket,
-  CheckSquare,
-  Music,
-  ArrowRight,
-  BookOpen,
-} from "lucide-react";
+import { Video, Rocket, CheckSquare, ArrowRight, BookOpen } from "lucide-react";
 
 const trimesters = [
   {

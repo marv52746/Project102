@@ -8,13 +8,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import {
-  Package,
-  AlertTriangle,
-  Clock,
-  RefreshCcw,
-  FileText,
-} from "lucide-react";
+import { Package, AlertTriangle, Clock, RefreshCcw } from "lucide-react";
 import apiService from "../../../core/services/apiService";
 import { useDispatch } from "react-redux";
 import StatCard from "../../../core/components/dashboard/StatCard";
@@ -32,7 +26,6 @@ export default function InventoryDashboard() {
 
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [categoryData, setCategoryData] = useState([]); // [{ name, count }]
-  const [monthlyMovement, setMonthlyMovement] = useState([]);
   const [monthlyItemTransactions, setMonthlyItemTransactions] = useState([]); // [{ name, category, stockIn, stockOut }]
 
   const [allItems, setAllItems] = useState([]);
@@ -135,9 +128,6 @@ export default function InventoryDashboard() {
           if (t.type === "Adjustment")
             monthMap[monthKey].adjustment += t.quantity;
         });
-        const monthlyChart = Object.entries(monthMap)
-          .map(([month, data]) => ({ ...data, month }))
-          .sort((a, b) => new Date(a.month) - new Date(b.month));
 
         // set states
         setStats({
@@ -159,7 +149,7 @@ export default function InventoryDashboard() {
         setRecentTransactions(sortedTransactions.slice(0, 5));
         setCategoryData(categoryChart);
         setCategoryItemsMap(categoryMap);
-        setMonthlyMovement(monthlyChart);
+
         setMonthlyItemTransactions(itemChart);
       } catch (error) {
         console.error(error);

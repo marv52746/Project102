@@ -1,13 +1,10 @@
 import React, { useState } from "react";
-import { Pencil, Save, X, Camera, LogOut } from "lucide-react";
+import { Save, LogOut } from "lucide-react";
 import { logoutUser } from "../../../core/services/slices/userSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { handleFormSubmit } from "../../../core/components/formActions/formSubmit";
-import {
-  userFormFields,
-  userSettings,
-} from "../../../core/constants/userPresets";
+import { userSettings } from "../../../core/constants/userPresets";
 import { getInputValue } from "../../../core/utils/fieldUtils";
 import { getAvatarUrl } from "../../../core/utils/avatarURL";
 

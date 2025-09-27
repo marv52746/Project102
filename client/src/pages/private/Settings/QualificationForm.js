@@ -2,7 +2,6 @@
 import React from "react";
 import CreatableSelect from "react-select/creatable";
 import {
-  doctorCertificationOptionsPH,
   doctorSpecializationOptionsArr,
   qualificationOptions,
 } from "../../../core/constants/choices";

@@ -1,7 +1,6 @@
 import {
   LayoutDashboard,
   UserCircle,
-  Network,
   Calendar,
   Settings,
   Users,
@@ -99,14 +98,6 @@ export const iconMapping = [
   {
     section: "Settings",
     items: [
-      // {
-      //   text: "Properties",
-      //   icon: <Settings size={20} />,
-      //   alert: false,
-      //   iconText: "Properties",
-      //   to: all_routes.properties,
-      //   table: "properties",
-      // },
       {
         text: "Settings",
         icon: <Settings size={20} />,

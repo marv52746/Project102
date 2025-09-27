@@ -5,7 +5,6 @@ import { useParams } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { internalRoles } from "../../core/constants/rolePresets";
-import FormNew from "../../core/components/FormNew";
 import { formConfigMap } from "../../core/constants/FieldConfigMap";
 import FormFormat from "../../core/components/FormFormat";
 import apiService from "../../core/services/apiService";
