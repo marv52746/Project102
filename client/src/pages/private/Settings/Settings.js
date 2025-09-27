@@ -133,18 +133,13 @@ export default function SettingsPage() {
   if (!hasValidRole) return <div>Access denied</div>;
   if (loading || !data) return <div className="p-4">Loading...</div>;
 
-  const tabs = [
-    "Account",
-    "Qualifications",
-    "Clinic Information",
-    "Link Account",
-  ];
+  const tabs = ["Account", "Qualifications", "Affiliations", "Link Account"];
 
   return (
     <div className="min-h-screen bg-white text-sm p-6">
       <div className="w-full mx-auto flex rounded-lg border shadow-sm">
         {/* Sidebar */}
-        <div className="w-64 border-r p-4">
+        <div className="w-56 border-r p-4">
           <h2 className="text-xl font-semibold mb-4">Settings</h2>
           <nav className="space-y-2">
             {tabs.map((item) => (
@@ -243,7 +238,7 @@ export default function SettingsPage() {
                           setData({ ...data, [field.name]: e.target.value })
                         }
                         placeholder={field.placeholder}
-                        rows={3}
+                        rows={5}
                         className="w-full border rounded px-3 py-2"
                       />
                     ) : (
@@ -283,10 +278,10 @@ export default function SettingsPage() {
           )}
 
           {/* Clinic*/}
-          {activeTab === "Clinic Information" && (
+          {activeTab === "Affiliations" && (
             <>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold">Clinic Information</h3>
+                <h3 className="text-lg font-semibold">Affiliations</h3>
               </div>
 
               <ClinicForm

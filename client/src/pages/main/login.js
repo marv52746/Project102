@@ -7,7 +7,6 @@ import { loggedUserData } from "../../core/services/slices/userSlice";
 import { showNotification } from "../../core/services/slices/notificationSlice";
 import { all_routes } from "../../routes/all_routes";
 import apiService from "../../core/services/apiService";
-import { internalRoles } from "../../core/constants/rolePresets";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -88,16 +87,30 @@ const Login = () => {
       // 👇 Save token for interceptor
       localStorage.setItem("token", token);
 
-      dispatch(loggedUserData({ ...userObject, token }));
-      dispatch(
-        showNotification({
-          message: "Login Successfully!",
-          type: "success",
-        })
-      );
+      if (userObject.must_change_password) {
+        // 👇 redirect to reset-password page
+        navigate(all_routes.forcePasswordChange);
+        dispatch(
+          showNotification({
+            message: "Set new password!",
+            type: "warning",
+          })
+        );
+        return; //
+      } else {
+        dispatch(loggedUserData({ ...userObject, token }));
 
-      navigate("/");
-      window.location.reload();
+        dispatch(
+          showNotification({
+            message: "Login Successfully!",
+            type: "success",
+          })
+        );
+        navigate("/");
+        window.location.reload();
+      }
+
+      // window.location.reload();
     } catch (err) {
       console.error("Login failed", err);
       // Error is already handled in apiService with showNotification
@@ -145,6 +158,15 @@ const Login = () => {
             >
               {showPassword ? <EyeOff size={25} /> : <Eye size={25} />}
             </button>
+          </div>
+
+          <div className="text-right mb-6">
+            <Link
+              to={all_routes.forgotPassword}
+              className="text-sm text-blue-500 hover:underline"
+            >
+              Forgot Password?
+            </Link>
           </div>
 
           <button

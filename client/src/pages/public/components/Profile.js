@@ -10,8 +10,6 @@ import {
 } from "../../../core/constants/userPresets";
 import { getInputValue } from "../../../core/utils/fieldUtils";
 import { getAvatarUrl } from "../../../core/utils/avatarURL";
-import ConfirmDeleteModal from "../../../core/components/modal/ConfirmDeleteModal";
-import { handleFormDelete } from "../../../core/components/formActions/formHandlers";
 
 export function Profile({ user }) {
   const dispatch = useDispatch();
@@ -20,7 +18,6 @@ export function Profile({ user }) {
   const [data, setData] = useState(user);
   const [fileData, setFileData] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleSave = async () => {
     await handleFormSubmit({
@@ -37,16 +34,6 @@ export function Profile({ user }) {
     dispatch(logoutUser());
     navigate("/");
     window.location.reload(); // force full page reload
-  };
-
-  const handleDeleteConfirm = () => {
-    handleFormDelete({
-      dispatch,
-      tablename: "users",
-      id: user._id,
-      // navigate,
-    });
-    setShowDeleteModal(false);
   };
 
   return (
@@ -152,31 +139,8 @@ export function Profile({ user }) {
               </div>
             ))}
           </div>
-
-          {/* Delete Account Section */}
-          <div className="mt-10">
-            <h4 className="font-semibold text-red-600 mb-2">Delete account</h4>
-            <p className="text-gray-600 text-sm mb-4 max-w-md">
-              Deleting your account will remove your access to all services, and
-              your personal data will be permanently deleted.
-            </p>
-            <button
-              onClick={() => setShowDeleteModal(true)}
-              type="button"
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-            >
-              Delete Account
-            </button>
-          </div>
         </form>
       </section>
-
-      {/* Modal */}
-      <ConfirmDeleteModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={handleDeleteConfirm}
-      />
     </>
   );
 }

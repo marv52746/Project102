@@ -79,11 +79,12 @@ export const medicationFormFields = [
     placeholder: "e.g. Amoxicillin",
     required: true,
   },
-  { name: "dose", label: "Dose", placeholder: "e.g. 500mg" },
+  { name: "dose", label: "Dose", placeholder: "e.g. 500mg", required: true },
   {
     name: "frequency",
     label: "Frequency",
     type: "select",
+    required: true,
     options: [
       { label: "Once daily", value: "Once daily" },
       { label: "Twice daily (BID)", value: "Twice daily (BID)" },
@@ -118,6 +119,7 @@ export const medicationFormFields = [
     label: "Instructions",
     type: "textarea",
     placeholder: "Instructions or additional info",
+    required: true,
   },
 ];
 
@@ -135,7 +137,12 @@ export const allergyFormFields = [
     placeholder: "e.g. Penicillin",
     required: true,
   },
-  { name: "reaction", label: "Reaction", placeholder: "e.g. Rash, swelling" },
+  {
+    name: "reaction",
+    label: "Reaction",
+    placeholder: "e.g. Rash, swelling",
+    required: true,
+  },
   {
     name: "severity",
     label: "Severity",
@@ -147,11 +154,13 @@ export const allergyFormFields = [
       { label: "Life-threatening", value: "Life-threatening" },
     ],
     placeholder: "Select severity",
+    required: true,
   },
   {
     name: "notes",
     label: "Notes",
     type: "textarea",
+    required: true,
     placeholder: "Additional allergy details",
   },
 ];
@@ -196,6 +205,7 @@ export const appointmentsFormFields = [
     type: "reference",
     ref: "users",
     hidden: true,
+    required: true,
   },
   {
     name: "date",
@@ -216,9 +226,11 @@ export const appointmentsFormFields = [
     label: "Doctor",
     type: "reference",
     ref: "users",
+    required: true,
   },
   {
     name: "reason",
+    required: true,
     label: "Reason",
     type: "textarea",
     placeholder: "Reason of visit",
@@ -245,6 +257,7 @@ export const pregnancyFormFields = [
     type: "number",
     placeholder: "e.g. 2 (total pregnancies)",
     min: 0,
+    required: true,
   },
   {
     name: "para",
@@ -252,6 +265,7 @@ export const pregnancyFormFields = [
     type: "number",
     placeholder: "e.g. 1 (total births)",
     min: 0,
+    required: true,
   },
   {
     name: "code",
@@ -288,6 +302,7 @@ export const pregnancyFormFields = [
     placeholder: "Additional pregnancy-related notes or risks",
   },
 ];
+
 export const othersFormFields = [
   {
     name: "diagnosis",
@@ -324,6 +339,7 @@ export const labRequestFormFields = [
     name: "name",
     label: "Test Name",
     type: "select",
+    required: true,
     options: [
       {
         label: "Complete Blood Count (CBC)",
@@ -347,7 +363,6 @@ export const labRequestFormFields = [
       { label: "Pap Smear", value: "Pap Smear" },
       { label: "COVID-19 Antigen", value: "COVID-19 Antigen" },
       { label: "COVID-19 RT-PCR", value: "COVID-19 RT-PCR" },
-      { label: "Others", value: "Others" },
     ],
 
     placeholder: "Select test",

@@ -9,6 +9,16 @@ const upload = multer();
 // Login route for credentials
 router.post("/login", upload.none(), authController.login);
 
+router.post("/forgot-password", upload.none(), authController.forgotPassword);
+
+// POST /api/auth/change-password
+router.post(
+  "/change-password",
+  authMiddleware,
+  upload.none(),
+  authController.changePassword
+);
+
 // Google login route
 router.post("/google", upload.none(), authController.googleLogin);
 

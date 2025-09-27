@@ -80,18 +80,6 @@ export default function Home() {
               if (tab.id === "login" && authState) return null;
               if (tab.id === "profile" && !authState) return null;
 
-              // if (tab.id === "login") {
-              //   return (
-              //     <Link
-              //       className="pb-2 px-2"
-              //       key={tab.id}
-              //       to={all_routes.login}
-              //     >
-              //       {tab.label}
-              //     </Link>
-              //   );
-              // }
-
               return (
                 <button
                   key={tab.id}

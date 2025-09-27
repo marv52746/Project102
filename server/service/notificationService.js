@@ -376,6 +376,105 @@ const notificationTemplates = {
       };
     },
   },
+  user_password: {
+    create: (data) => ({
+      subject: "Birthing Home - Your Account Details",
+      html: baseEmailTemplate({
+        title: "Your Account Has Been Created",
+        data: {
+          ...data,
+          greetingName: data.user?.first_name || "there",
+        },
+        message: {
+          appointmentScheduled: `An account has been created for you at ${DEFAULT_CLINIC_NAME}. 
+            Below is your login information:`,
+          details: `
+          <tr>
+            <td style="font-size: 15px; padding: 8px 0">
+              📧 <strong>Email:</strong> ${data.user?.email}
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size: 15px; padding: 8px 0">
+              🔑 <strong>Temporary Password:</strong> 
+              <span style="font-family: monospace; background: #f3f4f6; padding: 4px 8px; border-radius: 4px;">
+                ${data.password}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding: 20px 0;">
+              <a href="${process.env.FRONTEND_URL}/login"
+                style="
+                  display: inline-block;
+                  padding: 12px 20px;
+                  font-size: 16px;
+                  color: #ffffff;
+                  background-color: #2563eb;
+                  text-decoration: none;
+                  border-radius: 6px;
+                  font-weight: bold;
+                ">
+                Log In to Your Account
+              </a>
+            </td>
+          </tr>
+        `,
+          pleaseArrive: `For security, please log in and change your password as soon as possible.`,
+          lookForward: "We look forward to supporting your wellness journey 💖",
+        },
+      }),
+    }),
+  },
+  forgot_password: {
+    create: (data) => ({
+      subject: "Birthing Home - Temporary Password",
+      html: baseEmailTemplate({
+        title: "Password Reset Request",
+        data: {
+          ...data,
+          greetingName: data.user?.first_name || "there",
+        },
+        message: {
+          appointmentScheduled: `We have generated a new temporary password for your account at ${DEFAULT_CLINIC_NAME}.`,
+          details: `
+            <tr>
+              <td style="font-size: 15px; padding: 8px 0">
+                📧 <strong>Email:</strong> ${data.user?.email}
+              </td>
+            </tr>
+            <tr>
+              <td style="font-size: 15px; padding: 8px 0">
+                🔑 <strong>Temporary Password:</strong> 
+                <span style="font-family: monospace; background: #f3f4f6; padding: 4px 8px; border-radius: 4px;">
+                  ${data.password}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding: 20px 0;">
+                <a href="${process.env.FRONTEND_URL}/login"
+                  style="
+                    display: inline-block;
+                    padding: 12px 20px;
+                    font-size: 16px;
+                    color: #ffffff;
+                    background-color: #2563eb;
+                    text-decoration: none;
+                    border-radius: 6px;
+                    font-weight: bold;
+                  ">
+                  Log In to Your Account
+                </a>
+              </td>
+            </tr>
+          `,
+          pleaseArrive: `For security reasons, you must log in with this temporary password and change it immediately.`,
+          lookForward: "Thank you for being with us 💖",
+        },
+      }),
+    }),
+  },
 };
 
 async function createNotificationService({

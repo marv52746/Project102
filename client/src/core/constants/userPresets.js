@@ -90,13 +90,13 @@ export const userFormFields = [
     showOn: "all",
     required: true,
   },
-  {
-    name: "password",
-    label: "Password",
-    type: "password",
-    showOn: "create",
-    required: true,
-  },
+  // {
+  //   name: "password",
+  //   label: "Password",
+  //   type: "password",
+  //   showOn: "create",
+  //   required: true,
+  // },
   {
     name: "phone_number",
     label: "Phone",

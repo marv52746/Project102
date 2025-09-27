@@ -1,4 +1,5 @@
 const fs = require("fs");
+const crypto = require("crypto");
 const mongoose = require("mongoose");
 const { GridFSBucket } = require("mongodb");
 const { Readable } = require("stream");
@@ -9,12 +10,31 @@ const { PatientDb } = require("../../model/Patient");
 const { DoctorDb } = require("../../model/Doctor");
 const BaseController = require("./baseController");
 
+const sendEmail = require("../../jobs/sendEmail");
+const {
+  createNotificationService,
+} = require("../../service/notificationService");
+
 const conn = mongoose.connection;
 let gfs;
 
 conn.once("open", () => {
   gfs = new GridFSBucket(conn.db, { bucketName: "uploads" });
 });
+
+// helper: generate a secure temporary password
+function generateTempPassword(length = 12) {
+  const charset =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~";
+  let ret = "";
+  // Use crypto.randomBytes for secure randomness
+  const bytes = crypto.randomBytes(length);
+  for (let i = 0; i < length; i++) {
+    // map byte to index in charset
+    ret += charset[bytes[i] % charset.length];
+  }
+  return ret;
+}
 
 class UserController extends BaseController {
   constructor() {
@@ -30,18 +50,39 @@ class UserController extends BaseController {
         first_name,
         middle_initial,
         last_name,
+        googleId, // if supplied in body
         suffix,
         ...userData
       } = req.body;
 
-      if (!email || !password) {
+      if (!email) {
         return res
           .status(400)
           .json({ error: "Email and password are required" });
       }
 
+      let finalPassword = null;
+      let mustChange = false;
+
+      // If password provided in payload -> use it
+      if (password) {
+        finalPassword = password;
+      } else {
+        // If NOT Google-created (no googleId) then generate a temp password
+        if (!googleId) {
+          finalPassword = generateTempPassword(12); // 12 char secure temp password
+          mustChange = true; // mark that user should change password on first login
+        } else {
+          // Created by Google (or other OAuth) - leave password null
+          finalPassword = null;
+        }
+      }
+
       // 1. Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
+      let hashedPassword = null;
+      if (finalPassword) {
+        hashedPassword = await bcrypt.hash(finalPassword, 10);
+      }
 
       // 2. Build full name
       const fullName =
@@ -70,6 +111,8 @@ class UserController extends BaseController {
         email,
         username: email,
         password: hashedPassword,
+        must_change_password: mustChange,
+        googleId: googleId || undefined,
         avatar: null,
       });
 
@@ -105,6 +148,20 @@ class UserController extends BaseController {
         savedUser.updated_by = savedUser._id;
       }
       await savedUser.save();
+
+      // If we generated a temp password, email it to the user
+      if (!password && !googleId && finalPassword) {
+        await createNotificationService({
+          category: "user_password",
+          type: "create",
+          data: {
+            password: finalPassword,
+            user: savedUser,
+          },
+          recipients: [savedUser.email],
+          status: "immediate",
+        });
+      }
 
       // ✅ Log Activity
       await this.logActivity("create", savedUser, req.currentUser?._id);
@@ -210,45 +267,46 @@ class UserController extends BaseController {
   };
 
   // CREATE PATIENT
-  createPatient = async (req, res) => {
-    try {
-      const { medical_notes, email, password, ...userData } = req.body;
+  // createPatient = async (req, res) => {
+  //   try {
+  //     const { medical_notes, email, password, ...userData } = req.body;
 
-      if (!email || !password) {
-        return res
-          .status(400)
-          .json({ error: "Email and password are required" });
-      }
+  //     if (!email || !password) {
+  //       return res
+  //         .status(400)
+  //         .json({ error: "Email and password are required" });
+  //     }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+  //     const hashedPassword = await bcrypt.hash(password, 10);
 
-      const user = new UserDb({
-        ...userData,
-        email,
-        username: email,
-        password: hashedPassword,
-        created_by: req.currentUser?._id || null,
-        updated_by: req.currentUser?._id || null,
-      });
-      const savedUser = await user.save();
+  //     const user = new UserDb({
+  //       ...userData,
+  //       email,
+  //       username: email,
+  //       password: hashedPassword,
+  //       created_by: req.currentUser?._id || null,
+  //       updated_by: req.currentUser?._id || null,
+  //     });
+  //     const savedUser = await user.save();
 
-      const patient = new PatientDb({
-        user: savedUser._id,
-        medical_notes,
-        created_by: req.currentUser?._id || null,
-        updated_by: req.currentUser?._id || null,
-      });
+  //     const patient = new PatientDb({
+  //       user: savedUser._id,
+  //       medical_notes,
+  //       created_by: req.currentUser?._id || null,
+  //       updated_by: req.currentUser?._id || null,
+  //     });
 
-      const savedPatient = await patient.save();
+  //     const savedPatient = await patient.save();
 
-      res.status(201).json(savedPatient);
-    } catch (error) {
-      console.error("Create Patient Error:", error);
-      res.status(500).json({ error: error.message });
-    }
-  };
+  //     res.status(201).json(savedPatient);
+  //   } catch (error) {
+  //     console.error("Create Patient Error:", error);
+  //     res.status(500).json({ error: error.message });
+  //   }
+  // };
 
   // DELETE USER
+
   delete = async (req, res) => {
     const userId = req.params.id;
 
@@ -287,6 +345,55 @@ class UserController extends BaseController {
     } catch (error) {
       console.error("Delete User Error:", error);
       res.status(500).json({ error: error.message });
+    }
+  };
+
+  forgotPassword = async (req, res) => {
+    try {
+      const { email } = req.body;
+      const user = await UserDb.findOne({ email });
+      if (!user)
+        return res.status(404).json({ error: "No user with that email" });
+
+      const token = crypto.randomBytes(20).toString("hex");
+      user.resetPasswordToken = token;
+      user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+      await user.save();
+
+      const resetURL = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+      await sendEmail({
+        to: user.email,
+        subject: "Password Reset Request",
+        html: `<p>You requested a password reset</p>
+             <p><a href="${resetURL}">Click here to reset</a></p>`,
+      });
+
+      res.json({ message: "Password reset link sent" });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
+
+  resetPassword = async (req, res) => {
+    try {
+      const { token } = req.params;
+      const { password } = req.body;
+
+      const user = await UserDb.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpires: { $gt: Date.now() },
+      });
+      if (!user)
+        return res.status(400).json({ error: "Invalid or expired token" });
+
+      user.password = await bcrypt.hash(password, 10);
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+
+      res.json({ message: "Password has been reset successfully" });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
   };
 }

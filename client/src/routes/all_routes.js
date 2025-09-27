@@ -3,6 +3,8 @@ export const all_routes = {
   home: "/",
   singin: "/signin",
   login: "/login",
+  forcePasswordChange: "/login-new",
+  forgotPassword: "/forgot-password",
   signup: "/signup",
   create_appointment: "/create_appointment",
 

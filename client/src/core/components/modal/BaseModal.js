@@ -6,6 +6,7 @@ import apiService from "../../services/apiService";
 import { useDispatch, useSelector } from "react-redux";
 import { setRefreshKey } from "../../services/reducers/utilsReducer";
 import { canEditForms } from "../../constants/rolePresets";
+import CreatableSelect from "react-select/creatable";
 
 const BaseModal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
@@ -59,14 +60,25 @@ const ClinicalForm = ({ fields, formData, setFormData, type, readOnly }) => {
               </label>
               {field.type === "textarea" ? (
                 <textarea
-                  rows={3}
+                  rows={4}
                   className="w-full border rounded-lg p-2 text-sm"
                   value={value}
                   disabled={readOnly}
+                  required={field.required}
                   placeholder={field.placeholder}
                   onChange={(e) =>
                     setFormData({ ...formData, [field.name]: e.target.value })
                   }
+                />
+              ) : field.type === "multiselect" ? (
+                <CreatableSelect
+                  isMulti
+                  value={getInputValue(formData, field)}
+                  onChange={(selected) =>
+                    setFormData({ ...formData, [field.name]: selected })
+                  }
+                  options={field.options || []}
+                  placeholder={field.placeholder}
                 />
               ) : (
                 <InputField
@@ -225,72 +237,74 @@ const MultiEntryModal = ({
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} title={title}>
-      <div className="space-y-6 max-h-[70vh] overflow-y-auto p-2">
-        {entries.map((formData, idx) => {
-          return (
-            <div
-              key={idx}
-              className="p-4 border rounded-xl bg-gray-50 relative"
-            >
-              <span className="absolute -top-2 left-3 bg-white px-2 text-xs text-gray-500">
-                Entry {idx + 1}
-              </span>
+      <form onSubmit={handleSave}>
+        <div className="space-y-6 max-h-[70vh] overflow-y-auto p-2">
+          {entries.map((formData, idx) => {
+            return (
+              <div
+                key={idx}
+                className="p-4 border rounded-xl bg-gray-50 relative"
+              >
+                <span className="absolute -top-2 left-3 bg-white px-2 text-xs text-gray-500">
+                  Entry {idx + 1}
+                </span>
 
-              {/* Remove row button */}
-              {entries.length > 1 && !readOnly && (
-                <button
-                  onClick={() => handleRemove(idx, formData._id)}
-                  className="absolute top-2 right-2 p-1 rounded-full hover:bg-red-100"
-                  title="Remove entry"
-                >
-                  <Trash2 className="w-4 h-4 text-red-500" />
-                </button>
-              )}
+                {/* Remove row button */}
+                {entries.length > 1 && !readOnly && (
+                  <button
+                    onClick={() => handleRemove(idx, formData._id)}
+                    className="absolute top-2 right-2 p-1 rounded-full hover:bg-red-100"
+                    title="Remove entry"
+                  >
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                  </button>
+                )}
 
-              <ClinicalForm
-                fields={fields}
-                formData={formData}
-                setFormData={(updated) => handleChange(idx, updated)}
-                columns={columns}
-                type={type}
-                readOnly={readOnly}
-              />
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Footer */}
-      {!readOnly && (
-        <div className="flex justify-between items-center mt-6">
-          {columns === 2 && (
-            <button
-              onClick={handleAddMore}
-              className="flex items-center gap-2 px-4 py-2 text-sm border rounded-lg hover:bg-gray-100"
-            >
-              <Plus className="w-4 h-4" /> Add More
-            </button>
-          )}
-
-          <div className="flex gap-3">
-            <button
-              onClick={() => {
-                setEntries([{}]); // ✅ reset all inputs
-                onClose(); // ✅ close modal
-              }}
-              className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-100"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:brightness-90"
-            >
-              Save All
-            </button>
-          </div>
+                <ClinicalForm
+                  fields={fields}
+                  formData={formData}
+                  setFormData={(updated) => handleChange(idx, updated)}
+                  columns={columns}
+                  type={type}
+                  readOnly={readOnly}
+                />
+              </div>
+            );
+          })}
         </div>
-      )}
+
+        {/* Footer */}
+        {!readOnly && (
+          <div className="flex justify-between items-center mt-6">
+            {columns === 2 && (
+              <button
+                onClick={handleAddMore}
+                className="flex items-center gap-2 px-4 py-2 text-sm border rounded-lg hover:bg-gray-100"
+              >
+                <Plus className="w-4 h-4" /> Add More
+              </button>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setEntries([{}]); // ✅ reset all inputs
+                  onClose(); // ✅ close modal
+                }}
+                className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:brightness-90"
+              >
+                Save All
+              </button>
+            </div>
+          </div>
+        )}
+      </form>
     </BaseModal>
   );
 };

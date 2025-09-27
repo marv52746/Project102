@@ -13,6 +13,8 @@ import SettingsPage from "../pages/private/Settings/Settings";
 import Calendar from "../pages/private/Calendar/Calendar";
 import InventoryDashboard from "../pages/private/Dashboard/InventoryDashboard";
 import MainDashboard from "../pages/private/Dashboard/MainDashboard";
+import ForcePasswordChange from "../pages/main/forcePasswordChange";
+import ForgotPassword from "../pages/main/forgotPassword";
 
 const routes = all_routes;
 
@@ -26,6 +28,16 @@ export const publicRoutesArray = [
     path: routes.login,
     name: "login",
     element: <Login />,
+  },
+  {
+    path: routes.forcePasswordChange,
+    name: "login-new",
+    element: <ForcePasswordChange />,
+  },
+  {
+    path: routes.forgotPassword,
+    name: "forgot-password",
+    element: <ForgotPassword />,
   },
   {
     path: routes.signup,

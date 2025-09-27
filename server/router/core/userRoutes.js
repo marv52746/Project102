@@ -20,4 +20,7 @@ router.put(
 ); // PUT /user/:id
 router.delete("/:id", authMiddleware, userController.delete); // DELETE /user/:id
 
+router.post("/forgot-password", userController.forgotPassword);
+router.post("/reset-password/:token", userController.resetPassword);
+
 module.exports = router;

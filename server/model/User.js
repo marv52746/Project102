@@ -13,10 +13,17 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  password: {
-    type: String,
-    minlength: 8,
+  password: { type: String, minlength: 8, select: false },
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date },
+
+  temp_password: { type: String, select: false },
+  // new flag to indicate the password was auto-generated and user should change it
+  must_change_password: {
+    type: Boolean,
+    default: false,
   },
+
   username: {
     type: String,
   },
@@ -162,22 +169,20 @@ const userSchema = new mongoose.Schema({
   updated_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 });
 
-// // 🔐 Hash password before saving
-// userSchema.pre("save", async function (next) {
-//   if (this.isModified("password")) {
-//     const salt = await bcrypt.genSalt(10);
-//     this.password = await bcrypt.hash(this.password, salt);
-//   }
+userSchema.pre("save", async function (next) {
+  // if (this.isModified("password") && this.password) {
+  //   const salt = await bcrypt.genSalt(10);
+  //   this.password = await bcrypt.hash(this.password, salt);
+  // }
 
-//   // Combine first_name and last_name into name
-//   if (this.isModified("first_name") || this.isModified("last_name")) {
-//     const first = this.first_name?.trim() || "";
-//     const last = this.last_name?.trim() || "";
-//     this.name = `${first} ${last}`.trim();
-//   }
-
-//   next();
-// });
+  // combine first/last name
+  if (this.isModified("first_name") || this.isModified("last_name")) {
+    const first = this.first_name?.trim() || "";
+    const last = this.last_name?.trim() || "";
+    this.fullname = `${first} ${last}`.trim();
+  }
+  next();
+});
 
 // // 🔁 Hash password & combine name during update
 // userSchema.pre("findOneAndUpdate", async function (next) {
