@@ -65,7 +65,7 @@ export default function Home() {
           {/* Logo + Title */}
           <Link to="/" className="flex items-center space-x-3 hover:opacity-90">
             <img
-              src="/assets/images/logo.png"
+              src="/assets/images/Logo.png"
               alt="Logo"
               className="h-10 w-10 object-contain"
             />
