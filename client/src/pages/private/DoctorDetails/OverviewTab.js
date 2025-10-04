@@ -51,17 +51,29 @@ export default function OverviewTab({ appointments }) {
   const [showStatListModal, setShowStatListModal] = useState(false);
   const [selectedStat, setSelectedStat] = useState(null);
 
+  const [dayBounds, setDayBounds] = useState({ start: null, end: null });
+
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const today = new Date();
+        const now = new Date();
+        const phNow = new Date(
+          now.toLocaleString("en-US", { timeZone: "Asia/Manila" })
+        );
+
+        const startOfDayPH = new Date(phNow.setHours(0, 0, 0, 0));
+        const endOfDayPH = new Date(phNow.setHours(23, 59, 59, 999));
 
         let upcomingCount = 0;
         let completedCount = 0;
         let cancelledCount = 0;
 
         const recentActivities = appointments
-          .slice(-5) // last 5 appointments
+          .filter((a) => {
+            const d = new Date(a.date);
+            return d >= startOfDayPH && d <= endOfDayPH;
+          })
+          .slice(-5) // last 5 today
           .reverse()
           .map((a) => {
             let icon;
@@ -82,30 +94,27 @@ export default function OverviewTab({ appointments }) {
             };
           });
 
-        var upcomingAppointmentsArr = [];
-        var inLobbyArr = [];
+        const upcomingAppointmentsArr = [];
+        const inLobbyArr = [];
 
         appointments.forEach((a) => {
           const appointmentDate = new Date(a.date);
-          if (
-            a.status === "scheduled" &&
-            appointmentDate >= new Date(today.setHours(0, 0, 0, 0))
-          ) {
-            upcomingAppointmentsArr.push(a);
-            upcomingCount++;
-          }
 
           if (
-            a.status === "ready" &&
-            appointmentDate >= new Date(today.setHours(0, 0, 0, 0))
+            appointmentDate >= startOfDayPH &&
+            appointmentDate <= endOfDayPH
           ) {
-            inLobbyArr.push(a);
+            if (a.status === "scheduled") {
+              upcomingAppointmentsArr.push(a);
+              upcomingCount++;
+            }
+            if (a.status === "ready") {
+              inLobbyArr.push(a);
+            }
+            if (a.status === "completed") completedCount++;
+            if (a.status === "cancelled") cancelledCount++;
           }
-          if (a.status === "completed") completedCount++;
-          if (a.status === "cancelled") cancelledCount++;
         });
-
-        // console.log(upcomingAppointmentsArr);
 
         setStats({
           upcoming: upcomingCount,
@@ -116,7 +125,6 @@ export default function OverviewTab({ appointments }) {
         setActivities(recentActivities);
         setupcomingAppointments(upcomingAppointmentsArr);
         setInLobbyAppointments(inLobbyArr);
-        // console.log(upcomingAppointmentsArr);
       } catch (err) {
         console.error("Error fetching appointments:", err);
       }
@@ -125,24 +133,33 @@ export default function OverviewTab({ appointments }) {
     fetchAppointments();
   }, [dispatch, appointments, manualRefresh]);
 
-  const doctor = {
-    recentActivities: [
-      {
-        time: "Today 10:00 AM",
-        action: "Completed check-up with Ana Cruz",
-        icon: <Stethoscope className="w-4 h-4 text-blue-600" />,
-      },
-      {
-        time: "Yesterday 4:15 PM",
-        action: "Prescribed antibiotics to Juan Dela Cruz",
-        icon: <ClipboardList className="w-4 h-4 text-green-600" />,
-      },
-      {
-        time: "2 days ago",
-        action: "Added clinical notes for Maria Lopez",
-        icon: <FileText className="w-4 h-4 text-purple-600" />,
-      },
-    ],
+  useEffect(() => {
+    const now = new Date();
+    const phNow = new Date(
+      now.toLocaleString("en-US", { timeZone: "Asia/Manila" })
+    );
+    const start = new Date(phNow.setHours(0, 0, 0, 0));
+    const end = new Date(phNow.setHours(23, 59, 59, 999));
+    setDayBounds({ start, end });
+  }, []);
+
+  // 👇 Update to only include today's completed & cancelled
+  const statAppointmentsMap = {
+    Upcoming: upcomingAppointments,
+    Completed: appointments.filter(
+      (a) =>
+        a.status === "completed" &&
+        dayBounds.start &&
+        new Date(a.date) >= dayBounds.start &&
+        new Date(a.date) <= dayBounds.end
+    ),
+    Cancelled: appointments.filter(
+      (a) =>
+        a.status === "cancelled" &&
+        dayBounds.start &&
+        new Date(a.date) >= dayBounds.start &&
+        new Date(a.date) <= dayBounds.end
+    ),
   };
 
   const statCards = [
@@ -165,12 +182,6 @@ export default function OverviewTab({ appointments }) {
       icon: <CalendarX2 className="w-6 h-6 text-red-600" />,
     },
   ];
-
-  const statAppointmentsMap = {
-    Upcoming: upcomingAppointments,
-    Completed: appointments.filter((a) => a.status === "completed"),
-    Cancelled: appointments.filter((a) => a.status === "cancelled"),
-  };
 
   const quickActions = [
     {

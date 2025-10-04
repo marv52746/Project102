@@ -13,6 +13,7 @@ import ClinicalRecordTab from "./ClinicalRecordTab";
 import ConsultationHistoryTab from "./ConsultationHistoryTab";
 import DashboardTabStaff from "./DashboardTabStaff";
 import PatientsList from "./PatientsList";
+import UltrasoundTab from "./UltrasoundTab";
 
 export default function UserDashboardPage({ data }) {
   const { id } = useParams();
@@ -78,7 +79,7 @@ export default function UserDashboardPage({ data }) {
           { key: "calendar", label: "Calendar" },
           { key: "patients", label: "Recent Patients" },
           { key: "consultation-history", label: "Apppointment History" },
-          // { key: "reviews", label: "Reviews" },
+          { key: "ultrasound", label: "Ultrasound Records" },
         ];
       case "patient":
         return [
@@ -129,6 +130,8 @@ export default function UserDashboardPage({ data }) {
         return <CalendarTab id={userId} tablename={"users"} />;
       case "reviews":
         return <ReviewsTab data={data} />;
+      case "ultrasound":
+        return <UltrasoundTab data={data} />;
 
       // staff
       case "staff-dashboard":

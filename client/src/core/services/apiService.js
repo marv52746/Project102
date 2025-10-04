@@ -9,23 +9,8 @@ const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: false, // ✅ set to true only if using cookies
 });
-
-// Utility: Converts JS object to FormData if needed
-// const prepareData = (data) => {
-//   const hasFile = Object.values(data).some((value) => value instanceof File);
-//   if (!hasFile)
-//     return { data, headers: { "Content-Type": "application/json" } };
-
-//   const formData = new FormData();
-//   Object.entries(data).forEach(([key, value]) => {
-//     if (value !== undefined && value !== null) {
-//       formData.append(key, value);
-//     }
-//   });
-
-//   return { data: formData, headers: { "Content-Type": "multipart/form-data" } };
-// };
 
 // ✅ Interceptor to attach token automatically
 apiClient.interceptors.request.use(

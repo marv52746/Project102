@@ -121,3 +121,18 @@ export const capitalizeText = (text, eachWord = false) => {
 
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 };
+
+export function getAbsoluteAge(dob) {
+  if (!dob) return "";
+  const birthDate = new Date(dob);
+  const today = new Date();
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age;
+}

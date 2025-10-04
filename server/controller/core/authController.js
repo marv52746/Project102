@@ -63,7 +63,7 @@ const login = async (req, res) => {
         must_change_password: user.must_change_password,
       },
       JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "365d" }
     );
 
     res.status(200).json({ token });
@@ -119,7 +119,7 @@ const googleLogin = async (req, res) => {
         avatar: user.avatar,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "365d" }
     );
 
     res.status(200).json({ token: appToken });
@@ -166,7 +166,7 @@ const signup = async (req, res) => {
         avatar: savedUser.avatar,
       },
       JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "365d" }
     );
 
     res.status(201).json({ token });

@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../services/slices/userSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { getAvatarUrl } from "../utils/avatarURL";
-import apiService from "../services/apiService";
+// import apiService from "../services/apiService";
 
 export default function Sidebar({ children }) {
   const dispatch = useDispatch();
@@ -23,8 +23,8 @@ export default function Sidebar({ children }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null); // Ref for the dropdown
   const moreVerticalRef = useRef(null); // Ref for the MoreVertical button
-  const { refreshKey } = useSelector((state) => state.utils);
-  const [record, setRecord] = useState(null);
+  // const { refreshKey } = useSelector((state) => state.utils);
+  // const [record, setRecord] = useState(null);
 
   // Check if the screen width is small and set the state accordingly
   useEffect(() => {
@@ -45,32 +45,34 @@ export default function Sidebar({ children }) {
     };
   }, []);
 
-  useEffect(() => {
-    const fetchDetails = async () => {
-      if (!userInfo) return;
+  // useEffect(() => {
+  //   const fetchDetails = async () => {
+  //     if (!userInfo) return;
 
-      // only fetch for doctors or patients
-      if (userInfo.role === "doctor" || userInfo.role === "patient") {
-        try {
-          const tablename = userInfo.role + "s";
-          const res = await apiService.get(dispatch, `${tablename}`, {
-            user: userInfo.id,
-          });
+  //     console.log(userInfo);
 
-          // console.log(res);
+  //     // only fetch for doctors or patients
+  //     if (userInfo.role === "doctor" || userInfo.role === "patient") {
+  //       try {
+  //         const tablename = userInfo.role + "s";
+  //         const res = await apiService.get(dispatch, `${tablename}`, {
+  //           user: userInfo.id,
+  //         });
 
-          setRecord(res[0]); // save the full record
-        } catch (error) {
-          console.error(`Error fetching ${userInfo.role} details:`, error);
-        }
-      }
-    };
-    fetchDetails();
-  }, [userInfo, dispatch, refreshKey]);
+  //         // console.log(res);
+
+  //         setRecord(res[0]); // save the full record
+  //       } catch (error) {
+  //         console.error(`Error fetching ${userInfo.role} details:`, error);
+  //       }
+  //     }
+  //   };
+  //   fetchDetails();
+  // }, [userInfo, dispatch, refreshKey]);
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    // navigate("/");
+    navigate("/");
   };
 
   const handleDropdownToggle = () => {

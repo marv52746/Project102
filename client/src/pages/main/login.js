@@ -2,7 +2,7 @@ import { jwtDecode } from "jwt-decode";
 import { Eye, EyeOff } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loggedUserData } from "../../core/services/slices/userSlice";
 import { showNotification } from "../../core/services/slices/notificationSlice";
 import { all_routes } from "../../routes/all_routes";
@@ -11,10 +11,15 @@ import apiService from "../../core/services/apiService";
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  // ✅ Hide logo on certain routes
+  const hideLogoRoutes = ["/", "/dashboard"];
+  const shouldHideLogo = hideLogoRoutes.includes(location.pathname);
 
   const handleCredentialResponse = async (response) => {
     try {
@@ -126,6 +131,23 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen px-4 py-8 bg-gray-100">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+        {/* ✅ Clickable Logo (hidden on certain routes) */}
+        {!shouldHideLogo && (
+          <Link
+            to="/"
+            className="flex flex-col items-center space-x-3 mb-8 hover:opacity-90"
+          >
+            <img
+              src="/assets/images/Logo.png"
+              alt="Logo"
+              className="h-12 w-12 object-contain"
+            />
+            <h1 className="text-md font-bold bg-gradient-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent">
+              Bislig Premier Birthing Home
+            </h1>
+          </Link>
+        )}
+
         <h1 className="text-3xl font-bold mb-6 text-center">Welcome back</h1>
         <form onSubmit={handleLogin}>
           <div className="mb-4">

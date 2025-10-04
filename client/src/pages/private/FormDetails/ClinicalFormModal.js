@@ -27,6 +27,8 @@ export default function ClinicalFormModal({
   });
   const dispatch = useDispatch();
 
+  // console.log(formData);
+
   const handleChange = (e) => {
     handleInputChange({ e, setInputData: setFormData });
   };
@@ -34,7 +36,7 @@ export default function ClinicalFormModal({
   const handleDeleteConfirm = () => {
     handleFormDelete({
       dispatch,
-      tablename: formData.type,
+      tablename: formData.type === "labrequests" ? "labrequest" : formData.type,
       id: initialData._id,
       // navigate,
     });

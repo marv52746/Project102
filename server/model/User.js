@@ -170,11 +170,6 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre("save", async function (next) {
-  // if (this.isModified("password") && this.password) {
-  //   const salt = await bcrypt.genSalt(10);
-  //   this.password = await bcrypt.hash(this.password, salt);
-  // }
-
   // combine first/last name
   if (this.isModified("first_name") || this.isModified("last_name")) {
     const first = this.first_name?.trim() || "";
@@ -184,26 +179,27 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// // 🔁 Hash password & combine name during update
-// userSchema.pre("findOneAndUpdate", async function (next) {
-//   const update = this.getUpdate();
+// 📌 Virtual field for computed age (PH timezone)
+userSchema.virtual("age").get(function () {
+  if (!this.date_of_birth) return null;
 
-//   // Combine first_name + last_name -> name
-//   if (update.first_name || update.last_name) {
-//     const first = update.first_name?.trim() || "";
-//     const last = update.last_name?.trim() || "";
-//     update.name = `${first} ${last}`.trim();
-//   }
+  // get "today" in PH timezone
+  const todayPH = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" })
+  );
 
-//   // Hash password if included in update
-//   if (update.password) {
-//     const salt = await bcrypt.genSalt(10);
-//     update.password = await bcrypt.hash(update.password, salt);
-//   }
+  let age = todayPH.getFullYear() - this.date_of_birth.getFullYear();
+  const m = todayPH.getMonth() - this.date_of_birth.getMonth();
 
-//   this.setUpdate(update);
-//   next();
-// });
+  if (m < 0 || (m === 0 && todayPH.getDate() < this.date_of_birth.getDate())) {
+    age--;
+  }
+  return age;
+});
+
+// Ensure virtuals show in JSON & Objects
+userSchema.set("toJSON", { virtuals: true });
+userSchema.set("toObject", { virtuals: true });
 
 // Model Export
 const UserDb = mongoose.model("user", userSchema);

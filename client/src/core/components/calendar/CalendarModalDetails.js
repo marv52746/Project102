@@ -1,11 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useReactToPrint } from "react-to-print";
+import React, { useEffect, useState } from "react";
 import {
   X,
   User,
   Stethoscope,
-  FilePlus2,
-  ClipboardList,
   Baby,
   Scissors,
   NotebookText,
@@ -32,7 +29,6 @@ import {
   PregnanciesModal,
   PrescriptionModal,
   SurgeriesModal,
-  UltrasoundModal,
   VitalsModal,
 } from "../modal/BaseModal";
 import { clinicalFormFieldMap } from "../../constants/medical/clinicalPresets";
@@ -41,11 +37,14 @@ import { handleFormSubmit } from "../formActions/formSubmit";
 import apiService from "../../services/apiService";
 import VitalItem from "./VitalItem";
 import PrintActionButtons from "../documents/PrintCertificate";
+import UltrasoundModalNew from "../modal/UltrasoundModalNew";
+import { adminOnlyRoles } from "../../constants/rolePresets";
 
 function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
   const [report, setReport] = useState(initialReport);
   const [activeModal, setActiveModal] = useState(null);
   const userInfo = useSelector((state) => state.user.userInfo);
+  const hasPermission = adminOnlyRoles.includes(userInfo.role);
 
   // console.log(report);
 
@@ -546,12 +545,15 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
           onSave={(data) => handleSave("labrequest", data)}
           initialData={report.labrequest} // empty array
         />
-        <UltrasoundModal
+        <UltrasoundModalNew
+          title={"Ultrasound Data"}
           status={report.status}
+          hasPermission={hasPermission}
           isOpen={activeModal === "ultrasound"}
           onClose={() => setActiveModal(null)}
           onSave={(data) => handleSave("ultrasound", data)}
-          initialData={report.ultrasound} // empty array
+          initialData={report.ultrasound[0]} // empty array
+          patient={report.patient}
         />
       </div>
     </div>

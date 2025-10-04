@@ -35,6 +35,9 @@ function Dashboard() {
           apiService.get(dispatch, "users", { role: "patient" }),
         ]);
 
+        console.log(appointmentsRes);
+        console.log(patientsRes);
+
         setAppointments(appointmentsRes || []);
         setPatients(patientsRes || []);
       } catch (err) {

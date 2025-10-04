@@ -109,9 +109,9 @@ const Field = ({ value, width = "120px" }) => (
   </span>
 );
 
-const Prescription = forwardRef(
+const LabRequestPrint = forwardRef(
   ({ data = {}, doctor = {}, clinics = {} }, ref) => {
-    const prescriptions = data.prescriptionList || [];
+    const labRequests = data.labRequests || []; // Array of lab requests
 
     const specialization = Array.isArray(doctor.specialization)
       ? doctor.specialization.join(", ")
@@ -213,28 +213,33 @@ const Prescription = forwardRef(
           />
         </div>
 
-        {/* Prescription Table */}
-        {prescriptions.length > 0 && (
-          <table style={styles.rxTable}>
-            <thead>
-              <tr>
-                <th style={styles.rxTableHeader}>Medicine</th>
-                <th style={styles.rxTableHeader}>Dose</th>
-                <th style={styles.rxTableHeader}>Frequency</th>
-                <th style={styles.rxTableHeader}>Instructions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {prescriptions.map((item, idx) => (
-                <tr key={idx}>
-                  <td style={styles.rxTableCell}>{item.name}</td>
-                  <td style={styles.rxTableCell}>{item.dose}</td>
-                  <td style={styles.rxTableCell}>{item.frequency}</td>
-                  <td style={styles.rxTableCell}>{item.notes}</td>
+        {/* Lab Request Table */}
+        {labRequests.length > 0 && (
+          <>
+            <div style={{ marginTop: "15px", fontWeight: "bold" }}>
+              Lab Request:
+            </div>
+            <table style={styles.labTable}>
+              <thead>
+                <tr>
+                  <th style={styles.labTableHeader}>Test Name</th>
+                  <th style={styles.labTableHeader}>Remarks</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {labRequests.map((item, idx) => (
+                  <tr key={idx}>
+                    <td style={styles.labTableCell}>
+                      {item.name === "Others"
+                        ? `Others > ${item.name_custom || ""}`
+                        : item.name}
+                    </td>
+                    <td style={styles.labTableCell}>{item.notes}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         )}
 
         {/* Footer */}
@@ -248,4 +253,4 @@ const Prescription = forwardRef(
   }
 );
 
-export default Prescription;
+export default LabRequestPrint;

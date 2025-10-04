@@ -7,12 +7,16 @@ import {
   Scissors,
   Activity,
   Baby,
+  Stethoscope,
+  FlaskConical,
 } from "lucide-react";
 import apiService from "../../../core/services/apiService";
 import { useDispatch, useSelector } from "react-redux";
 import ClinicalFormModal from "./ClinicalFormModal";
 import { formatFullDate } from "../../../core/utils/tableUtils";
 import { adminOnlyRoles } from "../../../core/constants/rolePresets";
+import UltrasoundModalNew from "../../../core/components/modal/UltrasoundModalNew";
+import { handleFormSubmit } from "../../../core/components/formActions/formSubmit";
 
 export default function ClinicalRecordTab({ patientId }) {
   const [clinicalTab, setClinicalTab] = useState("conditions");
@@ -27,8 +31,11 @@ export default function ClinicalRecordTab({ patientId }) {
   const [allergies, setAllergies] = useState([]);
   const [surgeries, setSurgical] = useState([]);
   const [pregnancies, setPregnancy] = useState([]);
+  const [ultrasounds, setUltrasound] = useState([]);
+  const [labrequest, setLabrequest] = useState([]);
 
   const [openViewModal, setOpenViewModal] = useState(false);
+  const [openUltrasound, setOpenUltrasound] = useState(false);
   const [viewData, setViewData] = useState(null);
   const [viewType, setViewType] = useState(null);
 
@@ -46,6 +53,8 @@ export default function ClinicalRecordTab({ patientId }) {
           allergyData,
           surgicalData,
           prenancyData,
+          ultrasoundData,
+          labrequestData,
         ] = await Promise.all([
           apiService.get(dispatch, "vitals", { patient: patientId }),
           apiService.get(dispatch, "conditions", { patient: patientId }),
@@ -53,6 +62,8 @@ export default function ClinicalRecordTab({ patientId }) {
           apiService.get(dispatch, "allergies", { patient: patientId }),
           apiService.get(dispatch, "surgeries", { patient: patientId }),
           apiService.get(dispatch, "pregnancies", { patient: patientId }),
+          apiService.get(dispatch, "ultrasound", { patient: patientId }),
+          apiService.get(dispatch, "labrequest", { patient: patientId }),
         ]);
 
         setVitals(vitalData);
@@ -61,6 +72,8 @@ export default function ClinicalRecordTab({ patientId }) {
         setAllergies(allergyData);
         setSurgical(surgicalData);
         setPregnancy(prenancyData);
+        setUltrasound(ultrasoundData);
+        setLabrequest(labrequestData);
       } catch (error) {
         console.error("Error fetching clinical data:", error);
       }
@@ -78,6 +91,15 @@ export default function ClinicalRecordTab({ patientId }) {
       label: `Medications(${medications.length})`,
       icon: Pill,
     },
+    ultrasound: {
+      label: `Ultrasound(${ultrasounds.length})`,
+      icon: Stethoscope,
+    },
+    labrequest: {
+      label: `Lab Requests(${labrequest.length})`,
+      icon: Pill,
+    },
+
     allergies: {
       label: `Allergies(${allergies.length})`,
       icon: AlertTriangle,
@@ -96,12 +118,30 @@ export default function ClinicalRecordTab({ patientId }) {
     },
   };
 
+  const handleSave = async (type, data) => {
+    // console.log(data);
+    // console.log(type);
+
+    if (data._id) {
+      // update existing
+      return handleFormSubmit({
+        dispatch,
+        tablename: type,
+        data: data,
+        id: data._id,
+        fields: [], // <-- pass an empty array if no fields
+      });
+    }
+  };
+
+  // console.log(labrequest);
+
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 w-full">
       <div className="xl:col-span-3 space-y-4">
         <Card
           title={
-            <div className="flex flex-wrap items-center gap-6 text-sm">
+            <div className="flex flex-wrap items-center gap-6 text-sm pb-6">
               {Object.keys(tabConfig).map((key) => {
                 const { label } = tabConfig[key];
                 return (
@@ -124,241 +164,251 @@ export default function ClinicalRecordTab({ patientId }) {
         >
           {/* --- PREGNANCY TAB --- */}
           {clinicalTab === "pregnancies" && (
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 w-full">
-              {pregnancies.map((p, index) => {
-                const gestationalWeeks = p.lmp
-                  ? Math.floor(
-                      (new Date() - new Date(p.lmp)) / (1000 * 60 * 60 * 24 * 7)
-                    )
-                  : null;
+            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
+              {pregnancies
+                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on)) // 👈 recent first
+                .map((p, index) => {
+                  const gestationalWeeks = p.lmp
+                    ? Math.floor(
+                        (new Date() - new Date(p.lmp)) /
+                          (1000 * 60 * 60 * 24 * 7)
+                      )
+                    : null;
 
-                return (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      setViewType(clinicalTab);
-                      setViewData(p);
-                      setOpenViewModal(true);
-                    }}
-                    className="cursor-pointer p-4 rounded-lg bg-pink-50 border border-pink-200 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <Baby className="h-6 w-6 text-pink-500" />
-                      {/* <h4 className="text-sm font-semibold text-pink-700">
+                  return (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        setViewType(clinicalTab);
+                        setViewData(p);
+                        setOpenViewModal(true);
+                      }}
+                      className="cursor-pointer p-4 rounded-lg bg-pink-50 border border-pink-200 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <Baby className="h-6 w-6 text-pink-500" />
+                        {/* <h4 className="text-sm font-semibold text-pink-700">
                         {p.is_pregnant ? "Pregnant" : "Not Pregnant"}
                       </h4> */}
-                    </div>
+                      </div>
 
-                    {/* {p.is_pregnant && ( */}
-                    <>
-                      <div className="text-xs text-pink-800 mb-1">
-                        <strong>Gravida:</strong> {p.gravida || "0"} |{" "}
-                        <strong>Para:</strong> {p.para || "0"} |{" "}
-                        <strong>Code:</strong> {p.code || "0"}
-                      </div>
-                      <div className="text-xs text-pink-800 mb-1">
-                        <strong>LMP:</strong> {formatFullDate(p.lmp) || "N/A"}
-                      </div>
-                      <div className="text-xs text-pink-800 mb-1">
-                        <strong>EDD:</strong> {formatFullDate(p.edd) || "N/A"}
-                      </div>
-                      {/* <div className="text-xs text-pink-800 mb-1">
+                      {/* {p.is_pregnant && ( */}
+                      <>
+                        <div className="text-xs text-pink-800 mb-1">
+                          <strong>Gravida:</strong> {p.gravida || "0"} |{" "}
+                          <strong>Para:</strong> {p.para || "0"} |{" "}
+                          <strong>Code:</strong> {p.code || "0"}
+                        </div>
+                        <div className="text-xs text-pink-800 mb-1">
+                          <strong>LMP:</strong> {formatFullDate(p.lmp) || "N/A"}
+                        </div>
+                        <div className="text-xs text-pink-800 mb-1">
+                          <strong>EDD:</strong> {formatFullDate(p.edd) || "N/A"}
+                        </div>
+                        {/* <div className="text-xs text-pink-800 mb-1">
                         <strong>Trimester:</strong> {p.trimester || "N/A"}
                       </div> */}
-                      {gestationalWeeks !== null && (
-                        <div className="text-xs text-pink-800 mb-1">
-                          <strong>Gestational Age:</strong> {gestationalWeeks}{" "}
-                          weeks
-                        </div>
-                      )}
-                      {p.notes && (
-                        <p className="text-xs text-pink-900 mt-2">
-                          <strong>Notes:</strong> {p.notes}
-                        </p>
-                      )}
-                    </>
-                    {/* )} */}
-                  </div>
-                );
-              })}
+                        {gestationalWeeks !== null && (
+                          <div className="text-xs text-pink-800 mb-1">
+                            <strong>Gestational Age:</strong> {gestationalWeeks}{" "}
+                            weeks
+                          </div>
+                        )}
+                        {p.notes && (
+                          <p className="text-xs text-pink-900 mt-2">
+                            <strong>Notes:</strong> {p.notes}
+                          </p>
+                        )}
+                      </>
+                      {/* )} */}
+                    </div>
+                  );
+                })}
             </div>
           )}
 
           {/* CONDITIONS */}
           {clinicalTab === "conditions" && (
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 w-full">
-              {conditions.map((c, index) => (
-                <div
-                  key={index}
-                  onClick={() => {
-                    setViewType(clinicalTab);
-                    setViewData(c);
-                    setOpenViewModal(true);
-                  }}
-                  className="cursor-pointer p-4 rounded-lg bg-yellow-50 border border-yellow-200 shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <ShieldAlert className="h-6 w-6 text-yellow-500" />
-                    <h4 className="text-sm font-semibold text-yellow-700">
-                      {c.name}
-                    </h4>
+            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
+              {conditions
+                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on)) // 👈 recent first
+                .map((c, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      setViewType(clinicalTab);
+                      setViewData(c);
+                      setOpenViewModal(true);
+                    }}
+                    className="cursor-pointer p-4 rounded-lg bg-yellow-50 border border-yellow-200 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <ShieldAlert className="h-6 w-6 text-yellow-500" />
+                      <h4 className="text-sm font-semibold text-yellow-700">
+                        {c.name}
+                      </h4>
+                    </div>
+
+                    <div className="text-xs text-yellow-800 mb-1">
+                      <strong>Diagnosed:</strong>{" "}
+                      {formatFullDate(c.diagnosed_date) || "N/A"}
+                    </div>
+
+                    <p className="text-xs text-yellow-900 mb-2">
+                      <strong>Notes:</strong>{" "}
+                      {c.notes ? c.notes : "No notes available."}
+                    </p>
+
+                    {c.code && (
+                      <span className="inline-block bg-yellow-200 text-yellow-900 text-xs font-medium px-2 py-0.5 rounded">
+                        Code: {c.code.toUpperCase()}
+                      </span>
+                    )}
                   </div>
-
-                  <div className="text-xs text-yellow-800 mb-1">
-                    <strong>Diagnosed:</strong>{" "}
-                    {formatFullDate(c.diagnosed_date) || "N/A"}
-                  </div>
-
-                  <p className="text-xs text-yellow-900 mb-2">
-                    <strong>Notes:</strong>{" "}
-                    {c.notes ? c.notes : "No notes available."}
-                  </p>
-
-                  {c.code && (
-                    <span className="inline-block bg-yellow-200 text-yellow-900 text-xs font-medium px-2 py-0.5 rounded">
-                      Code: {c.code.toUpperCase()}
-                    </span>
-                  )}
-                </div>
-              ))}
+                ))}
             </div>
           )}
 
           {/* MEDICATIONS */}
           {clinicalTab === "medications" && (
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 w-full">
-              {medications.map((m, index) => (
-                <div
-                  key={index}
-                  onClick={() => {
-                    setViewType(clinicalTab);
-                    setViewData(m);
-                    setOpenViewModal(true);
-                  }}
-                  className="cursor-pointer p-4 rounded-lg bg-green-50 border border-green-200 shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <Pill className="h-6 w-6 text-green-500" />
-                    <h4 className="text-sm font-semibold text-green-700">
-                      {m.name}
-                    </h4>
-                  </div>
+            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
+              {medications
+                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on)) // 👈 recent first
+                .map((m, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      setViewType(clinicalTab);
+                      setViewData(m);
+                      setOpenViewModal(true);
+                    }}
+                    className="cursor-pointer p-4 rounded-lg bg-green-50 border border-green-200 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <Pill className="h-6 w-6 text-green-500" />
+                      <h4 className="text-sm font-semibold text-green-700">
+                        {m.name}
+                      </h4>
+                    </div>
 
-                  <div className="text-xs text-green-800 mb-1">
-                    <strong>Dose:</strong> {m.dose || "N/A"}
-                  </div>
-                  <div className="text-xs text-green-800 mb-1">
-                    <strong>Frequency:</strong> {m.frequency || "N/A"}
-                  </div>
+                    <div className="text-xs text-green-800 mb-1">
+                      <strong>Dose:</strong> {m.dose || "N/A"}
+                    </div>
+                    <div className="text-xs text-green-800 mb-1">
+                      <strong>Frequency:</strong> {m.frequency || "N/A"}
+                    </div>
 
-                  <div className="text-xs text-green-800 mb-1">
-                    <strong>Start:</strong>{" "}
-                    {formatFullDate(m.start_date) || "N/A"}
-                  </div>
-                  <div className="text-xs text-green-800 mb-1">
-                    <strong>End:</strong> {formatFullDate(m.end_date) || "N/A"}
-                  </div>
+                    <div className="text-xs text-green-800 mb-1">
+                      <strong>Start:</strong>{" "}
+                      {formatFullDate(m.start_date) || "N/A"}
+                    </div>
+                    <div className="text-xs text-green-800 mb-1">
+                      <strong>End:</strong>{" "}
+                      {formatFullDate(m.end_date) || "N/A"}
+                    </div>
 
-                  {m.notes && (
-                    <p className="text-xs text-green-900 mt-2">
-                      <strong>Notes:</strong> {m.notes}
-                    </p>
-                  )}
-                </div>
-              ))}
+                    {m.notes && (
+                      <p className="text-xs text-green-900 mt-2">
+                        <strong>Notes:</strong> {m.notes}
+                      </p>
+                    )}
+                  </div>
+                ))}
             </div>
           )}
 
           {/* ALLERGIES */}
           {clinicalTab === "allergies" && (
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 w-full">
-              {allergies.map((a, index) => (
-                <div
-                  key={index}
-                  onClick={() => {
-                    setViewType(clinicalTab);
-                    setViewData(a);
-                    setOpenViewModal(true);
-                  }}
-                  className="cursor-pointer p-4 rounded-lg bg-red-50 border border-red-200 shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <AlertTriangle className="h-6 w-6 text-red-500" />
-                    <h4 className="text-sm font-semibold text-red-700">
-                      {a.name}
-                    </h4>
-                  </div>
+            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
+              {allergies
+                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on)) // 👈 recent first
+                .map((a, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      setViewType(clinicalTab);
+                      setViewData(a);
+                      setOpenViewModal(true);
+                    }}
+                    className="cursor-pointer p-4 rounded-lg bg-red-50 border border-red-200 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <AlertTriangle className="h-6 w-6 text-red-500" />
+                      <h4 className="text-sm font-semibold text-red-700">
+                        {a.name}
+                      </h4>
+                    </div>
 
-                  <div className="text-xs text-red-800 mb-1">
-                    <strong>Reaction:</strong> {a.reaction || "N/A"}
-                  </div>
+                    <div className="text-xs text-red-800 mb-1">
+                      <strong>Reaction:</strong> {a.reaction || "N/A"}
+                    </div>
 
-                  <div className="text-xs text-red-800 mb-1">
-                    <strong>Severity:</strong> {a.severity || "Unknown"}
-                  </div>
+                    <div className="text-xs text-red-800 mb-1">
+                      <strong>Severity:</strong> {a.severity || "Unknown"}
+                    </div>
 
-                  <div className="text-xs text-red-800 mb-2">
-                    <strong>Recorded:</strong>{" "}
-                    {a.created_on
-                      ? new Date(a.created_on).toLocaleDateString(undefined, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })
-                      : "N/A"}
+                    <div className="text-xs text-red-800 mb-2">
+                      <strong>Recorded:</strong>{" "}
+                      {a.created_on
+                        ? new Date(a.created_on).toLocaleDateString(undefined, {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })
+                        : "N/A"}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           )}
 
           {/* SURGERIES */}
-          {/* SURGERIES */}
           {clinicalTab === "surgeries" && (
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 w-full">
-              {surgeries.map((s, index) => (
-                <div
-                  key={index}
-                  onClick={() => {
-                    setViewType(clinicalTab);
-                    setViewData(s);
-                    setOpenViewModal(true);
-                  }}
-                  className="cursor-pointer p-4 rounded-lg bg-gray-50 border border-gray-300 shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <Scissors className="h-6 w-6 text-gray-600" />
-                    <h4 className="text-sm font-semibold text-gray-700">
-                      {s.name}
-                    </h4>
-                  </div>
-
-                  <div className="text-xs text-gray-600 mb-1">
-                    <strong>Year:</strong> {s.year || "N/A"}
-                  </div>
-
-                  {s.surgeon && (
-                    <div className="text-xs text-gray-600 mb-1">
-                      <strong>Surgeon:</strong> {s.surgeon}
+            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
+              {surgeries
+                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on)) // 👈 recent first
+                .map((s, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      setViewType(clinicalTab);
+                      setViewData(s);
+                      setOpenViewModal(true);
+                    }}
+                    className="cursor-pointer p-4 rounded-lg bg-gray-50 border border-gray-300 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <Scissors className="h-6 w-6 text-gray-600" />
+                      <h4 className="text-sm font-semibold text-gray-700">
+                        {s.name}
+                      </h4>
                     </div>
-                  )}
 
-                  {s.notes && (
-                    <p className="text-xs text-gray-700 mt-2">
-                      <strong>Notes:</strong> {s.notes}
-                    </p>
-                  )}
-                </div>
-              ))}
+                    <div className="text-xs text-gray-600 mb-1">
+                      <strong>Year:</strong> {s.year || "N/A"}
+                    </div>
+
+                    {s.surgeon && (
+                      <div className="text-xs text-gray-600 mb-1">
+                        <strong>Surgeon:</strong> {s.surgeon}
+                      </div>
+                    )}
+
+                    {s.notes && (
+                      <p className="text-xs text-gray-700 mt-2">
+                        <strong>Notes:</strong> {s.notes}
+                      </p>
+                    )}
+                  </div>
+                ))}
             </div>
           )}
 
           {/* VITALS LOG */}
-
           {clinicalTab === "vitals" && (
-            <ul className="space-y-3 w-full">
+            <ul className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
               {vitals
-                .sort((a, b) => new Date(b.date) - new Date(a.date)) // 👈 recent first
+                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on)) // 👈 recent first
                 .map((v, index) => {
                   const heightMeters = v.height ? v.height / 100 : null;
                   const bmi =
@@ -448,6 +498,103 @@ export default function ClinicalRecordTab({ patientId }) {
                 })}
             </ul>
           )}
+
+          {/* --- Ultrasound TAB --- */}
+          {clinicalTab === "ultrasound" && (
+            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
+              {ultrasounds
+                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on))
+                .map((p, index) => {
+                  return (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        setViewType(clinicalTab);
+                        setViewData(p);
+                        setOpenUltrasound(true);
+                      }}
+                      className="cursor-pointer p-4 rounded-lg bg-indigo-50 border border-indigo-200 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <Stethoscope className="h-6 w-6 text-indigo-500" />
+                        <h4 className="text-sm font-semibold text-indigo-700">
+                          {p.type || "Ultrasound"}
+                        </h4>
+                      </div>
+
+                      <div className="text-xs text-indigo-800 mb-1">
+                        <strong>Date:</strong> {formatFullDate(p.date) || "N/A"}
+                      </div>
+                      {p.impression && (
+                        <div className="text-xs text-indigo-800 mb-1">
+                          <strong>Impression:</strong> {p.impression}
+                        </div>
+                      )}
+                      {p.others && (
+                        <p className="text-xs text-indigo-900 mt-2">
+                          <strong>Others:</strong> {p.others}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+          )}
+
+          {/* --- LAB REQUEST TAB --- */}
+          {clinicalTab === "labrequest" && (
+            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
+              {labrequest
+                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on))
+                .map((lab, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      setViewType(clinicalTab);
+                      setViewData({
+                        ...lab,
+                        type: "labrequests",
+                      });
+                      setOpenViewModal(true);
+                    }}
+                    className="cursor-pointer p-4 rounded-lg bg-purple-50 border border-purple-200 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <FlaskConical className="h-6 w-6 text-purple-600" />
+                      <h4 className="text-sm font-semibold text-purple-700">
+                        {lab.name || "Laboratory Test"}
+                      </h4>
+                    </div>
+
+                    <div className="text-xs text-purple-800 mb-1">
+                      <strong>Status:</strong>{" "}
+                      <span
+                        className={`font-medium ${
+                          lab.status === "Completed"
+                            ? "text-green-600"
+                            : lab.status === "Pending"
+                            ? "text-orange-600"
+                            : "text-gray-600"
+                        }`}
+                      >
+                        {lab.status || "Unknown"}
+                      </span>
+                    </div>
+
+                    <div className="text-xs text-purple-800 mb-1">
+                      <strong>Date:</strong>{" "}
+                      {formatFullDate(lab.created_on) || "N/A"}
+                    </div>
+
+                    {lab.notes && (
+                      <p className="text-xs text-purple-900 mt-2">
+                        <strong>Notes:</strong> {lab.notes}
+                      </p>
+                    )}
+                  </div>
+                ))}
+            </div>
+          )}
         </Card>
       </div>
 
@@ -462,6 +609,19 @@ export default function ClinicalRecordTab({ patientId }) {
           initialData={viewData}
           type={viewType}
           patient={patientId}
+        />
+      )}
+
+      {/* Modal */}
+      {openUltrasound && (
+        <UltrasoundModalNew
+          title={"Ultrasound Data"}
+          hasPermission={hasPermission}
+          isOpen={openUltrasound}
+          onClose={() => setOpenUltrasound(false)}
+          onSave={(data) => handleSave("ultrasound", data)}
+          initialData={viewData} // empty array
+          patient={viewData.patient}
         />
       )}
     </div>

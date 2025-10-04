@@ -3,10 +3,17 @@ import MedicalCertificate from "./MedicalCertificate";
 import Prescription from "./PrescriptionPrint";
 import { useDispatch } from "react-redux";
 import apiService from "../../services/apiService";
+import jsPDF from "jspdf";
+import UltrasoundPhysicalPrint from "./UltrasoundBiophysical";
+import UltrasoundTransvaginalOBPrint from "./UltrasoundTVSOB";
+import TransvaginalUltrasoundGynePrint from "./UltrasoundTVSGyne";
+import LabRequestPrint from "./LabRequestPrint";
 
 export default function PrintActionButtons({ data }) {
   const certRef = useRef(); // separate ref for certificate
   const prescRef = useRef(); // separate ref for prescription
+  const usRef = useRef(); // ✅ new ref for ultrasound
+  const labreqRef = useRef(); // ✅ new ref for ultrasound
   const patientName = data?.patient?.name || "Patient";
 
   const [clinics, setClinics] = useState([]);
@@ -47,54 +54,6 @@ export default function PrintActionButtons({ data }) {
     }
     return age;
   };
-
-  // Doctor data (example)
-  const doctorShalomData = {
-    details: {
-      name: "Shalom C. Victoriano, M.D.",
-      specialization: "Obstetrician - Gynecologist",
-      title: "Physician",
-      license: "0117246",
-    },
-    leftAdd: {
-      address1: "Bislig Premiere Birthing Home",
-      address2: "EGS Building, Espirito Street, Mangagoy, Bislig City",
-      schedule: "Monday - Saturday:",
-      time: "9:00 am - 5:00 pm",
-      phone: "09171135187",
-    },
-    // rightAdd: {
-    //   address1: "Door P-1 OJLC Bldg., Datu Abing St., Calinan, D.C.",
-    //   address2: "",
-    //   schedule: "MWTF Sat:",
-    //   time: "1:00 pm - 5:00 pm",
-    //   phone: "0923-521-6714",
-    // },
-  };
-
-  const doctorKarolData = {
-    details: {
-      name: "Karol Augustus L. Lesiguez, M.D.",
-      specialization: "General Surgery",
-      license: "0117220",
-    },
-    leftAdd: {
-      address1: "Room 611, Medical Arts Building",
-      address2: "San Pedro Hospital, C. Guzman Street, Davao City",
-      schedule: "Monday-Wednesday:",
-      time: "10:00 am - 4:00 pm",
-      phone: "0943-525-9582",
-    },
-    rightAdd: {
-      address1: "Room 3, Bislig Medical Specialists and Wound Care Clinic",
-      address2: "EGS Building, Espiritu Street, Mangagoy, Bislig City",
-      schedule: "Thurs.-Sun.:",
-      time: "9:00 am - 5:00 pm",
-      phone: "0923-521-6714",
-    },
-  };
-
-  const doctor = doctorKarolData;
 
   // Format date to human-readable
   const formatDate = (rawDate) => {
@@ -139,9 +98,6 @@ export default function PrintActionButtons({ data }) {
           #print-container {
             width: 100%;
             height: 100%;
-            // display: flex;
-            // justify-content: center;
-            // align-items: center;
           }
 
           /* Optional: scale down if content is too big */
@@ -163,24 +119,140 @@ export default function PrintActionButtons({ data }) {
     win.close();
   };
 
+  const handlePrintA4 = (ref, title) => {
+    if (!ref.current) return;
+    const printContent = ref.current.innerHTML;
+
+    const win = window.open("", "", "width=1000,height=600");
+    win.document.write(`
+    <html>
+      <head>
+        <title>${title}</title>
+        <link rel="stylesheet" href="/output.css" />
+        <style>
+          @page {
+            size: A4 portrait;   /* or 'A4 landscape' */
+          }
+
+          html, body {
+            margin: 0;
+            padding: 0;
+            width: 210mm;   /* A4 width */
+            height: 297mm;  /* A4 height */
+          }
+
+        </style>
+      </head>
+      <body>
+        <div id="print-container">${printContent}</div>
+      </body>
+    </html>
+  `);
+
+    win.document.close();
+    win.focus();
+    win.print();
+    win.close();
+  };
+
+  // const handlePrintIframe = (ref, title) => {
+  //   if (!ref.current) return;
+
+  //   const patientName = data.patient?.name || "Patient"; // fallback
+  //   const dynamicTitle = `${title} - ${patientName}`;
+
+  //   const printContent = ref.current.innerHTML;
+  //   const iframe = document.createElement("iframe");
+  //   iframe.style.position = "absolute";
+  //   iframe.style.left = "-9999px";
+  //   document.body.appendChild(iframe);
+
+  //   const doc = iframe.contentWindow.document;
+  //   doc.open();
+  //   doc.write(`
+  //   <html>
+  //     <head>
+  //       <title>${dynamicTitle}</title>
+  //       <link rel="stylesheet" href="/output.css" />
+  //     </head>
+  //     <body>${printContent}</body>
+  //   </html>
+  // `);
+  //   doc.close();
+
+  //   // Set the dynamic title for the print dialog
+  //   iframe.contentWindow.document.title = dynamicTitle;
+
+  //   iframe.contentWindow.focus();
+  //   iframe.contentWindow.print();
+
+  //   document.body.removeChild(iframe);
+  // };
+
+  const handlePDFDownload = (ref, fileName) => {
+    if (!ref.current) return;
+    const doc = new jsPDF("p", "px", "a4");
+
+    // Use html2canvas if you want the HTML content as image
+    doc.html(ref.current, {
+      callback: function (doc) {
+        doc.save(`${fileName}.pdf`);
+      },
+      x: 10,
+      y: 10,
+      html2canvas: { scale: 0.5 },
+    });
+  };
+
   return (
     <>
       <div className="flex gap-2 mt-2">
-        <button
-          onClick={() => handlePrint(prescRef, "Prescription", "portrait")}
-          className="px-4 py-2 rounded-lg bg-blue-50 border text-blue-600 border-blue-100 text-sm"
-        >
-          🖨️ Print Prescription
-        </button>
+        {/* Only show Prescription button if data.medication exists */}
+        {data.medication && data.medication.length > 0 && (
+          <button
+            onClick={() => handlePrint(prescRef, "Prescription", "portrait")}
+            className="px-4 py-2 rounded-lg bg-blue-50 border text-blue-600 border-blue-100 text-sm"
+          >
+            🖨️ Prescription
+          </button>
+        )}
 
-        <button
-          onClick={() =>
-            handlePrint(certRef, "Medical Certificate", "landscape")
-          }
-          className="px-4 py-2 rounded-lg bg-blue-50 border text-blue-600 border-blue-100 text-sm"
-        >
-          🖨️ Print Medical Certificate
-        </button>
+        {/* Only show Lab Request button if data.labrequest exists */}
+        {data.labrequest && data.labrequest.length > 0 && (
+          <button
+            onClick={() => handlePrint(labreqRef, "Lab Request", "portrait")}
+            className="px-4 py-2 rounded-lg bg-blue-50 border text-blue-600 border-blue-100 text-sm"
+          >
+            🖨️ Lab Request
+          </button>
+        )}
+
+        {/* Only show Medical Certificate button if diagnosis exists */}
+        {data.diagnosis && data.diagnosis.length > 0 && (
+          <button
+            onClick={() =>
+              handlePrint(certRef, "Medical Certificate", "landscape")
+            }
+            className="px-4 py-2 rounded-lg bg-blue-50 border text-blue-600 border-blue-100 text-sm"
+          >
+            🖨️ Medical Certificate
+          </button>
+        )}
+
+        {/* Only show Ultrasound button if ultrasound array exists and has items */}
+        {data.ultrasound && data.ultrasound.length > 0 && (
+          <button
+            onClick={() =>
+              handlePDFDownload(
+                usRef,
+                `${data.patient?.name} - ${data.ultrasound[0].type}`
+              )
+            }
+            className="px-4 py-2 rounded-lg bg-blue-50 border text-blue-600 border-blue-100 text-sm"
+          >
+            🖨️ Ultrasound
+          </button>
+        )}
       </div>
 
       {/* Hidden printable content */}
@@ -212,11 +284,102 @@ export default function PrintActionButtons({ data }) {
             gender: data.patient?.gender,
             age: calculateAge(data.patient?.date_of_birth), // transform DOB to age
             prescriptionList: data.medication,
+          }}
+          doctor={data.doctor}
+          clinics={{ left: clinics[0], right: clinics[1] }}
+        />
+      </div>
+
+      <div style={{ display: "none" }}>
+        <LabRequestPrint
+          ref={labreqRef}
+          data={{
+            patientName: data.patient?.name,
+            address: data.patient?.address,
+            date: formatDate(data.date),
+            remarks: data.notes,
+            requestor: "Employer",
+            gender: data.patient?.gender,
+            age: calculateAge(data.patient?.date_of_birth), // transform DOB to age
             labRequests: data.labrequest,
           }}
           doctor={data.doctor}
           clinics={{ left: clinics[0], right: clinics[1] }}
         />
+      </div>
+
+      <div style={{ display: "none" }}>
+        {(() => {
+          const firstUS = data.ultrasound?.[0];
+          const type = firstUS?.type;
+
+          if (!firstUS || !type) return null;
+
+          switch (type) {
+            case "Biometry":
+              return (
+                <UltrasoundPhysicalPrint
+                  ref={usRef}
+                  data={{
+                    ...data.ultrasound[0],
+                    date: formatDate(data.date),
+                  }}
+                  patient={{
+                    ...data.patient,
+                    age: calculateAge(data.patient?.date_of_birth),
+                  }}
+                />
+              );
+
+            case "Biophysical Score":
+              return (
+                <UltrasoundPhysicalPrint
+                  ref={usRef}
+                  data={{
+                    ...data.ultrasound[0],
+                    date: formatDate(data.date),
+                  }}
+                  patient={{
+                    ...data.patient,
+                    age: calculateAge(data.patient?.date_of_birth),
+                  }}
+                />
+              );
+
+            case "Transvaginal Ultrasound - OB":
+              return (
+                <UltrasoundTransvaginalOBPrint
+                  ref={usRef}
+                  data={{
+                    ...data.ultrasound[0],
+                    date: formatDate(data.date),
+                  }}
+                  patient={{
+                    ...data.patient,
+                    age: calculateAge(data.patient?.date_of_birth),
+                  }}
+                />
+              );
+
+            case "Transvaginal Ultrasound - Gyne":
+              return (
+                <TransvaginalUltrasoundGynePrint
+                  ref={usRef}
+                  data={{
+                    ...data.ultrasound[0],
+                    date: formatDate(data.date),
+                  }}
+                  patient={{
+                    ...data.patient,
+                    age: calculateAge(data.patient?.date_of_birth),
+                  }}
+                />
+              );
+
+            default:
+              return null;
+          }
+        })()}
       </div>
     </>
   );

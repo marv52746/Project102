@@ -3,7 +3,7 @@ const { NotificationDb } = require("../model/notifications/Notification");
 const sendEmail = require("./sendEmail");
 
 // run every minute
-cron.schedule("* * * * *", async () => {
+cron.schedule("* 6 * * *", async () => {
   try {
     // get today's start and end
     const startOfDay = new Date();

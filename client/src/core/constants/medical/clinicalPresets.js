@@ -338,7 +338,7 @@ export const labRequestFormFields = [
   {
     name: "name",
     label: "Test Name",
-    type: "select",
+    type: "reactselect",
     required: true,
     options: [
       {
@@ -369,13 +369,13 @@ export const labRequestFormFields = [
     dynamic: true, // 👈 tells your form handler to allow switching type
   },
   // 👇 This extra field is hidden unless "Others" is chosen
-  {
-    name: "name_custom",
-    label: "Specify Test (if Others)",
-    type: "text",
-    placeholder: "Enter test name",
-    conditional: { field: "name", value: "Others" },
-  },
+  // {
+  //   name: "name_custom",
+  //   label: "Specify Test (if Others)",
+  //   type: "text",
+  //   placeholder: "Enter test name",
+  //   conditional: { field: "name", value: "Others" },
+  // },
 
   {
     name: "requested_on",
@@ -414,6 +414,75 @@ export const labRequestFormFields = [
   },
 ];
 
+// export const ultrasoundFormFields = [
+//   {
+//     name: "patient",
+//     label: "Patient",
+//     type: "reference",
+//     ref: "users",
+//     hidden: true,
+//   },
+//   {
+//     name: "type",
+//     label: "Ultrasound Type",
+//     type: "select",
+//     options: [
+//       { label: "Biometry", value: "Biometry" },
+//       { label: "Biophysical Score", value: "Biophysical Score" },
+//       {
+//         label: "Transvaginal Ultrasound - OB",
+//         value: "Transvaginal Ultrasound - OB",
+//       },
+//       {
+//         label: "Transvaginal Ultrasound - Gyne",
+//         value: "Transvaginal Ultrasound - Gyne",
+//       },
+
+//       { label: "Others", value: "Others" },
+//     ],
+//     placeholder: "Select ultrasound type",
+//     required: true,
+//     dynamic: true, // 👈 allow conditional rendering
+//   },
+//   {
+//     name: "type_custom",
+//     label: "Specify Ultrasound (if Others)",
+//     type: "text",
+//     placeholder: "Enter ultrasound type",
+//     conditional: { field: "type", value: "Others" },
+//   },
+//   {
+//     name: "date",
+//     label: "Date",
+//     type: "date",
+//     default: new Date(),
+//   },
+//   {
+//     name: "radiologist",
+//     label: "Radiologist",
+//     placeholder: "e.g. Dr. Cruz",
+//   },
+//   {
+//     name: "findings",
+//     label: "Findings",
+//     type: "textarea",
+//     placeholder: "Enter ultrasound findings",
+//   },
+//   {
+//     name: "impression",
+//     label: "Impression",
+//     type: "textarea",
+//     placeholder: "Enter impression/summary",
+//   },
+
+//   {
+//     name: "notes",
+//     label: "Additional Notes",
+//     type: "textarea",
+//     placeholder: "Any extra notes related to this ultrasound",
+//   },
+// ];
+
 export const ultrasoundFormFields = [
   {
     name: "patient",
@@ -427,18 +496,21 @@ export const ultrasoundFormFields = [
     label: "Ultrasound Type",
     type: "select",
     options: [
-      { label: "Abdominal", value: "Abdominal" },
-      { label: "Obstetric", value: "Obstetric" },
-      { label: "Pelvic", value: "Pelvic" },
-      { label: "Thyroid", value: "Thyroid" },
-      { label: "Breast", value: "Breast" },
-      { label: "Vascular", value: "Vascular" },
-      { label: "Kidney", value: "Kidney" },
+      { label: "Biometry", value: "Biometry" },
+      { label: "Biophysical Score", value: "Biophysical Score" },
+      {
+        label: "Transvaginal Ultrasound - OB",
+        value: "Transvaginal Ultrasound - OB",
+      },
+      {
+        label: "Transvaginal Ultrasound - Gyne",
+        value: "Transvaginal Ultrasound - Gyne",
+      },
       { label: "Others", value: "Others" },
     ],
     placeholder: "Select ultrasound type",
     required: true,
-    dynamic: true, // 👈 allow conditional rendering
+    dynamic: true,
   },
   {
     name: "type_custom",
@@ -458,24 +530,461 @@ export const ultrasoundFormFields = [
     label: "Radiologist",
     placeholder: "e.g. Dr. Cruz",
   },
+
+  // ---------------- OB DATA ----------------
   {
-    name: "findings",
-    label: "Findings",
+    name: "ob_data.lmp",
+    label: "LMP",
+    type: "date",
+  },
+  {
+    name: "ob_data.edd",
+    label: "EDD",
+    type: "date",
+  },
+  {
+    name: "ob_data.aog",
+    label: "AOG",
+    type: "text",
+    placeholder: "e.g. 21W 4D",
+  },
+  {
+    name: "ob_data.gravida_para",
+    label: "Gravida / Para",
+    type: "text",
+    placeholder: "e.g. G3P1(1011)",
+  },
+
+  // ---------------- EARLY PREGNANCY (TVS-OB) ----------------
+  {
+    name: "early_pregnancy.gestational_sac.size",
+    label: "Gestational Sac Size",
+    type: "text",
+    placeholder: "e.g. 2.0 cm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "early_pregnancy.gestational_sac.age_equiv",
+    label: "Gestational Sac Age Equivalent",
+    type: "text",
+    placeholder: "e.g. 6W 3D",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "early_pregnancy.crown_rump_length.size",
+    label: "CRL Size",
+    type: "text",
+    placeholder: "e.g. 1.14 cm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "early_pregnancy.crown_rump_length.age_equiv",
+    label: "CRL Age Equivalent",
+    type: "text",
+    placeholder: "e.g. 7W 2D",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "early_pregnancy.yolk_sac",
+    label: "Yolk Sac",
+    type: "text",
+    placeholder: "present / absent",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "early_pregnancy.fetal_heart_rate",
+    label: "Fetal Heart Rate",
+    type: "text",
+    placeholder: "e.g. 165 bpm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "early_pregnancy.average_ultrasonic_age",
+    label: "Average Ultrasonic Age",
+    type: "text",
+    placeholder: "e.g. 7W 2D",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "early_pregnancy.ultrasonic_edc",
+    label: "Ultrasonic EDC",
+    type: "date",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "early_pregnancy.uterus",
+    label: "Uterus",
+    type: "text",
+    placeholder: "e.g. anteverted",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "early_pregnancy.adnexae.right_ovary",
+    label: "Right Ovary",
+    type: "text",
+    placeholder: "e.g. normal",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "early_pregnancy.adnexae.left_ovary",
+    label: "Left Ovary",
+    type: "text",
+    placeholder: "e.g. normal",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "early_pregnancy.cervix.dimensions",
+    label: "Cervix Dimensions",
+    type: "text",
+    placeholder: "e.g. 2.79 x 2.12 x 2.47 cm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "early_pregnancy.cervix.volume",
+    label: "Cervix Volume",
+    type: "text",
+    placeholder: "e.g. 7.64 ml",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "early_pregnancy.cervix.notes",
+    label: "Cervix Notes",
     type: "textarea",
-    placeholder: "Enter ultrasound findings",
+    placeholder: "e.g. long and closed",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+
+  // ---------------- FETAL SURVEY ----------------
+  {
+    name: "fetal_survey.presentation",
+    label: "Presentation",
+    type: "text",
+    placeholder: "e.g. cephalic",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "fetal_survey.fetal_sex",
+    label: "Fetal Sex",
+    type: "text",
+    placeholder: "e.g. male / female",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "fetal_survey.number_of_fetus",
+    label: "Number of Fetuses",
+    type: "text",
+    placeholder: "e.g. singleton",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "fetal_survey.placenta_grade",
+    label: "Placenta Grade",
+    type: "text",
+    placeholder: "e.g. Grade II",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "fetal_survey.placenta_position",
+    label: "Placenta Position",
+    type: "text",
+    placeholder: "e.g. anterior",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "fetal_survey.fetal_heart_rate",
+    label: "Fetal Heart Rate",
+    type: "text",
+    placeholder: "e.g. 140 bpm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "fetal_survey.amniotic_fluid.svp",
+    label: "Amniotic Fluid SVP",
+    type: "text",
+    placeholder: "e.g. 2.1 cm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "fetal_survey.amniotic_fluid.afi.q1",
+    label: "AFI Q1",
+    type: "text",
+    placeholder: "Quadrant 1",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "fetal_survey.amniotic_fluid.afi.q2",
+    label: "AFI Q2",
+    type: "text",
+    placeholder: "Quadrant 2",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "fetal_survey.amniotic_fluid.afi.q3",
+    label: "AFI Q3",
+    type: "text",
+    placeholder: "Quadrant 3",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "fetal_survey.amniotic_fluid.afi.q4",
+    label: "AFI Q4",
+    type: "text",
+    placeholder: "Quadrant 4",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+  {
+    name: "fetal_survey.amniotic_fluid.afi.total",
+    label: "AFI Total",
+    type: "text",
+    placeholder: "e.g. 12.4 cm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - OB" },
+  },
+
+  // ---------------- FETAL BIOMETRY ----------------
+  {
+    name: "fetal_biometry.bpd.measurement",
+    label: "BPD (cm)",
+    type: "text",
+    placeholder: "e.g. 5.02 cm",
+    conditional: { field: "type", value: "Biometry" },
+  },
+  {
+    name: "fetal_biometry.bpd.age_equiv",
+    label: "BPD Age Equivalent",
+    type: "text",
+    placeholder: "e.g. 21W 1D",
+    conditional: { field: "type", value: "Biometry" },
+  },
+  {
+    name: "fetal_biometry.ofd.measurement",
+    label: "OFD (cm)",
+    type: "text",
+    placeholder: "e.g. 6.14 cm",
+    conditional: { field: "type", value: "Biometry" },
+  },
+  {
+    name: "fetal_biometry.ofd.age_equiv",
+    label: "OFD Age Equivalent",
+    type: "text",
+    placeholder: "e.g. 22W 0D",
+    conditional: { field: "type", value: "Biometry" },
+  },
+  {
+    name: "fetal_biometry.hc.measurement",
+    label: "HC (cm)",
+    type: "text",
+    placeholder: "e.g. 19.2 cm",
+    conditional: { field: "type", value: "Biometry" },
+  },
+  {
+    name: "fetal_biometry.hc.age_equiv",
+    label: "HC Age Equivalent",
+    type: "text",
+    placeholder: "e.g. 22W 3D",
+    conditional: { field: "type", value: "Biometry" },
+  },
+  {
+    name: "fetal_biometry.ac.measurement",
+    label: "AC (cm)",
+    type: "text",
+    placeholder: "e.g. 16.4 cm",
+    conditional: { field: "type", value: "Biometry" },
+  },
+  {
+    name: "fetal_biometry.ac.age_equiv",
+    label: "AC Age Equivalent",
+    type: "text",
+    placeholder: "e.g. 21W 6D",
+    conditional: { field: "type", value: "Biometry" },
+  },
+  {
+    name: "fetal_biometry.fl.measurement",
+    label: "FL (cm)",
+    type: "text",
+    placeholder: "e.g. 3.7 cm",
+    conditional: { field: "type", value: "Biometry" },
+  },
+  {
+    name: "fetal_biometry.fl.age_equiv",
+    label: "FL Age Equivalent",
+    type: "text",
+    placeholder: "e.g. 21W 2D",
+    conditional: { field: "type", value: "Biometry" },
+  },
+
+  // ---------------- BIOPHYSICAL PROFILE ----------------
+  {
+    name: "biophysical_profile.fetal_breathing",
+    label: "Fetal Breathing (0/2)",
+    type: "number",
+    conditional: { field: "type", value: "Biophysical Score" },
+  },
+  {
+    name: "biophysical_profile.fetal_tone",
+    label: "Fetal Tone (0/2)",
+    type: "number",
+    conditional: { field: "type", value: "Biophysical Score" },
+  },
+  {
+    name: "biophysical_profile.fetal_movement",
+    label: "Fetal Movement (0/2)",
+    type: "number",
+    conditional: { field: "type", value: "Biophysical Score" },
+  },
+  {
+    name: "biophysical_profile.afi_score",
+    label: "AFI Score (0/2)",
+    type: "number",
+    conditional: { field: "type", value: "Biophysical Score" },
+  },
+  {
+    name: "biophysical_profile.total",
+    label: "Total BPS Score",
+    type: "number",
+    conditional: { field: "type", value: "Biophysical Score" },
+  },
+
+  // ---------------- GYNE FINDINGS ----------------
+  {
+    name: "gyn_findings.cervix.dimensions",
+    label: "Cervix Dimensions",
+    type: "text",
+    placeholder: "e.g. 2.47 x 1.91 x 2.10 cm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.cervix.notes",
+    label: "Cervix Notes",
+    type: "textarea",
+    placeholder: "e.g. nabothian cysts, long and closed",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.uterus.dimensions",
+    label: "Uterus Dimensions",
+    type: "text",
+    placeholder: "e.g. 7.2 x 5.4 x 6.1 cm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.uterus.orientation",
+    label: "Uterus Orientation",
+    type: "text",
+    placeholder: "e.g. anteverted",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.uterus.notes",
+    label: "Uterus Notes",
+    type: "textarea",
+    placeholder: "e.g. homogeneous myometrium",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.uterus.wall_thickness.anterior",
+    label: "Wall Thickness (Anterior)",
+    type: "text",
+    placeholder: "e.g. 0.9 cm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.uterus.wall_thickness.posterior",
+    label: "Wall Thickness (Posterior)",
+    type: "text",
+    placeholder: "e.g. 1.1 cm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.endometrium.thickness",
+    label: "Endometrium Thickness",
+    type: "text",
+    placeholder: "e.g. 0.7 cm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.endometrium.notes",
+    label: "Endometrium Notes",
+    type: "textarea",
+    placeholder: "e.g. secretory phase",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.right_ovary.dimensions",
+    label: "Right Ovary Dimensions",
+    type: "text",
+    placeholder: "e.g. 2.5 x 1.8 x 2.0 cm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.right_ovary.volume",
+    label: "Right Ovary Volume",
+    type: "text",
+    placeholder: "e.g. 7.2 ml",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.right_ovary.notes",
+    label: "Right Ovary Notes",
+    type: "textarea",
+    placeholder: "e.g. functional cyst",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.left_ovary.dimensions",
+    label: "Left Ovary Dimensions",
+    type: "text",
+    placeholder: "e.g. 2.6 x 2.1 x 1.9 cm",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.left_ovary.volume",
+    label: "Left Ovary Volume",
+    type: "text",
+    placeholder: "e.g. 8.1 ml",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.left_ovary.notes",
+    label: "Left Ovary Notes",
+    type: "textarea",
+    placeholder: "e.g. cystic follicle",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+  {
+    name: "gyn_findings.others.notes",
+    label: "Other Gyne Findings",
+    type: "textarea",
+    placeholder: "Additional notes",
+    conditional: { field: "type", value: "Transvaginal Ultrasound - Gyne" },
+  },
+
+  // ---------------- COMMON ----------------
+  {
+    name: "average_age",
+    label: "Average Age",
+    type: "text",
+    placeholder: "e.g. 22W 0D",
+  },
+  { name: "ultrasonic_edd", label: "Ultrasonic EDD", type: "date" },
+  {
+    name: "efw",
+    label: "Estimated Fetal Weight",
+    type: "text",
+    placeholder: "e.g. 520 g",
+  },
+
+  // ---------------- IMPRESSION & NOTES ----------------
+  {
+    name: "others",
+    label: "Other Findings",
+    type: "textarea",
+    placeholder: "Additional findings or comments",
   },
   {
     name: "impression",
     label: "Impression",
     type: "textarea",
-    placeholder: "Enter impression/summary",
-  },
-
-  {
-    name: "notes",
-    label: "Additional Notes",
-    type: "textarea",
-    placeholder: "Any extra notes related to this ultrasound",
+    placeholder: "Final impression / conclusion",
   },
 ];
 

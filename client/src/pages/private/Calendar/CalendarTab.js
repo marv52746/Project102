@@ -30,25 +30,26 @@ export default function CalendarTab({ id, tablename }) {
       };
 
       // 1. Fetch appointments
-      const data = await apiService.get(dispatch, "calendar", params);
+      const data = (await apiService.get(dispatch, "calendar", params)) ?? [];
 
       // 2. Fetch EDD schedules
-      const eddData = await apiService.get(dispatch, "pregnancies", {
-        patient: id,
-      });
+      const eddData =
+        (await apiService.get(dispatch, "pregnancies", { patient: id })) ?? [];
 
       // console.log(eddData);
 
       const grouped = {};
       // Appointments
-      data.forEach((a) => {
+      (data || []).forEach((a) => {
+        if (!a?.date) return; // skip invalid records
         const d = a.date.split("T")[0];
         if (!grouped[d]) grouped[d] = [];
         grouped[d].push(a);
       });
 
       // EDDs
-      eddData.forEach((e) => {
+      (eddData || []).forEach((e) => {
+        if (!e?.edd) return; // skip if no EDD
         const d = e.edd.split("T")[0];
         if (!grouped[d]) grouped[d] = [];
         grouped[d].push({
@@ -61,6 +62,7 @@ export default function CalendarTab({ id, tablename }) {
 
       setAppointments(grouped);
     } catch (error) {
+      console.error("Calendar fetch error:", error);
       dispatch(
         showNotification({ message: "Failed to load calendar", type: "error" })
       );

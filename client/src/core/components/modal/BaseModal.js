@@ -70,6 +70,24 @@ const ClinicalForm = ({ fields, formData, setFormData, type, readOnly }) => {
                     setFormData({ ...formData, [field.name]: e.target.value })
                   }
                 />
+              ) : field.type === "reactselect" ? (
+                <CreatableSelect
+                  isMulti={false}
+                  value={
+                    formData[field.name]
+                      ? {
+                          label: formData[field.name],
+                          value: formData[field.name],
+                        }
+                      : null
+                  }
+                  onChange={(selected) => {
+                    const value = selected?.value || ""; // sanitize to string
+                    setFormData({ ...formData, [field.name]: value });
+                  }}
+                  options={field.options || []}
+                  placeholder={field.placeholder}
+                />
               ) : field.type === "multiselect" ? (
                 <CreatableSelect
                   isMulti

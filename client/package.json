@@ -13,6 +13,7 @@
     "chart.js": "^4.4.6",
     "clsx": "^2.1.1",
     "feather-icons-react": "^0.7.0",
+    "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^5.0.2",
     "jwt-decode": "^4.0.0",

@@ -72,11 +72,11 @@ export const inventoryFormFields = [
     type: "textarea",
     showOn: "all",
   },
-  {
-    name: "createdAt",
-    label: "Created At",
-    type: "date",
-    showOn: "view,edit",
-    disabled: true,
-  },
+  // {
+  //   name: "created_on",
+  //   label: "Created On",
+  //   type: "date",
+  //   showOn: "view,edit",
+  //   disabled: true,
+  // },
 ];
