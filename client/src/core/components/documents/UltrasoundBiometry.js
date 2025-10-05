@@ -1,6 +1,7 @@
 import React, { forwardRef } from "react";
 import PrintHeader from "./PrintHeader";
 import { Footer } from "./PrintFooter";
+import { formatDate } from "../../utils/dateUtils";
 
 const styles = {
   container: {
@@ -86,16 +87,6 @@ const styles = {
   },
 };
 
-const formatDate = (raw) => {
-  if (!raw) return "";
-  const date = new Date(raw);
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(date);
-};
-
 const UltrasoundBiometryPrint = forwardRef(
   ({ data = {}, patient = {} }, ref) => {
     return (
@@ -107,7 +98,7 @@ const UltrasoundBiometryPrint = forwardRef(
             <div>
               Examination: <strong>BIOMETRY</strong>
             </div>
-            <div>Date: {formatDate(data.date)}</div>
+            <div>Date: {data.date}</div>
           </div>
 
           {/* PATIENT DATA */}

@@ -6,7 +6,6 @@ import { showNotification } from "../../../core/services/slices/notificationSlic
 import { formatDate, generateDaysInMonth } from "./Utils";
 import CalendarDayModal from "../../../core/components/calendar/CalendarDayModal";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
-import CalendarModal from "../../../core/components/calendar/CalendarModal";
 
 export default function CalendarTab({ id, tablename }) {
   const dispatch = useDispatch();
@@ -17,7 +16,7 @@ export default function CalendarTab({ id, tablename }) {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   // const [showDayModal, setShowDayModal] = useState(false);
 
-  // console.log(selectedAppointment);
+  // console.log(id);
 
   const month = currentDate.getMonth() + 1;
   const year = currentDate.getFullYear();
@@ -32,6 +31,9 @@ export default function CalendarTab({ id, tablename }) {
         ...(tablename === "patients" && { patient: id }),
       };
 
+      // console.log(tablename);
+      // console.log(params);
+
       // 1. Fetch appointments
       const data = (await apiService.get(dispatch, "calendar", params)) ?? [];
 
@@ -39,7 +41,7 @@ export default function CalendarTab({ id, tablename }) {
       const eddData =
         (await apiService.get(dispatch, "pregnancies", { patient: id })) ?? [];
 
-      // console.log(eddData);
+      // console.log(data);
 
       const grouped = {};
       // Appointments

@@ -23,8 +23,6 @@ export default function Sidebar({ children }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null); // Ref for the dropdown
   const moreVerticalRef = useRef(null); // Ref for the MoreVertical button
-  // const { refreshKey } = useSelector((state) => state.utils);
-  // const [record, setRecord] = useState(null);
 
   // Check if the screen width is small and set the state accordingly
   useEffect(() => {
@@ -45,31 +43,6 @@ export default function Sidebar({ children }) {
     };
   }, []);
 
-  // useEffect(() => {
-  //   const fetchDetails = async () => {
-  //     if (!userInfo) return;
-
-  //     console.log(userInfo);
-
-  //     // only fetch for doctors or patients
-  //     if (userInfo.role === "doctor" || userInfo.role === "patient") {
-  //       try {
-  //         const tablename = userInfo.role + "s";
-  //         const res = await apiService.get(dispatch, `${tablename}`, {
-  //           user: userInfo.id,
-  //         });
-
-  //         // console.log(res);
-
-  //         setRecord(res[0]); // save the full record
-  //       } catch (error) {
-  //         console.error(`Error fetching ${userInfo.role} details:`, error);
-  //       }
-  //     }
-  //   };
-  //   fetchDetails();
-  // }, [userInfo, dispatch, refreshKey]);
-
   const handleLogout = () => {
     dispatch(logoutUser());
     navigate("/");
@@ -83,22 +56,6 @@ export default function Sidebar({ children }) {
     if (!userInfo) return;
 
     switch (userInfo.role) {
-      // case "doctor":
-      //   if (record?._id) {
-      //     navigate(`/form/doctors/view/${record._id}`);
-      //   } else {
-      //     navigate("/list/doctors");
-      //   }
-      //   break;
-
-      // case "patient":
-      //   if (record?._id) {
-      //     navigate(`/form/patients/view/${record._id}`);
-      //   } else {
-      //     navigate("/list/patients");
-      //   }
-      //   break;
-
       default:
         navigate(`/form/users/view/${userInfo.id}`);
         break;
@@ -172,7 +129,7 @@ export default function Sidebar({ children }) {
         </ul>
 
         <div
-          className="border-t flex p-3 relative cursor-pointer"
+          className="border-t flex p-3 relative cursor-pointer justify-start"
           onClick={handleRedirect}
         >
           <img
@@ -186,17 +143,19 @@ export default function Sidebar({ children }) {
               overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
           `}
           >
-            <button className="leading-4">
+            <div className="flex flex-col items-start">
               <h4 className="font-semibold">{userInfo.fullname}</h4>
               <span className="text-xs text-text-primary">
                 {userInfo.email}
               </span>
-            </button>
+            </div>
             <button
-              aria-label="profileMoreBtn"
-              onClick={handleDropdownToggle}
+              onClick={(e) => {
+                e.stopPropagation(); // ✅ stop redirect trigger
+                handleDropdownToggle();
+              }}
               ref={moreVerticalRef}
-              className="p-2 rounded-md hover:bg-side-active/30"
+              className="p-2 rounded-md hover:bg-side-active/30 z-50"
             >
               <MoreVertical size={20} />
             </button>

@@ -104,7 +104,7 @@ const UltrasoundTransvaginalOBPrint = forwardRef(
             <div>
               Examination: <strong>TRANSVAGINAL ULTRASOUND</strong>
             </div>
-            <div>Date: {formatDate(data.date)}</div>
+            <div>Date: {data.date}</div>
           </div>
 
           {/* PATIENT DATA */}

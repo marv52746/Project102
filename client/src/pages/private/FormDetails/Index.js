@@ -98,7 +98,7 @@ export default function UserDashboardPage({ data }) {
     }
 
     const userId = data._id;
-    // console.log(mainTab);
+    // console.log(userId);
     // console.log(appointments);
 
     switch (mainTab) {
@@ -106,7 +106,7 @@ export default function UserDashboardPage({ data }) {
       case "dashboard":
         return <DashboardTab data={data} patientId={userId} />;
       case "patientCalendar":
-        return <CalendarTab id={userId} tablename={"users"} />;
+        return <CalendarTab id={userId} tablename={"patients"} />;
       case "clinical-records":
         return <ClinicalRecordTab data={data} patientId={userId} />;
       case "consultation-history":
@@ -120,7 +120,7 @@ export default function UserDashboardPage({ data }) {
       case "patients":
         return <PatientsTab appointments={appointments} doctorID={userId} />;
       case "calendar":
-        return <CalendarTab id={userId} tablename={"users"} />;
+        return <CalendarTab id={userId} tablename={"doctors"} />;
       case "reviews":
         return <ReviewsTab data={data} />;
       case "ultrasound":

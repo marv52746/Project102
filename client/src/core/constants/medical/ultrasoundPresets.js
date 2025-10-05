@@ -1,5 +1,3 @@
-import { getAbsoluteAge } from "../../utils/stringUtils";
-import { getAge } from "../../utils/tableUtils";
 import { genderOptions } from "../formFieldPresets";
 
 export const ultrasoundsForm = {
@@ -75,8 +73,11 @@ export const ultrasoundsForm = {
       { name: "radio_fee", label: "Radiologist Fee", type: "number" },
     ],
   },
+
   ob_data: {
-    condition: null,
+    condition: {
+      type: ["Biometry", "Biophysical Score", "Transvaginal Ultrasound - Gyne"],
+    },
     fields: [
       { name: "ob_data.lmp", label: "LMP", type: "date" },
       { name: "ob_data.edd", label: "EDD", type: "date" },
@@ -91,6 +92,23 @@ export const ultrasoundsForm = {
         label: "Gravida / Para",
         type: "text",
         placeholder: "e.g. G3P1(1011)",
+      },
+    ],
+  },
+
+  ob_data: {
+    condition: { type: "Transvaginal Ultrasound - Gyne" },
+    fields: [
+      {
+        name: "ob_data.gravida_para",
+        label: "Gravida / Para",
+        type: "text",
+        placeholder: "e.g. G3P1(1011)",
+      },
+      {
+        name: "ob_data.day_of_cycle",
+        label: "Day of Cycle",
+        type: "text",
       },
     ],
   },

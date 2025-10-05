@@ -24,9 +24,9 @@ export default function PatientsTab({ appointments }) {
   };
 
   const handleAppointmentClick = (patientId) => {
-    const appts = (appointments || []).filter(
-      (appt) => appt?.patient?._id === patientId
-    );
+    const appts = (appointments || [])
+      .filter((appt) => appt?.patient?._id === patientId)
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
     setSelectedAppointments(appts);
   };
 

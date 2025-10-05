@@ -35,6 +35,13 @@ const styles = {
     marginBottom: "4px",
     alignItems: "start",
   },
+  gridRowEnd: {
+    display: "grid",
+    gridTemplateColumns: "20% 30% 20% 30%",
+    marginBottom: "20px",
+    alignItems: "start",
+  },
+
   gridRowGyneMid: {
     display: "grid",
     gridTemplateColumns: "20% 70%",
@@ -55,12 +62,7 @@ const styles = {
     marginBottom: "20px",
     alignItems: "start",
   },
-  gridRowEnd: {
-    display: "grid",
-    gridTemplateColumns: "20% 80%",
-    marginBottom: "20px",
-    alignItems: "start",
-  },
+
   th: {
     fontWeight: "bold",
     fontSize: "12px",
@@ -106,7 +108,7 @@ const TransvaginalUltrasoundGynePrint = forwardRef(
             <div>
               Examination: <strong>TRANSVAGINAL ULTRASOUND</strong>
             </div>
-            <div>Date: {formatDate(data.date)}</div>
+            <div>Date: {data.date}</div>
           </div>
 
           {/* PATIENT DATA */}
@@ -123,13 +125,17 @@ const TransvaginalUltrasoundGynePrint = forwardRef(
             <div style={styles.th}>Date of Birth:</div>
             <div style={styles.td}>{formatDate(patient?.date_of_birth)}</div>
           </div>
-          <div style={styles.gridRowGyneTop}>
+          <div style={styles.gridRowEnd}>
             <div style={styles.th}>Age:</div>
             <div style={styles.td}>{patient?.age} y.o.</div>
-            <div style={styles.th}>G/P:</div>
-            <div style={styles.td}>{data.ob_data?.gravida_para}</div>
-            <div style={styles.th}>Day of Cycle:</div>
-            <div style={styles.td}>{data.ob_data?.day_of_cycle || "-"}</div>
+            <div style={styles.th}>
+              <div>G/P:</div>
+              <div>Day of Cycle:</div>
+            </div>
+            <div style={styles.td}>
+              <div>{data.ob_data?.gravida_para}</div>
+              <div>{data.ob_data?.day_of_cycle || "-"}</div>
+            </div>
           </div>
 
           {/* EXAMINATION FINDINGS */}

@@ -173,11 +173,17 @@ export default function UltrasoundTab() {
                           (Total Fee: ₱{totalFee.toFixed(2)})
                         </span>
                       </h5>
-                      {isExpanded ? (
-                        <ChevronDown className="h-4 w-4" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4" />
-                      )}
+                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <span>
+                          {radiologists[radiologist].length} record
+                          {radiologists[radiologist].length > 1 ? "s" : ""}
+                        </span>
+                        {isExpanded ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
+                      </div>
                     </div>
                     {isExpanded && (
                       <table className="min-w-full divide-y divide-gray-200 text-sm">

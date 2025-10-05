@@ -104,7 +104,7 @@ const UltrasoundBiophysicalPrint = forwardRef(
             <div>
               Examination: <strong>{data.type?.toUpperCase()}</strong>
             </div>
-            <div>Date: {formatDate(data.date)}</div>
+            <div>Date: {data.date}</div>
           </div>
 
           {/* PATIENT DATA */}

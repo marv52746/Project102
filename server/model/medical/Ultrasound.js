@@ -25,6 +25,7 @@ const ultrasoundSchema = new mongoose.Schema({
     edd: { type: Date },
     aog: { type: String }, // ex. "21W 4D"
     gravida_para: { type: String }, // G1P0, G3P1(1011)
+    day_of_cycle: { type: String },
   },
 
   // TRANSVAGINAL ULTRASOUND - OB
