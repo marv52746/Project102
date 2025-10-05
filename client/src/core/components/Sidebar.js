@@ -143,9 +143,9 @@ export default function Sidebar({ children }) {
               overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
           `}
           >
-            <div className="flex flex-col items-start">
-              <h4 className="font-semibold">{userInfo.fullname}</h4>
-              <span className="text-xs text-text-primary">
+            <div className="flex flex-col items-start max-w-[calc(100%-40px)] overflow-hidden">
+              <h4 className="font-semibold truncate">{userInfo.fullname}</h4>
+              <span className="text-xs text-text-primary truncate">
                 {userInfo.email}
               </span>
             </div>
