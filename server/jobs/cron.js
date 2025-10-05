@@ -1,21 +1,23 @@
 const cron = require("node-cron");
+const moment = require("moment-timezone");
 const { NotificationDb } = require("../model/notifications/Notification");
 const sendEmail = require("./sendEmail");
 
 // run every minute
 cron.schedule("* 6 * * *", async () => {
   try {
-    // get today's start and end
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
+    // 🔹 Get start & end of *today* in PH timezone
+    const startOfDayPH = moment.tz("Asia/Manila").startOf("day");
+    const endOfDayPH = moment.tz("Asia/Manila").endOf("day");
 
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
+    // 🔹 Convert them to UTC for querying (since sendAt is stored in UTC)
+    const startUTC = startOfDayPH.clone().utc().toDate();
+    const endUTC = endOfDayPH.clone().utc().toDate();
 
-    // fetch only pending + today's date
+    // 🔹 Find all pending notifications scheduled up to now (UTC)
     const pending = await NotificationDb.find({
       status: "pending",
-      sendAt: { $gte: startOfDay, $lte: endOfDay },
+      sendAt: { $gte: startUTC, $lte: endUTC },
     });
 
     // const pending = await NotificationDb.find({ status: "pending" });

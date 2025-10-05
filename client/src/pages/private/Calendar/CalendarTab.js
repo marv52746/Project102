@@ -3,9 +3,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useDispatch } from "react-redux";
 import apiService from "../../../core/services/apiService";
 import { showNotification } from "../../../core/services/slices/notificationSlice";
-import CalendarModal from "../../../core/components/calendar/CalendarModal";
 import { formatDate, generateDaysInMonth } from "./Utils";
 import CalendarDayModal from "../../../core/components/calendar/CalendarDayModal";
+import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
+import CalendarModal from "../../../core/components/calendar/CalendarModal";
 
 export default function CalendarTab({ id, tablename }) {
   const dispatch = useDispatch();
@@ -15,6 +16,8 @@ export default function CalendarTab({ id, tablename }) {
   const [selectedDayAppointments, setSelectedDayAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   // const [showDayModal, setShowDayModal] = useState(false);
+
+  // console.log(selectedAppointment);
 
   const month = currentDate.getMonth() + 1;
   const year = currentDate.getFullYear();
@@ -82,9 +85,20 @@ export default function CalendarTab({ id, tablename }) {
     // setShowDayModal(true);
   };
 
-  const handleSelectAppointment = (appt) => {
-    setSelectedAppointment(appt);
-    // setShowDayModal(false);
+  const handleSelectAppointment = async (appt) => {
+    try {
+      // ✅ Query full appointment data by ID
+      const fullData = await apiService.get(
+        dispatch,
+        `appointments/${appt._id}`
+      );
+      // console.log(fullData);
+      setSelectedAppointment(fullData);
+    } catch (error) {
+      console.error("Failed to load appointment:", error);
+      // fallback to using existing appt data if fetch fails
+      setSelectedAppointment(appt);
+    }
   };
 
   const closeModal = () => {
@@ -212,9 +226,17 @@ export default function CalendarTab({ id, tablename }) {
             onClick={(e) => e.stopPropagation()}
           >
             {selectedAppointment ? (
-              <CalendarModal
+              // <CalendarModal
+              //   report={selectedAppointment}
+              //   onClose={closeModal}
+              //   isOpen={true}
+              // />
+              <CalendarModalDetails
                 report={selectedAppointment}
-                onClose={closeModal}
+                onClose={() => {
+                  setSelectedDayAppointments([]);
+                  setSelectedAppointment(null);
+                }}
                 isOpen={true}
               />
             ) : (

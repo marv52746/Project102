@@ -85,9 +85,6 @@ export default function UltrasoundTab() {
   };
 
   const handleSave = async (type, data) => {
-    // console.log(data);
-    // console.log(type);
-
     if (data._id) {
       // update existing
       return handleFormSubmit({

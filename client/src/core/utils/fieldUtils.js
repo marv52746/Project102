@@ -55,11 +55,14 @@ export const getInputValue = (inputData, field) => {
 
   // ✅ Date handling remains the same
   if (field.type === "date") {
-    return new Date(val).toISOString().split("T")[0]; // "YYYY-MM-DD"
-  }
-
-  if (field.type === "datetime-local") {
-    return new Date(val).toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
+    const date = new Date(val);
+    return (
+      date.getFullYear() +
+      "-" +
+      String(date.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(date.getDate()).padStart(2, "0")
+    );
   }
 
   if (field.type === "time") {

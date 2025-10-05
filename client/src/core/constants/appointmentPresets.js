@@ -52,7 +52,7 @@ export const appointmentFormFields = [
     label: "Date",
     type: "date",
     showOn: "all",
-    default: new Date().toLocaleString("en-PH", { timeZone: "Asia/Manila" }),
+    default: new Date(),
     required: true,
   },
   {
@@ -60,9 +60,7 @@ export const appointmentFormFields = [
     label: "Time",
     type: "time",
     showOn: "all",
-    default: new Date()
-      .toTimeString("en-PH", { timeZone: "Asia/Manila" })
-      .slice(0, 5),
+    default: new Date().toTimeString().slice(0, 5),
     required: true,
   },
 

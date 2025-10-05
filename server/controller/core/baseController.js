@@ -20,11 +20,65 @@ class BaseController {
     }
   }
 
+  // getAll = async (req, res) => {
+  //   try {
+  //     const filters = req.query;
+  //     let query = this.model.find(filters);
+
+  //     if (Array.isArray(this.populateFields) && this.populateFields.length) {
+  //       this.populateFields.forEach((field) => {
+  //         query = query.populate(field);
+  //       });
+  //     }
+
+  //     const items = await query;
+  //     res.json(items);
+  //   } catch (error) {
+  //     res.status(500).json({ error: error.message });
+  //   }
+  // };
+
+  // In your BaseController or appointmentsController
   getAll = async (req, res) => {
     try {
-      const filters = req.query;
-      let query = this.model.find(filters);
+      const filters = { ...req.query };
+      let query = this.model.find();
 
+      // 🕗 Special handling: date=today
+      if (filters.date === "today") {
+        const now = new Date();
+
+        // Compute PH start and end of the day in UTC
+        const startOfDayPH = new Date(
+          Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+        );
+        const startOfDayUTC = new Date(
+          startOfDayPH.getTime() - 8 * 60 * 60 * 1000
+        ); // PH -8h
+        const endOfDayUTC = new Date(
+          startOfDayUTC.getTime() + 24 * 60 * 60 * 1000
+        );
+
+        query = query.find({
+          date: { $gte: startOfDayUTC, $lt: endOfDayUTC },
+        });
+
+        delete filters.date;
+      } else if (filters.date) {
+        // 🕗 optional: handle ISO string or range
+        const date = new Date(filters.date);
+        const start = new Date(date.setUTCHours(0, 0, 0, 0));
+        const end = new Date(date.setUTCHours(23, 59, 59, 999));
+        query = query.find({ date: { $gte: start, $lt: end } });
+        delete filters.date;
+      }
+
+      // Apply remaining filters
+      Object.keys(filters).forEach((key) => {
+        query = query.where(key).equals(filters[key]);
+      });
+
+      // Populate as before
       if (Array.isArray(this.populateFields) && this.populateFields.length) {
         this.populateFields.forEach((field) => {
           query = query.populate(field);
@@ -34,6 +88,7 @@ class BaseController {
       const items = await query;
       res.json(items);
     } catch (error) {
+      console.error("Error in getAll:", error);
       res.status(500).json({ error: error.message });
     }
   };

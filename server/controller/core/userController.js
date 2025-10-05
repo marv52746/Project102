@@ -55,6 +55,8 @@ class UserController extends BaseController {
         ...userData
       } = req.body;
 
+      console.log(req.body);
+
       if (!email) {
         return res
           .status(400)
@@ -265,47 +267,6 @@ class UserController extends BaseController {
       });
     }
   };
-
-  // CREATE PATIENT
-  // createPatient = async (req, res) => {
-  //   try {
-  //     const { medical_notes, email, password, ...userData } = req.body;
-
-  //     if (!email || !password) {
-  //       return res
-  //         .status(400)
-  //         .json({ error: "Email and password are required" });
-  //     }
-
-  //     const hashedPassword = await bcrypt.hash(password, 10);
-
-  //     const user = new UserDb({
-  //       ...userData,
-  //       email,
-  //       username: email,
-  //       password: hashedPassword,
-  //       created_by: req.currentUser?._id || null,
-  //       updated_by: req.currentUser?._id || null,
-  //     });
-  //     const savedUser = await user.save();
-
-  //     const patient = new PatientDb({
-  //       user: savedUser._id,
-  //       medical_notes,
-  //       created_by: req.currentUser?._id || null,
-  //       updated_by: req.currentUser?._id || null,
-  //     });
-
-  //     const savedPatient = await patient.save();
-
-  //     res.status(201).json(savedPatient);
-  //   } catch (error) {
-  //     console.error("Create Patient Error:", error);
-  //     res.status(500).json({ error: error.message });
-  //   }
-  // };
-
-  // DELETE USER
 
   delete = async (req, res) => {
     const userId = req.params.id;

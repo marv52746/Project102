@@ -2,6 +2,37 @@ import apiService from "../../services/apiService";
 import { setRefreshKey } from "../../services/reducers/utilsReducer";
 import { showNotification } from "../../services/slices/notificationSlice";
 import { loggedUserData } from "../../services/slices/userSlice";
+import moment from "moment-timezone";
+
+// ✅ Helper: recursively convert all Date/time fields to UTC
+function convertDatesToUTC(obj) {
+  if (Array.isArray(obj)) {
+    return obj.map((item) => convertDatesToUTC(item));
+  } else if (obj && typeof obj === "object") {
+    const newObj = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value instanceof Date) {
+        newObj[key] = moment(value).utc().toDate();
+      } else if (typeof value === "string" && isISODate(value)) {
+        // Only convert YYYY-MM-DD strings
+        newObj[key] = moment.tz(value, "Asia/Manila").utc().toDate();
+      } else {
+        newObj[key] = value;
+      }
+    }
+    return newObj;
+  }
+  return obj;
+}
+
+function isISODate(str) {
+  if (typeof str !== "string") return false;
+
+  // Matches YYYY-MM-DD or YYYY/MM/DD, optionally with time
+  const isoDateRegex = /^\d{4}([-/])\d{2}\1\d{2}(\s+\d{2}:\d{2}(:\d{2})?)?$/;
+
+  return isoDateRegex.test(str);
+}
 
 export const handleFormSubmit = async ({
   dispatch,
@@ -22,8 +53,6 @@ export const handleFormSubmit = async ({
       rawTablename === "patients" || rawTablename === "doctors"
         ? "users"
         : rawTablename;
-
-    const hasFile = fileData || fields.some((f) => f.type === "file");
 
     // Clone original data to avoid mutating state
     const payload = JSON.parse(JSON.stringify(data));
@@ -60,35 +89,27 @@ export const handleFormSubmit = async ({
     });
 
     let savedRecord;
+    let bodyToSend = convertDatesToUTC(payload);
 
-    // If form uses file
-    if (hasFile) {
+    // // If form uses file
+    if (fileData) {
       const formData = new FormData();
-      // for (const [key, value] of Object.entries(payload)) {
-      //   if (Array.isArray(value)) {
-      //     value.forEach((v) => formData.append(`${key}[]`, v));
-      //   } else if (typeof value === "object" && value !== null) {
-      //     formData.append(key, JSON.stringify(value));
-      //   } else {
-      //     formData.append(key, value);
-      //   }
-      // }
-
-      for (const [key, value] of Object.entries(payload)) {
+      for (const [key, value] of Object.entries(bodyToSend)) {
         if (Array.isArray(value)) {
           if (value.length > 0 && typeof value[0] === "object") {
-            // ✅ Array of objects → send as JSON
             formData.append(key, JSON.stringify(value));
           } else {
-            // ✅ Simple array → append individually
             value.forEach((v) => formData.append(`${key}[]`, v));
           }
         } else if (value instanceof File) {
-          formData.append(key, value); // ✅ File
+          formData.append(key, value);
+        } else if (value instanceof Date) {
+          formData.append(key, value);
         } else if (typeof value === "object" && value !== null) {
-          formData.append(key, JSON.stringify(value)); // ✅ Single object
+          // ✅ Only stringify normal objects
+          formData.append(key, JSON.stringify(value));
         } else if (value !== undefined && value !== null) {
-          formData.append(key, value); // ✅ Primitive values
+          formData.append(key, value);
         }
       }
 
@@ -105,6 +126,7 @@ export const handleFormSubmit = async ({
           true
         );
       } else {
+        // console.log(formData);
         savedRecord = await apiService.post(
           dispatch,
           tablename,
@@ -114,9 +136,9 @@ export const handleFormSubmit = async ({
       }
     } else {
       if (id) {
-        savedRecord = await apiService.put(dispatch, tablename, id, payload);
+        savedRecord = await apiService.put(dispatch, tablename, id, bodyToSend);
       } else {
-        savedRecord = await apiService.post(dispatch, tablename, payload);
+        savedRecord = await apiService.post(dispatch, tablename, bodyToSend);
       }
     }
 

@@ -124,169 +124,6 @@ export default function BookAppointmentForm({
     setTimeout(() => setSubmitted(false), 5000);
   };
 
-  //   return (
-  //     <div className="bg-white/95 backdrop-blur-sm shadow-2xl rounded-2xl p-8">
-  //       <h2 className="text-3xl font-bold text-pink-700">{title}</h2>
-  //       <p className="mt-2 text-gray-600">{description}</p>
-
-  //       <form onSubmit={handleSubmit} className="mt-6">
-  //         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-  //           {/* Full Name */}
-  //           <div className="flex items-center border rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-pink-400 col-span-1">
-  //             <User className="w-5 h-5 text-gray-400 mr-2" />
-  //             <input
-  //               type="text"
-  //               name="fullname"
-  //               placeholder="Full Name"
-  //               className="flex-1 outline-none text-sm"
-  //               value={formData.fullname}
-  //               onChange={handleChange}
-  //               required
-  //             />
-  //           </div>
-  //           {/* Email */}
-  //           <div className="flex items-center border rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-pink-400 col-span-1">
-  //             <Mail className="w-5 h-5 text-gray-400 mr-2" />
-  //             <input
-  //               type="email"
-  //               name="email"
-  //               placeholder="Email Address"
-  //               className="flex-1 outline-none text-sm"
-  //               value={formData.email}
-  //               onChange={handleChange}
-  //               required
-  //             />
-  //           </div>
-  //           {/* Phone */}
-  //           <div className="flex items-center border rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-pink-400 col-span-1">
-  //             <Phone className="w-5 h-5 text-gray-400 mr-2" />
-  //             <input
-  //               type="number"
-  //               name="phone"
-  //               placeholder="Phone Number"
-  //               className="flex-1 outline-none text-sm"
-  //               value={formData.phone}
-  //               onChange={handleChange}
-  //               required
-  //             />
-  //           </div>
-  //           {/* Doctor */}
-  //           <div className="relative col-span-1">
-  //             <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-  //             <select
-  //               name="doctor"
-  //               className="w-full pl-10 pr-8 py-2 border rounded-lg text-sm text-gray-700
-  //                bg-white appearance-none outline-none focus:ring-2 focus:ring-pink-400
-  //                transition-all"
-  //               value={formData.doctor}
-  //               onChange={handleChange}
-  //               required
-  //             >
-  //               <option value="">Select Doctor</option>
-  //               {doctorOptions.map((doc) => (
-  //                 <option key={doc.id} value={doc.id}>
-  //                   {doc.name}
-  //                 </option>
-  //               ))}
-  //             </select>
-  //             <span className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400">
-  //               ▼
-  //             </span>
-  //           </div>
-
-  //           {/* Date */}
-  //           <div className="relative col-span-1">
-  //             <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-  //             <input
-  //               type="date"
-  //               name="date"
-  //               className="w-full pl-10 pr-3 py-2 border rounded-lg text-sm text-gray-700
-  //                bg-white outline-none focus:ring-2 focus:ring-pink-400
-  //                transition-all"
-  //               value={formData.date}
-  //               onChange={handleChange}
-  //               required
-  //             />
-  //           </div>
-
-  //           {/* Custome Date */}
-  //           {/* <div className="relative col-span-1">
-  //             <div
-  //               className="flex items-center border rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-pink-400 cursor-pointer"
-  //               onClick={() => setShowDatePicker(true)}
-  //             >
-  //               <Calendar className="w-5 h-5 text-gray-400 mr-2" />
-  //               <span className="text-sm text-gray-700">
-  //                 {formData.date
-  //                   ? new Date(formData.date).toLocaleDateString("en-US", {
-  //                       year: "numeric",
-  //                       month: "short",
-  //                       day: "numeric",
-  //                     })
-  //                   : "Select Date"}
-  //               </span>
-  //             </div>
-  //             <CustomDatePicker
-  //               value={formData.date}
-  //               onChange={(date) => setFormData((prev) => ({ ...prev, date }))}
-  //               open={showDatePicker}
-  //               onClose={() => setShowDatePicker(false)}
-  //             />
-  //           </div> */}
-
-  //           <div className="relative col-span-1">
-  //             <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-  //             <input
-  //               type="time"
-  //               name="time"
-  //               className="w-full pl-10 pr-3 py-2 border rounded-lg text-sm text-gray-700
-  //                bg-white outline-none focus:ring-2 focus:ring-pink-400
-  //                transition-all"
-  //               value={formData.time}
-  //               onChange={handleChange}
-  //               required
-  //             />
-  //           </div>
-  //           {/* Reason */}
-  //           <div className="col-span-2">
-  //             <textarea
-  //               name="reason"
-  //               placeholder="Reason for Appointment"
-  //               className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-pink-400"
-  //               rows="3"
-  //               value={formData.reason}
-  //               onChange={handleChange}
-  //               required
-  //             ></textarea>
-  //           </div>
-  //           {/* Submit */}
-  //           <div className="col-span-2">
-  //             <button
-  //               type="submit"
-  //               disabled={loading}
-  //               className={`w-full py-3 rounded-lg shadow-md font-semibold transition-all duration-300 flex items-center justify-center gap-2
-  //                 ${
-  //                   submitted
-  //                     ? "bg-green-600 text-white hover:bg-green-700"
-  //                     : "bg-gradient-to-r from-pink-600 to-pink-500 text-white hover:from-pink-700 hover:to-pink-600 hover:shadow-lg"
-  //                 }`}
-  //             >
-  //               {submitted ? (
-  //                 <>
-  //                   <Check size={18} /> Appointment Booked
-  //                 </>
-  //               ) : loading ? (
-  //                 "Booking..." // ⏳ shows instantly on click
-  //               ) : (
-  //                 "Confirm Appointment"
-  //               )}
-  //             </button>
-  //           </div>
-  //         </div>
-  //       </form>
-  //     </div>
-  //   );
-
   return (
     <>
       <div className="bg-white/95 backdrop-blur-sm shadow-2xl rounded-2xl p-6 sm:p-8">
@@ -346,13 +183,14 @@ export default function BookAppointmentForm({
             </div>
 
             {/* Doctor */}
-            <div className="relative col-span-1">
+            <div className="relative col-span-1 ">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <select
                 name="doctor"
-                className="w-full pl-10 pr-8 py-2 border rounded-lg text-sm sm:text-base text-gray-700 
-             bg-white appearance-none outline-none focus:ring-2 focus:ring-pink-400
-             transition-all"
+                className="w-full pl-10 pr-8 py-2 border border-gray-300 rounded-lg text-sm sm:text-base text-gray-700 
+               bg-white appearance-none outline-none 
+               focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 
+               transition-all duration-150"
                 value={formData.doctor}
                 onChange={handleChange}
                 required
@@ -375,9 +213,10 @@ export default function BookAppointmentForm({
               <input
                 type="date"
                 name="date"
-                className="w-full pl-10 pr-3 py-2 border rounded-lg text-sm sm:text-base text-gray-700
-             bg-white outline-none focus:ring-2 focus:ring-pink-400
-             transition-all"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm sm:text-base text-gray-700
+               bg-white outline-none 
+               focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300
+               transition-all duration-150"
                 value={formData.date}
                 onChange={handleChange}
                 required
@@ -390,9 +229,10 @@ export default function BookAppointmentForm({
               <input
                 type="time"
                 name="time"
-                className="w-full pl-10 pr-3 py-2 border rounded-lg text-sm sm:text-base text-gray-700
-             bg-white outline-none focus:ring-2 focus:ring-pink-400
-             transition-all"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm sm:text-base text-gray-700
+               bg-white outline-none 
+               focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300
+               transition-all duration-150"
                 value={formData.time}
                 onChange={handleChange}
                 required
@@ -400,11 +240,13 @@ export default function BookAppointmentForm({
             </div>
 
             {/* Reason */}
-            <div className="col-span-1 sm:col-span-2">
+            <div className="col-span-1 sm:col-span-2 ">
               <textarea
                 name="reason"
                 placeholder="Reason for Appointment"
-                className="w-full border rounded-lg px-3 py-2 text-sm sm:text-base outline-none focus:ring-2 focus:ring-pink-400"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm sm:text-base outline-none 
+               focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 
+               transition-all duration-150"
                 rows="3"
                 value={formData.reason}
                 onChange={handleChange}

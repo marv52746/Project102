@@ -37,48 +37,6 @@ export const generateDaysInMonth_OLD = (date, appointments) => {
   return days;
 };
 
-// export const generateDaysInMonth = (date, appointments, holidays) => {
-//   const start = new Date(date.getFullYear(), date.getMonth(), 1);
-//   const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-//   const days = [];
-
-//   const startDay = start.getDay();
-//   for (let i = 0; i < startDay; i++) {
-//     const d = new Date(start);
-//     d.setDate(d.getDate() - (startDay - i));
-//     days.push({ day: d.getDate(), date: d, prevMonth: true });
-//   }
-
-//   for (let i = 1; i <= end.getDate(); i++) {
-//     const current = new Date(date.getFullYear(), date.getMonth(), i);
-//     const key = formatDate(current);
-//     days.push({
-//       day: i,
-//       date: current,
-//       appointments: appointments[key] || [],
-//       isHoliday: holidays.includes(key),
-//     });
-//   }
-
-//   const remainder = 42 - days.length;
-//   for (let i = 1; i <= remainder; i++) {
-//     const d = new Date(date.getFullYear(), date.getMonth() + 1, i);
-//     days.push({ day: d.getDate(), date: d, prevMonth: true });
-//   }
-
-//   return days;
-// };
-
-// export const formatDate = (date) => {
-//   try {
-//     const d = new Date(date);
-//     if (isNaN(d.getTime())) return "Invalid Date";
-//     return d.toISOString().split("T")[0]; // returns "YYYY-MM-DD"
-//   } catch {
-//     return "Invalid Date";
-//   }
-// };
-
 export const formatDate = (date) => {
   try {
     const d = new Date(date);

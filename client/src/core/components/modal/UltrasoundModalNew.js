@@ -13,6 +13,7 @@ import TransvaginalUltrasoundGynePrint from "../documents/UltrasoundTVSGyne";
 import { handleFormDelete } from "../formActions/formHandlers";
 import { useDispatch } from "react-redux";
 import ConfirmModal from "./ConfirmModal";
+import { formatDateForInput } from "../../utils/dateUtils";
 
 // 🔹 Section Title
 function SectionTitle({ title }) {
@@ -21,32 +22,6 @@ function SectionTitle({ title }) {
       {capitalizeText(title)}
     </h3>
   );
-}
-
-// utils/objectUtils.js
-function getNestedValue(obj, path) {
-  return path.split(".").reduce((o, k) => {
-    if (o && typeof o === "object" && k in o) {
-      return o[k];
-    }
-    return undefined; // stop safely
-  }, obj);
-}
-
-function setNestedValue(obj, path, value) {
-  const keys = path.split(".");
-  let temp = obj;
-  for (let i = 0; i < keys.length - 1; i++) {
-    if (!temp[keys[i]]) temp[keys[i]] = {}; // auto-create branch
-    temp = temp[keys[i]];
-  }
-  temp[keys[keys.length - 1]] = value;
-}
-
-function formatDateForInput(date) {
-  if (!date) return "";
-  const d = new Date(date);
-  return d.toISOString().split("T")[0]; // ✅ "2025-09-29"
 }
 
 // Helper function: calculate age from date of birth

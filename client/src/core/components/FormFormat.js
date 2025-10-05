@@ -106,8 +106,8 @@ const FormFormat = ({ data, fields }) => {
                   return renderSpacer(field, index);
                 }
 
-                // Section label
                 if (field.type === "label") {
+                  // Section label
                   return (
                     <div key={index} className="col-span-2">
                       <h3 className="text-md font-semibold text-gray-600 mt-4 mb-2">

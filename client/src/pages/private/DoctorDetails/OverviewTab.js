@@ -57,12 +57,8 @@ export default function OverviewTab({ appointments }) {
     const fetchAppointments = async () => {
       try {
         const now = new Date();
-        const phNow = new Date(
-          now.toLocaleString("en-US", { timeZone: "Asia/Manila" })
-        );
-
-        const startOfDayPH = new Date(phNow.setHours(0, 0, 0, 0));
-        const endOfDayPH = new Date(phNow.setHours(23, 59, 59, 999));
+        const startOfDayPH = new Date(now.setHours(0, 0, 0, 0));
+        const endOfDayPH = new Date(now.setHours(23, 59, 59, 999));
 
         let upcomingCount = 0;
         let completedCount = 0;
@@ -135,11 +131,8 @@ export default function OverviewTab({ appointments }) {
 
   useEffect(() => {
     const now = new Date();
-    const phNow = new Date(
-      now.toLocaleString("en-US", { timeZone: "Asia/Manila" })
-    );
-    const start = new Date(phNow.setHours(0, 0, 0, 0));
-    const end = new Date(phNow.setHours(23, 59, 59, 999));
+    const start = new Date(now.setHours(0, 0, 0, 0));
+    const end = new Date(now.setHours(23, 59, 59, 999));
     setDayBounds({ start, end });
   }, []);
 

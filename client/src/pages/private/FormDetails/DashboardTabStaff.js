@@ -8,7 +8,7 @@ import {
   CalendarPlus,
   FlaskConical,
 } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
 import UpcomingAppointments from "../FormDetails/UpcomingAppointments";
 import apiService from "../../../core/services/apiService";
@@ -22,6 +22,7 @@ import { useParams } from "react-router-dom";
 export default function DashboardTabStaff() {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const { refreshKey } = useSelector((state) => state.utils);
   const [stats, setStats] = useState({
     upcoming: 0,
     completed: 0,
@@ -30,6 +31,7 @@ export default function DashboardTabStaff() {
 
   const [activities, setActivities] = useState([]);
   const [upcomingAppointments, setupcomingAppointments] = useState([]);
+  const [completedAppointments, setCompletedAppointments] = useState([]);
   const [inLobbyAppointments, setInLobbyAppointments] = useState([]);
 
   const [openViewModal, setOpenViewModal] = useState(false);
@@ -52,8 +54,11 @@ export default function DashboardTabStaff() {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const today = new Date();
-        const appointments = await apiService.get(dispatch, "appointments");
+        const appointments = await apiService.get(dispatch, "appointments", {
+          date: "today",
+        });
+
+        // console.log(appointments);
 
         let upcomingCount = 0;
         let completedTodayCount = 0;
@@ -82,30 +87,22 @@ export default function DashboardTabStaff() {
           });
 
         var upcomingAppointmentsArr = [];
+        var completedAppointmentsArr = [];
         var inLobbyArr = [];
 
         appointments.forEach((a) => {
-          const appointmentDate = new Date(a.date);
-          if (
-            a.status === "scheduled" &&
-            appointmentDate >= new Date(today.setHours(0, 0, 0, 0))
-          ) {
+          if (a.status === "scheduled") {
             upcomingAppointmentsArr.push(a);
             upcomingCount++;
           }
 
-          if (
-            a.status === "ready" &&
-            appointmentDate >= new Date(today.setHours(0, 0, 0, 0))
-          ) {
+          if (a.status === "ready") {
             inLobbyArr.push(a);
             inlobbyCount++;
           }
 
-          if (
-            a.status === "completed" &&
-            appointmentDate === new Date(today.setHours(0, 0, 0, 0))
-          ) {
+          if (a.status === "completed") {
+            completedAppointmentsArr.push(a);
             completedTodayCount++;
           }
         });
@@ -118,6 +115,7 @@ export default function DashboardTabStaff() {
 
         setActivities(recentActivities);
         setupcomingAppointments(upcomingAppointmentsArr);
+        setCompletedAppointments(completedAppointmentsArr);
         setInLobbyAppointments(inLobbyArr);
         // console.log(upcomingAppointmentsArr);
       } catch (err) {
@@ -126,7 +124,7 @@ export default function DashboardTabStaff() {
     };
 
     fetchAppointments();
-  }, [dispatch, manualRefresh]);
+  }, [dispatch, manualRefresh, refreshKey]);
 
   const statCards = [
     {
@@ -136,13 +134,13 @@ export default function DashboardTabStaff() {
       icon: <ClipboardList className="w-6 h-6 text-green-600" />,
     },
     {
-      label: "Completed Appointments Today",
+      label: "Completed Appointments (Today)",
       value: stats.completed,
       color: "bg-green-100 text-green-800",
       icon: <CalendarCheck2 className="w-6 h-6 text-green-600" />,
     },
     {
-      label: "Upcoming Appointments",
+      label: "Upcoming Appointments (Today)",
       value: stats.upcoming,
       color: "bg-blue-100 text-blue-800",
       icon: <CalendarClock className="w-6 h-6 text-blue-600" />,
@@ -152,10 +150,8 @@ export default function DashboardTabStaff() {
   // Map stats to appointments
   const statAppointmentsMap = {
     "In Lobby": inLobbyAppointments,
-    "Completed Appointments Today": activities.filter((a) =>
-      a.action.includes("completed")
-    ),
-    "Upcoming Appointments": upcomingAppointments,
+    "Completed Appointments (Today)": completedAppointments,
+    "Upcoming Appointments (Today)": upcomingAppointments,
   };
 
   const quickActions = [
@@ -223,7 +219,7 @@ export default function DashboardTabStaff() {
           {/* Upcoming Appointments */}
           <div className="xl:col-span-2 space-y-4">
             <UpcomingAppointments
-              title={"Upcoming Appointments"}
+              title={"Upcoming Appointments (Today)"}
               appointments={upcomingAppointments}
               // scheduleAppointment={true}
               onSelect={(app) => {

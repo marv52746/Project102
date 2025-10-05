@@ -107,7 +107,10 @@ export function ContactUs() {
                 onChange={handleChange}
                 placeholder="Your Name"
                 required
-                className="w-full border rounded p-2 mb-3"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 text-sm sm:text-base text-gray-700 
+             bg-white outline-none 
+             focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 
+             transition-all duration-150"
               />
               <input
                 type="email"
@@ -116,7 +119,10 @@ export function ContactUs() {
                 onChange={handleChange}
                 placeholder="Your Email"
                 required
-                className="w-full border rounded p-2 mb-3"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 text-sm sm:text-base text-gray-700 
+             bg-white outline-none 
+             focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 
+             transition-all duration-150"
               />
               <textarea
                 name="message"
@@ -125,7 +131,10 @@ export function ContactUs() {
                 placeholder="Message"
                 rows="5"
                 required
-                className="w-full border rounded p-2 mb-3"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 text-sm sm:text-base text-gray-700 
+             bg-white outline-none 
+             focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 
+             transition-all duration-150"
               />
               <button
                 type="submit"

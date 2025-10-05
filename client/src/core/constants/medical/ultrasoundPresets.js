@@ -70,8 +70,7 @@ export const ultrasoundsForm = {
         name: "date",
         label: "Date",
         type: "date",
-        default: () =>
-          new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Manila" }),
+        default: () => new Date(),
       },
       { name: "radio_fee", label: "Radiologist Fee", type: "number" },
     ],

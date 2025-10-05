@@ -158,7 +158,10 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-3 border border-gray-300 rounded-md"
+              className="w-full border border-gray-300 rounded-lg p-3 text-sm sm:text-base text-gray-700 
+             bg-white outline-none 
+             focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 
+             transition-all duration-150"
             />
           </div>
 
@@ -170,7 +173,10 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-3 border border-gray-300 rounded-md pr-10"
+              className="w-full border border-gray-300 rounded-lg p-3 text-sm sm:text-base text-gray-700 
+             bg-white outline-none 
+             focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 
+             transition-all duration-150"
             />
 
             <button

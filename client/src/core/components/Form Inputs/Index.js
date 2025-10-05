@@ -104,7 +104,7 @@ export const renderInputByType = ({
           isReadOnly={isReadOnly}
         />
       );
-    case "date-time":
+    case "date":
       return (
         <DateTimeInput
           field={field}

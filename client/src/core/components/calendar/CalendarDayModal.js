@@ -41,6 +41,8 @@ export default function CalendarDayModal({
 }) {
   if (!appointments.length) return null;
 
+  // console.log(appointments);
+
   const isToday = formatDate(appointments[0].date) === formatDate(new Date());
   const title = isToday
     ? "Appointments for today"

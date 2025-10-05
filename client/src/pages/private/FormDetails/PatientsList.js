@@ -7,7 +7,7 @@ import CalendarModalDetails from "../../../core/components/calendar/CalendarModa
 import { capitalizeText } from "../../../core/utils/stringUtils";
 import apiService from "../../../core/services/apiService"; // ✅ import to fetch users
 
-export default function PatientsList({ appointments }) {
+export default function PatientsList() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -24,10 +24,11 @@ export default function PatientsList({ appointments }) {
     }
   };
 
-  const handleAppointmentClick = (patientId) => {
-    const appts = (appointments || [])
-      .filter((appt) => appt?.patient?._id === patientId)
-      .sort((a, b) => new Date(b.date) - new Date(a.date));
+  const handleAppointmentClick = async (patientId) => {
+    const appts = await apiService.get(dispatch, "appointments", {
+      patient: patientId,
+    });
+    appts.sort((a, b) => new Date(b.date) - new Date(a.date));
     setSelectedAppointments(appts);
   };
 
@@ -40,27 +41,14 @@ export default function PatientsList({ appointments }) {
         // ✅ Get all users with patient role
         const users = await apiService.get(dispatch, "users?role=patient");
 
-        // ✅ Map each patient with their appointments
-        const patientsWithAppointments = users.map((p) => {
-          const appts = (appointments || [])
-            .filter((appt) => appt?.patient?._id === p._id)
-            .sort((a, b) => new Date(b.date) - new Date(a.date));
-
-          return {
-            ...p,
-            appointments: appts,
-            lastVisit: appts[0]?.date || null,
-          };
-        });
-
-        setPatients(patientsWithAppointments);
+        setPatients(users);
       } catch (error) {
         console.error("Error fetching patients:", error);
       }
     };
 
     fetchPatients();
-  }, [appointments, dispatch]);
+  }, [dispatch]);
 
   const filteredPatients = patients.filter((p) =>
     p?.name?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -94,7 +82,6 @@ export default function PatientsList({ appointments }) {
               <th className="px-4 py-2 text-left font-semibold">Gender</th>
               <th className="px-4 py-2 text-left font-semibold">Birthday</th>
               <th className="px-4 py-2 text-left font-semibold">Age</th>
-              <th className="px-4 py-2 text-left font-semibold">Last Visit</th>
               <th className="px-4 py-2 text-left font-semibold">
                 Appointment Record
               </th>
@@ -133,14 +120,6 @@ export default function PatientsList({ appointments }) {
                     {patient?.date_of_birth
                       ? getAge(patient.date_of_birth)
                       : "—"}
-                  </td>
-                  <td className="px-4 py-3 text-gray-700">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4 text-gray-500" />
-                      {patient?.lastVisit
-                        ? new Date(patient.lastVisit).toLocaleDateString()
-                        : "—"}
-                    </div>
                   </td>
                   <td
                     onClick={() => handleAppointmentClick(patient._id)}

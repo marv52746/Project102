@@ -318,13 +318,13 @@ export const othersFormFields = [
     placeholder: "Enter additional notes",
     required: true,
   },
-  {
-    name: "amount",
-    label: "Consultation Fee",
-    type: "text",
-    placeholder: "Enter consultation fee (₱)",
-    required: true,
-  },
+  // {
+  //   name: "amount",
+  //   label: "Consultation Fee",
+  //   type: "text",
+  //   placeholder: "Enter consultation fee (₱)",
+  //   required: true,
+  // },
 ];
 
 export const labRequestFormFields = [
@@ -381,7 +381,7 @@ export const labRequestFormFields = [
     name: "requested_on",
     label: "Requested Date",
     type: "date",
-    default: new Date().toLocaleString("en-PH", { timeZone: "Asia/Manila" }),
+    default: new Date(),
   },
   {
     name: "notes",

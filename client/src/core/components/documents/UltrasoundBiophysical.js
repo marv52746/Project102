@@ -1,6 +1,7 @@
 import React, { forwardRef } from "react";
 import PrintHeader from "./PrintHeader";
 import { Footer } from "./PrintFooter";
+import { formatDate } from "../../utils/dateUtils";
 
 const styles = {
   container: {
@@ -90,17 +91,6 @@ const styles = {
     marginTop: "20px",
     textAlign: "justify",
   },
-};
-
-const formatDate = (raw) => {
-  if (!raw) return "";
-  const date = new Date(raw);
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    timeZone: "Asia/Manila", // Philippine Time
-  }).format(date);
 };
 
 const UltrasoundBiophysicalPrint = forwardRef(

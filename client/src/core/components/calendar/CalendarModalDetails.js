@@ -16,6 +16,8 @@ import {
   ImageIcon,
   Syringe,
   FileText,
+  XIcon,
+  Pencil,
 } from "lucide-react";
 
 import { formatDate, formatTime } from "../../utils/dateUtils";
@@ -305,7 +307,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
     },
     {
       type: "findings",
-      title: "Notes & Findings",
+      title: "Diagnosis",
       desc: "Add clinical notes and diagnosis",
     },
     // {
@@ -433,10 +435,10 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
             />
             <InfoCard
               label="Consultation Fee"
-              value={
-                report.amount
-                  ? `₱${Number(report.amount).toLocaleString()}`
-                  : "-"
+              value={report.amount}
+              editable={true}
+              onSave={(newValue) =>
+                handleSave("appointments", { amount: newValue })
               }
             />
             <InfoCard
@@ -560,7 +562,99 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
   );
 }
 
-const InfoCard = ({ icon: Icon, label, value, onClick, clickable, status }) => {
+// const InfoCard = ({
+//   icon: Icon,
+//   label,
+//   value,
+//   onClick,
+//   clickable,
+//   editable,
+//   status,
+//   onSave,
+// }) => {
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [tempValue, setTempValue] = useState(value ?? "");
+//   const statusBadgeClasses = (s) => {
+//     switch (s) {
+//       case "ready":
+//         return "bg-green-100 text-green-700";
+//       case "scheduled":
+//         return "bg-gray-100 text-gray-700";
+//       case "cancelled":
+//         return "bg-yellow-100 text-yellow-700";
+//       case "completed":
+//         return "bg-blue-100 text-blue-700";
+//       default:
+//         return "bg-gray-100 text-gray-700";
+//     }
+//   };
+//   const handleSave = () => {
+//     setIsEditing(false);
+//     if (onSave) onSave(tempValue);
+//   };
+
+//   const handleKeyDown = (e) => {
+//     if (e.key === "Enter") handleSave();
+//     if (e.key === "Escape") {
+//       setTempValue(value ?? "");
+//       setIsEditing(false);
+//     }
+//   };
+
+//   const displayValue = value ?? "N/A";
+
+//   return (
+//     <div
+//       className={`flex flex-col ${clickable ? "cursor-pointer" : ""}`}
+//       onClick={onClick}
+//     >
+//       <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+//         {Icon && <Icon size={14} className="text-gray-500" />}
+//         {label}
+//       </span>
+
+//       <span className="mt-1">
+//         {status ? (
+//           <span
+//             className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusBadgeClasses(
+//               status
+//             )}`}
+//           >
+//             {displayValue}
+//           </span>
+//         ) : (
+//           <span
+//             className={`${
+//               clickable
+//                 ? "text-blue-600 hover:underline hover:text-blue-800"
+//                 : "text-gray-800"
+//             }`}
+//           >
+//             {displayValue}
+//           </span>
+//         )}
+//       </span>
+//     </div>
+//   );
+// };
+
+const InfoCard = ({
+  icon: Icon,
+  label,
+  value,
+  onClick,
+  clickable,
+  status,
+  editable,
+  onSave,
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempValue, setTempValue] = useState(value);
+  const userInfo = useSelector((state) => state.user.userInfo);
+  const hasPermission = adminOnlyRoles.includes(userInfo.role);
+
+  // console.log(hasPermission);
+
   const statusBadgeClasses = (s) => {
     switch (s) {
       case "ready":
@@ -576,17 +670,64 @@ const InfoCard = ({ icon: Icon, label, value, onClick, clickable, status }) => {
     }
   };
 
-  const displayValue = value ?? "N/A";
+  const handleSave = () => {
+    setIsEditing(false);
+    if (onSave && tempValue !== value) onSave(tempValue);
+  };
+
+  const handleCancel = () => {
+    setTempValue(value);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleSave();
+    if (e.key === "Escape") handleCancel();
+  };
+
+  // console.log(tempValue);
+
+  const displayValue =
+    label === "Consultation Fee" && !isEditing
+      ? `₱ ${Number(value).toLocaleString() ?? "0"}`
+      : value ?? "N/A";
 
   return (
-    <div
-      className={`flex flex-col ${clickable ? "cursor-pointer" : ""}`}
-      onClick={onClick}
-    >
-      <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
-        {Icon && <Icon size={14} className="text-gray-500" />}
-        {label}
-      </span>
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+          {Icon && <Icon size={14} className="text-gray-500" />}
+          {label}
+          {editable && !isEditing && hasPermission && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="text-blue-600 hover:text-blue-800 transition"
+              title="Edit"
+            >
+              <Pencil size={16} strokeWidth={2.2} className="ml-1" />
+            </button>
+          )}
+        </span>
+
+        {editable && isEditing && hasPermission && (
+          <div className="flex gap-1">
+            <button
+              onClick={handleSave}
+              className="p-1 text-green-600 hover:text-green-700"
+              title="Save"
+            >
+              <Check size={14} />
+            </button>
+            <button
+              onClick={handleCancel}
+              className="p-1 text-gray-400 hover:text-red-600"
+              title="Cancel"
+            >
+              <XIcon size={14} />
+            </button>
+          </div>
+        )}
+      </div>
 
       <span className="mt-1">
         {status ? (
@@ -597,11 +738,21 @@ const InfoCard = ({ icon: Icon, label, value, onClick, clickable, status }) => {
           >
             {displayValue}
           </span>
+        ) : isEditing ? (
+          <input
+            type={label === "Consultation Fee" ? "number" : "text"}
+            autoFocus
+            value={tempValue}
+            onChange={(e) => setTempValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="border rounded-md px-2 py-1 text-sm w-full focus:outline-none focus:ring focus:ring-blue-200"
+          />
         ) : (
           <span
+            onClick={clickable ? onClick : undefined}
             className={`${
               clickable
-                ? "text-blue-600 hover:underline hover:text-blue-800"
+                ? "text-blue-600 hover:underline hover:text-blue-800 cursor-pointer"
                 : "text-gray-800"
             }`}
           >

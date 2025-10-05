@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import TableMini from "../TableMini";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { listConfigMap } from "../../constants/FieldConfigMap";
+import { formatDateForInput } from "../../utils/dateUtils";
 
 function AppointmentsTable({ appointments }) {
   const [isTableVisible, setIsTableVisible] = useState(true); // State to track table visibility
@@ -10,7 +11,7 @@ function AppointmentsTable({ appointments }) {
   const columns = config.fieldData;
   // Generate today's date in YYYY-MM-DD format
   const today = new Date();
-  const filterDate = today.toISOString().split("T")[0];
+  const filterDate = formatDateForInput(today);
 
   const toggleTable = () => {
     setIsTableVisible(!isTableVisible); // Toggle the table visibility
