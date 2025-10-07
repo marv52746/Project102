@@ -76,22 +76,24 @@ const PlanTable = () => {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <section id="planTable" className="py-16 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 text-center">
-        <h2 className="text-3xl font-bold text-pink-600">Plan Table</h2>
-        <p className="mt-2 text-gray-600">
+    <section id="planTable" className="py-2 sm:py-16 bg-gray-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        <h2 className="text-2xl sm:text-3xl font-bold text-pink-600">
+          Plan Table
+        </h2>
+        <p className="mt-2 text-gray-600 text-sm sm:text-base max-w-2xl mx-auto">
           From getting pregnant to caring for your little one, our plan table
           gives you clear insights and practical tips for every step of the
           journey.
         </p>
 
         {/* Tabs */}
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
+        <div className="mt-6 sm:mt-8 flex flex-wrap justify-center gap-3 sm:gap-4">
           {tabs.map((tab, index) => (
             <button
               key={index}
               onClick={() => setActiveTab(index)}
-              className={`flex flex-col items-center p-3 rounded-lg border transition ${
+              className={`flex flex-col items-center p-2 sm:p-3 rounded-lg border transition-all duration-200 ${
                 activeTab === index
                   ? "bg-pink-100 border-pink-500"
                   : "bg-white border-gray-200 hover:bg-gray-100"
@@ -100,23 +102,28 @@ const PlanTable = () => {
               <img
                 src={tab.image}
                 alt={tab.title}
-                className="w-20 h-12 object-contain"
+                className="w-14 h-10 sm:w-20 sm:h-12 object-contain"
               />
-              <span className="mt-2 text-sm font-medium">{tab.title}</span>
+              <span className="mt-2 text-xs sm:text-sm font-medium text-gray-700 text-center">
+                {tab.title}
+              </span>
             </button>
           ))}
         </div>
 
         {/* Tab Content */}
-        <div className="mt-12 grid md:grid-cols-2 gap-8 text-left items-center">
-          <div>
-            <h3 className="text-2xl font-semibold text-pink-600">
+        <div className="mt-8 sm:mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 text-left items-center">
+          {/* Left side (text) */}
+          <div className="px-2 sm:px-0">
+            <h3 className="text-xl sm:text-2xl font-semibold text-pink-600">
               {tabs[activeTab].title}
             </h3>
-            <p className="mt-4 text-gray-700">{tabs[activeTab].description}</p>
+            <p className="mt-3 sm:mt-4 text-gray-700 text-sm sm:text-base leading-relaxed">
+              {tabs[activeTab].description}
+            </p>
 
             {tabs[activeTab].list && (
-              <ul className="list-disc list-inside mt-4 text-gray-700 space-y-2">
+              <ul className="list-disc list-inside mt-3 sm:mt-4 text-gray-700 space-y-1 sm:space-y-2 text-sm sm:text-base">
                 {tabs[activeTab].list.map((item, i) => (
                   <li key={i}>{item}</li>
                 ))}
@@ -124,7 +131,7 @@ const PlanTable = () => {
             )}
 
             {tabs[activeTab].list2 && (
-              <ul className="list-disc list-inside mt-4 text-gray-700 space-y-2">
+              <ul className="list-disc list-inside mt-3 sm:mt-4 text-gray-700 space-y-1 sm:space-y-2 text-sm sm:text-base">
                 {tabs[activeTab].list2.map((item, i) => (
                   <li key={i}>{item}</li>
                 ))}
@@ -132,17 +139,18 @@ const PlanTable = () => {
             )}
 
             {tabs[activeTab].note && (
-              <p className="mt-6 text-sm text-gray-500">
+              <p className="mt-4 sm:mt-6 text-xs sm:text-sm text-gray-500 leading-snug">
                 <strong>Note:</strong> {tabs[activeTab].note}
               </p>
             )}
           </div>
 
+          {/* Right side (image) */}
           <div className="flex justify-center">
             <img
               src={tabs[activeTab].imgRight}
               alt={tabs[activeTab].title}
-              className="max-w-sm rounded-lg shadow-lg"
+              className="max-w-[70%] sm:max-w-sm rounded-lg shadow-md sm:shadow-lg"
             />
           </div>
         </div>

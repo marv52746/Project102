@@ -68,7 +68,7 @@ export default function Home() {
               alt="Logo"
               className="h-10 w-10 object-contain"
             />
-            <h1 className="text-pink-600 font-bold text-xl">
+            <h1 className="text-pink-600 font-bold text-base sm:text-xl leading-tight">
               Bislig Premier Birthing Home
             </h1>
           </Link>
@@ -107,23 +107,10 @@ export default function Home() {
         {/* Mobile Menu Dropdown */}
         {mobileOpen && (
           <div className="md:hidden bg-white border-t shadow">
-            <div className="flex flex-col p-4 space-y-3">
+            <div className="flex flex-col p-4 space-y-3 text-sm">
               {tabs.map((tab) => {
                 if (tab.id === "login" && authState) return null;
                 if (tab.id === "profile" && !authState) return null;
-
-                // if (tab.id === "login") {
-                //   return (
-                //     <Link
-                //       key={tab.id}
-                //       to={all_routes.login}
-                //       onClick={() => setMobileOpen(false)}
-                //       className="text-gray-700 hover:text-pink-600"
-                //     >
-                //       {tab.label}
-                //     </Link>
-                //   );
-                // }
 
                 return (
                   <button
@@ -149,7 +136,7 @@ export default function Home() {
 
       {/* Sections */}
       {activeTab === "home" && (
-        <section className="relative min-h-screen flex items-center pt-24">
+        <section className="relative min-h-screen flex items-center pt-0 sm:pt-24">
           {/* Background doctor image */}
           <div
             className="absolute inset-0 bg-no-repeat"

@@ -126,14 +126,12 @@ export default function BookAppointmentForm({
 
   return (
     <>
-      <div className="bg-white/95 backdrop-blur-sm shadow-2xl rounded-2xl p-6 sm:p-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-pink-700">
-          {title}
-        </h2>
+      <div className="bg-white/95 backdrop-blur-sm shadow-2xl rounded-2xl p-4 sm:p-8">
+        <h2 className="text-xl sm:text-3xl font-bold text-pink-700">{title}</h2>
         <p className="mt-2 text-gray-600 text-sm sm:text-base">{description}</p>
 
         <form onSubmit={handleSubmit} className="mt-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
             {/* Full Name */}
             <div
               className="flex items-center border rounded-lg px-3 py-2 bg-white 
