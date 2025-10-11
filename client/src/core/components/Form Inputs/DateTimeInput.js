@@ -8,6 +8,7 @@ const DateTimeInput = ({ field, value, onChange, isReadOnly }) => {
       id={field.name}
       name={field.name}
       type={field.type}
+      min={field.min ? new Date().toISOString().split("T")[0] : ""}
       value={value}
       onChange={onChange}
       disabled={field.disabled || isReadOnly}

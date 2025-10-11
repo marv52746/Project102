@@ -13,6 +13,7 @@ import { getInputValue } from "../../utils/fieldUtils";
 import CheckboxInput from "./CheckboxInput";
 import NumberInput from "./NumberInput";
 import DateTimeInput from "./DateTimeInput";
+import TimeInput from "./TimeInput";
 
 export const renderInputByType = ({
   field,
@@ -107,6 +108,15 @@ export const renderInputByType = ({
     case "date":
       return (
         <DateTimeInput
+          field={field}
+          value={value}
+          onChange={handleChange}
+          isReadOnly={isReadOnly}
+        />
+      );
+    case "time":
+      return (
+        <TimeInput
           field={field}
           value={value}
           onChange={handleChange}

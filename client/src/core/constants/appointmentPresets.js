@@ -52,6 +52,7 @@ export const appointmentFormFields = [
     label: "Date",
     type: "date",
     showOn: "all",
+    min: true,
     default: new Date(),
     required: true,
   },
@@ -60,7 +61,7 @@ export const appointmentFormFields = [
     label: "Time",
     type: "time",
     showOn: "all",
-    default: new Date().toTimeString().slice(0, 5),
+    default: "09:00",
     required: true,
   },
 

@@ -56,13 +56,12 @@ export function ContactUs() {
         {/* Grid Layout */}
         <div className="grid md:grid-cols-2 gap-8 items-start">
           {/* Google Map with Address */}
-          <div className="rounded-xl overflow-hidden shadow">
+          <div className="rounded-xl overflow-hidden shadow h-[300px] sm:h-[400px] md:h-full">
             <iframe
               title="Bislig Premier Birthing Home Location"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d318.17132788757134!2d126.3567559!3d8.1858627!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32fdbbd313ae1bf5%3A0x24376b032f893a26!2sBISLIG%20PREMIER%20BIRTHING%20HOME!5e0!3m2!1sen!2sph!4v1726900000000!5m2!1sen!2sph"
               width="100%"
-              height="300" // ✅ smaller on mobile
-              className="sm:h-[400px] md:h-[480px] w-full"
+              className="w-full h-full"
               style={{ border: 0 }}
               allowFullScreen=""
               loading="lazy"

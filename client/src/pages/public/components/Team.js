@@ -90,7 +90,7 @@ export default function Team({ doctors }) {
 
       {selectedDoctor && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30 p-4"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedDoctor(null)}
         >
           <div
@@ -98,7 +98,7 @@ export default function Team({ doctors }) {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Doctor Info */}
-            <div className="p-4 sm:p-6">
+            <div className="p-0 sm:p-6">
               <div className="absolute top-0 right-2 flex justify-end p-3 z-50">
                 <button
                   onClick={() => setSelectedDoctor(null)}

@@ -62,7 +62,12 @@ export default function Home() {
       <nav className="fixed top-0 w-full bg-white/50 backdrop-blur-md shadow z-40">
         <div className="max-w-6xl mx-auto flex justify-between items-center p-4">
           {/* Logo + Title */}
-          <Link to="/" className="flex items-center space-x-3 hover:opacity-90">
+          <button
+            onClick={() => {
+              setActiveTab("home");
+            }}
+            className="flex items-center space-x-3 hover:opacity-90"
+          >
             <img
               src="/assets/images/Logo.png"
               alt="Logo"
@@ -71,7 +76,7 @@ export default function Home() {
             <h1 className="text-pink-600 font-bold text-base sm:text-xl leading-tight">
               Bislig Premier Birthing Home
             </h1>
-          </Link>
+          </button>
 
           {/* Desktop Tabs */}
           <div className="hidden md:flex space-x-6 items-center">
