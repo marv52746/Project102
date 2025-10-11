@@ -57,6 +57,24 @@ function InputField({ field, value, onChange }) {
     return <div className="col-span-4"></div>;
   }
 
+  if (field.type === "link" && field.display) {
+    return (
+      <div className={`col-span-${field.colSpan || 1}`}>
+        <label className="block text-xs font-medium text-gray-600 mb-1">
+          {field.label}
+        </label>
+        <a
+          href={`/form/users/view/${value?._id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 underline break-words text-sm"
+        >
+          {value?.name}
+        </a>
+      </div>
+    );
+  }
+
   if (field.type === "textarea") {
     return (
       <div className={`col-span-${field.colSpan || 4}`}>
@@ -206,6 +224,15 @@ const UltrasoundForm = ({ data = {}, onChange, onSubmit, hasPermission }) => {
                 {fields.map((field, fIdx) => {
                   // let value = getNestedValue(data, field.name);
 
+                  // Skip field if showOnly condition doesn't match
+                  if (
+                    field.showOnly &&
+                    Array.isArray(field.showOnly) &&
+                    !field.showOnly.includes(data.type)
+                  ) {
+                    return null;
+                  }
+
                   let value = field.name
                     .split(".")
                     .reduce((o, k) => (o ? o[k] : ""), data);
@@ -324,7 +351,7 @@ export default function UltrasoundModalNew({
       average_ultrasonic_age: "",
       ultrasonic_edc: "",
       uterus: "",
-      adnexae: { right_ovary: "", left_ovary: "" },
+      adnexae: { right_ovary: "", left_ovary: "", notes: "" },
       cervix: { dimensions: "", volume: "", notes: "" },
       ...(initialData?.early_pregnancy || {}),
     },

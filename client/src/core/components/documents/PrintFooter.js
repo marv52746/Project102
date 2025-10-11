@@ -15,10 +15,16 @@ const styles = {
     borderTop: "1px solid #000",
     marginBottom: "0px",
   },
+  // signatureImage: {
+  //   maxWidth: "150px",
+  //   height: "auto",
+  //   marginBottom: "5px",
+  // },
   signatureImage: {
+    display: "block", // makes it take full width
+    margin: "0 auto 5px", // centers it horizontally
     maxWidth: "150px",
     height: "auto",
-    marginBottom: "5px",
   },
   disclaimer: {
     fontSize: "10px",

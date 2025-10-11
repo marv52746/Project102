@@ -29,6 +29,15 @@ export default function ModalFormActions({
   const [modalConfig, setModalConfig] = useState({});
   const userInfo = useSelector((state) => state.user.userInfo);
 
+  // At the top of the component
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Reset time to midnight for accurate comparison
+
+  const reportDate = new Date(report.date); // Assuming report.date exists
+  reportDate.setHours(0, 0, 0, 0);
+
+  const isToday = reportDate.getTime() === today.getTime();
+
   const onComplete = async () => {
     handleCompleteAppointment({
       dispatch,
@@ -109,7 +118,7 @@ export default function ModalFormActions({
         </button>
       )}
 
-      {report.status === "scheduled" && (
+      {report.status === "scheduled" && isToday && (
         <button
           onClick={() => {
             setModalConfig({

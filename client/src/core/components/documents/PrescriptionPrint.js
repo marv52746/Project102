@@ -5,52 +5,66 @@ const styles = {
   container: {
     background: "#fff",
     color: "#000",
-    minWidth: "210mm",
-    minHeight: "297mm",
-    margin: "0 auto",
-    padding: "10mm",
+    width: "calc(5.5in - 20mm)",
+    height: "calc(8.5in - 20mm)",
+    margin: "10mm auto",
+    padding: "8mm",
     fontFamily: "Arial, sans-serif",
-    fontSize: "13px",
-    lineHeight: "1.4",
+    fontSize: "11px",
+    lineHeight: "1.3",
     position: "relative",
+    boxSizing: "border-box",
+    justifyContent: "space-between",
   },
   headerName: {
     fontFamily: "Brush Script MT, cursive",
-    fontSize: "22px",
+    fontSize: "18px",
     fontWeight: "bold",
     textAlign: "center",
   },
   headerTitle: {
-    fontSize: "14px",
+    fontSize: "12px",
     textAlign: "center",
-    marginBottom: "8px",
+    marginBottom: "6px",
   },
   clinicRow: {
     display: "flex",
     justifyContent: "space-between",
-    fontSize: "12px",
-    marginBottom: "8px",
+    fontSize: "10px",
+    marginBottom: "6px",
   },
   divider: {
     borderTop: "1px solid #000",
     margin: "10px 0",
   },
-  patientRow: {
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginBottom: "6px",
-    gap: "10px",
+  patientGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 70px 60px", // name/addr, age, sex/date
+    gridTemplateRows: "auto auto",
+    gridTemplateAreas: `
+      "name age sex"
+      "address date date"
+    `,
+    gap: "6px 10px",
+    alignItems: "start",
+    marginBottom: "8px",
+    fontSize: "11px",
+  },
+  gridItem: {
+    display: "block",
   },
   label: {
     fontWeight: "bold",
     marginRight: "4px",
-  },
-  fieldLine: {
     display: "inline-block",
-    borderBottom: "1px solid #000",
-    minWidth: "80px",
-    paddingBottom: "2px",
+    verticalAlign: "top",
+  },
+  value: {
+    display: "inline-block",
+    padding: "0 2px",
+    whiteSpace: "normal", // allow wrapping
+    wordBreak: "break-word",
+    maxWidth: "100%",
   },
   rxSymbol: {
     fontSize: "36px",
@@ -62,6 +76,7 @@ const styles = {
     width: "100%",
     borderCollapse: "collapse",
     marginTop: "5px",
+    fontSize: "10px",
   },
   rxTableHeader: {
     border: "1px solid #000",
@@ -76,43 +91,27 @@ const styles = {
   },
   footer: {
     position: "absolute",
-    bottom: "30px",
-    right: "40px",
+    bottom: "10px",
+    right: "10px",
     textAlign: "center",
-    fontSize: "12px",
+    fontSize: "10px",
     borderTop: "1px solid #000",
     width: "250px",
     paddingTop: "4px",
   },
-  labTable: {
-    width: "100%",
-    borderCollapse: "collapse",
-    marginTop: "15px",
-  },
-  labTableHeader: {
-    border: "1px solid #000",
-    padding: "4px 6px",
-    fontWeight: "bold",
-    textAlign: "left",
-    backgroundColor: "#f0f0f0",
-  },
-  labTableCell: {
-    border: "1px solid #000",
-    padding: "4px 6px",
-    textAlign: "left",
-  },
+  // footer: {
+  //   textAlign: "center",
+  //   fontSize: "10px",
+  //   borderTop: "1px solid #000",
+  //   width: "250px",
+  //   paddingTop: "4px",
+  //   alignSelf: "flex-end", // keep it right-aligned
+  // },
 };
-
-const Field = ({ value, width = "120px" }) => (
-  <span style={{ ...styles.fieldLine, minWidth: width }}>
-    {value || "\u00A0"}
-  </span>
-);
 
 const Prescription = forwardRef(
   ({ data = {}, doctor = {}, clinics = {} }, ref) => {
     const prescriptions = data.prescriptionList || [];
-
     const specialization = Array.isArray(doctor.specialization)
       ? doctor.specialization.join(", ")
       : doctor.specialization || "";
@@ -123,90 +122,77 @@ const Prescription = forwardRef(
         <div style={styles.headerName}>{doctor.name}</div>
         <div style={styles.headerTitle}>{specialization}</div>
 
-        {/* Clinic Info */}
+        {/* Clinics */}
         <div style={styles.clinicRow}>
-          {clinics.left?.name && (
+          {clinics.left && (
             <div>
               <strong>Clinic Address:</strong> <br />
-              {clinics.left?.name} <br />
-              {clinics.left?.address} <br />
-              <strong>{clinics.left?.schedule}</strong> {clinics.left?.time}{" "}
+              {clinics.left.name} <br />
+              {clinics.left.address} <br />
+              <strong>{clinics.left.schedule}</strong> {clinics.left.time}{" "}
               <br />
-              <strong>Cell No:</strong> {clinics.left?.phone_number}
+              <strong>Cell No:</strong> {clinics.left.phone_number}
               <br />
-              {clinics.left?.website}
+              {clinics.left.website}
             </div>
           )}
-          {clinics.right?.name && (
+          {clinics.right && (
             <div style={{ textAlign: "right" }}>
               <strong>Clinic Address:</strong> <br />
-              {clinics.right?.name} <br />
-              {clinics.right?.address} <br />
-              <strong>{clinics.right?.schedule}</strong> {clinics.right?.time}{" "}
+              {clinics.right.name} <br />
+              {clinics.right.address} <br />
+              <strong>{clinics.right.schedule}</strong> {clinics.right.time}{" "}
               <br />
-              <strong>Cell No:</strong> {clinics.right?.phone_number}
+              <strong>Cell No:</strong> {clinics.right.phone_number}
               <br />
-              {clinics.right?.website}
+              {clinics.right.website}
             </div>
           )}
         </div>
 
         <div style={styles.divider}></div>
 
-        {/* Patient Info */}
-        <div style={{ ...styles.patientRow, marginBottom: "4px" }}>
-          <div
-            style={{
-              display: "inline-flex",
-              flexWrap: "wrap",
-              gap: "12px",
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
-            {/* Patient Name */}
-            <div style={{ minWidth: "220px", flexGrow: 1 }}>
-              <span style={{ ...styles.label, marginRight: "4px" }}>
-                Patient's Name:
-              </span>
-              <Field value={data.patientName} width="220px" />
-            </div>
+        {/* Patient Info Grid */}
+        <div style={styles.patientGrid}>
+          <div style={{ gridArea: "name" }}>
+            <span style={styles.label}>Patient's Name:</span>
+            <span style={styles.value}>
+              {data.patientName || "Juan Dela Cruz"}
+            </span>
+          </div>
 
-            {/* Age & Sex */}
-            <div
-              style={{ display: "inline-flex", gap: "6px", minWidth: "100px" }}
-            >
-              <span style={styles.label}>Age:</span>
-              <Field value={data.age} width="35px" />
-              <span style={styles.label}>Sex:</span>
-              <Field value={data.gender} width="35px" />
-            </div>
+          <div style={{ gridArea: "age" }}>
+            <span style={styles.label}>Age:</span>
+            <span style={styles.value}>{data.age || "32"}</span>
+          </div>
 
-            {/* Address */}
-            <div style={{ flexGrow: 2, minWidth: "250px" }}>
-              <span style={{ ...styles.label, marginRight: "4px" }}>
-                Address:
-              </span>
-              <Field value={data.address} />
-            </div>
+          <div style={{ gridArea: "sex" }}>
+            <span style={styles.label}>Sex:</span>
+            <span style={styles.value}>{data.gender || "M"}</span>
+          </div>
 
-            {/* Date */}
-            <div style={{ minWidth: "100px" }}>
-              <span style={{ ...styles.label, marginRight: "4px" }}>Date:</span>
-              <Field value={data.date} width="90px" />
-            </div>
+          <div style={{ gridArea: "address" }}>
+            <span style={styles.label}>Address:</span>{" "}
+            <span>
+              {data.address ||
+                "123 Mabuhay St., Barangay Example, Las Piñas City — beside the long compound near the market."}
+            </span>
+          </div>
+
+          <div style={{ gridArea: "date" }}>
+            <span style={styles.label}>Date:</span>
+            <span style={styles.value}>{data.date || "Oct 9, 2025"}</span>
           </div>
         </div>
 
         {/* Rx Symbol */}
-        {/* <div style={styles.rxSymbol}>℞</div> */}
-
         <div style={styles.rxSymbol}>
           <img
             src="/assets/images/RX.jpg"
+            // src={`${window.location.origin}/assets/images/RX.jpg`}
             alt="Rx Symbol"
             style={{
-              maxHeight: "36px", // same as fontSize
+              maxHeight: "36px",
               objectFit: "contain",
               display: "block",
             }}
@@ -239,7 +225,9 @@ const Prescription = forwardRef(
 
         {/* Footer */}
         <div style={styles.footer}>
-          <div style={{ fontWeight: "bold" }}>{doctor.name}</div>
+          <div style={{ fontWeight: "bold", fontSize: "12px" }}>
+            {doctor.name}
+          </div>
           <div>{doctor.specialization}</div>
           <div>License No.: {doctor.license}</div>
         </div>

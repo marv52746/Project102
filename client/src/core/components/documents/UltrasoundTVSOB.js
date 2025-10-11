@@ -10,7 +10,7 @@ const styles = {
     minWidth: "210mm",
     height: "297mm",
     margin: "0 auto",
-    padding: "10mm",
+    // padding: "10mm",
     fontFamily: "Arial, sans-serif",
     fontSize: "13px",
     lineHeight: "1.6",
@@ -101,9 +101,7 @@ const UltrasoundTransvaginalOBPrint = forwardRef(
           <PrintHeader />
 
           <div style={styles.titleRow}>
-            <div>
-              Examination: <strong>TRANSVAGINAL ULTRASOUND</strong>
-            </div>
+            <div>Examination: TRANSVAGINAL ULTRASOUND</div>
             <div>Date: {data.date}</div>
           </div>
 
@@ -181,16 +179,21 @@ const UltrasoundTransvaginalOBPrint = forwardRef(
           {/* UTERUS*/}
           <div style={styles.gridRow}>
             <div style={styles.th}>Uterus:</div>
-            <div style={styles.td}>{data.early_pregnancy?.uterus}</div>
+            <div style={{ ...styles.td, whiteSpace: "pre-line" }}>
+              {data.early_pregnancy?.uterus}
+            </div>
           </div>
           <div style={styles.gridRow}>
             <div style={styles.th}>Adnexa:</div>
             <div style={styles.td}>
-              <div style={styles.td}>
+              {/* <div style={styles.td}>
                 Right Ovary: {data.early_pregnancy?.adnexae.right_ovary}
               </div>
               <div style={styles.td}>
                 Left Ovary: {data.early_pregnancy?.adnexae.left_ovary}
+              </div> */}
+              <div style={{ ...styles.td, whiteSpace: "pre-line" }}>
+                {data.early_pregnancy?.adnexae.notes}
               </div>
             </div>
           </div>
@@ -203,17 +206,17 @@ const UltrasoundTransvaginalOBPrint = forwardRef(
               <div style={styles.td}>
                 Volume: {data.early_pregnancy?.cervix.volume}
               </div>
-              <div style={styles.td}>
-                Notes: {data.early_pregnancy?.cervix.notes}
+              <div style={{ ...styles.td, whiteSpace: "pre-line" }}>
+                {data.early_pregnancy?.cervix.notes}
               </div>
             </div>
           </div>
 
           {/* OTHERS & IMPRESSION */}
           <div style={styles.sectionTitle}>OTHERS:</div>
-          <p>{data.others}</p>
+          <p style={{ whiteSpace: "pre-line" }}>{data.others}</p>
           <div style={styles.sectionTitle}>IMPRESSION:</div>
-          <p>{data.impression}</p>
+          <p style={{ whiteSpace: "pre-line" }}>{data.impression}</p>
         </div>
 
         {/* Footer */}

@@ -10,7 +10,7 @@ const styles = {
     minWidth: "210mm",
     height: "297mm",
     margin: "0 auto",
-    padding: "10mm",
+    // padding: "10mm",
     fontFamily: "Arial, sans-serif",
     fontSize: "13px",
     lineHeight: "1.6",
@@ -105,9 +105,7 @@ const TransvaginalUltrasoundGynePrint = forwardRef(
           <PrintHeader />
 
           <div style={styles.titleRow}>
-            <div>
-              Examination: <strong>TRANSVAGINAL ULTRASOUND</strong>
-            </div>
+            <div>Examination: TRANSVAGINAL ULTRASOUND</div>
             <div>Date: {data.date}</div>
           </div>
 
@@ -143,7 +141,9 @@ const TransvaginalUltrasoundGynePrint = forwardRef(
             <div style={styles.th}>I. Cervix</div>
             <div style={styles.td}>
               <p>{data.gyn_findings.cervix?.dimensions}</p>
-              <p>{data.gyn_findings.cervix?.notes}</p>
+              <p style={{ whiteSpace: "pre-line" }}>
+                {data.gyn_findings.cervix?.notes}
+              </p>
             </div>
           </div>
 
@@ -155,7 +155,9 @@ const TransvaginalUltrasoundGynePrint = forwardRef(
               <p>{data.gyn_findings.uterus?.orientation}</p>
               <p>{data.gyn_findings.uterus?.wall_thickness.anterior}</p>
               <p>{data.gyn_findings.uterus?.wall_thickness.posterior}</p>
-              <p>{data.gyn_findings.uterus?.notes}</p>
+              <p style={{ whiteSpace: "pre-line" }}>
+                {data.gyn_findings.uterus?.notes}
+              </p>
             </div>
           </div>
 
@@ -163,7 +165,9 @@ const TransvaginalUltrasoundGynePrint = forwardRef(
             <div style={styles.th}>III. Endometrium</div>
             <div style={styles.td}>
               <p>{data.gyn_findings.endometrium?.thickness}</p>
-              <p>{data.gyn_findings.endometrium?.notes}</p>
+              <p style={{ whiteSpace: "pre-line" }}>
+                {data.gyn_findings.endometrium?.notes}
+              </p>
             </div>
           </div>
 
@@ -172,7 +176,9 @@ const TransvaginalUltrasoundGynePrint = forwardRef(
             <div style={styles.td}>
               <p>{data.gyn_findings.right_ovary?.dimensions}</p>
               <p>{data.gyn_findings.right_ovary?.volume}</p>
-              <p>{data.gyn_findings.right_ovary?.notes}</p>
+              <p style={{ whiteSpace: "pre-line" }}>
+                {data.gyn_findings.right_ovary?.notes}
+              </p>
             </div>
           </div>
 
@@ -181,17 +187,24 @@ const TransvaginalUltrasoundGynePrint = forwardRef(
             <div style={styles.td}>
               <p>{data.gyn_findings.left_ovary?.dimensions}</p>
               <p>{data.gyn_findings.left_ovary?.volume}</p>
-              <p>{data.gyn_findings.left_ovary?.notes}</p>
+              <p style={{ whiteSpace: "pre-line" }}>
+                {data.gyn_findings.left_ovary?.notes}
+              </p>
             </div>
           </div>
 
           <div style={styles.gridRowGyneEnd}>
             <div style={styles.th}>VI. Others</div>
-            <p>{data.others?.notes}</p>
+            <p style={{ whiteSpace: "pre-line" }}>
+              {data.gyn_findings.others.notes}
+            </p>
           </div>
 
+          <div style={styles.sectionTitle}>NOTES</div>
+          <p style={{ whiteSpace: "pre-line" }}>{data.others}</p>
+
           <div style={styles.sectionTitle}>IMPRESSION</div>
-          <p>{data.impression}</p>
+          <p style={{ whiteSpace: "pre-line" }}>{data.impression}</p>
         </div>
 
         {/* Footer */}

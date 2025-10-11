@@ -47,6 +47,7 @@ const ultrasoundSchema = new mongoose.Schema({
     adnexae: {
       right_ovary: { type: String }, // "normal"
       left_ovary: { type: String }, // "normal"
+      notes: { type: String },
     },
     cervix: {
       dimensions: { type: String }, // "2.79 x 2.12 x 2.47 cm"
@@ -86,11 +87,11 @@ const ultrasoundSchema = new mongoose.Schema({
 
   // Biophysical Profile (BPS)
   biophysical_profile: {
-    fetal_breathing: { type: Number }, // 0 or 2
-    fetal_tone: { type: Number },
-    fetal_movement: { type: Number },
-    afi_score: { type: Number },
-    total: { type: Number },
+    fetal_breathing: { type: String }, // 0 or 2
+    fetal_tone: { type: String },
+    fetal_movement: { type: String },
+    afi_score: { type: String },
+    total: { type: String },
   },
 
   // TRANSVAGINAL ULTRASOUND - Gyne

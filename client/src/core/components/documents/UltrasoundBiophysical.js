@@ -7,20 +7,22 @@ const styles = {
   container: {
     background: "#fff",
     color: "#000",
-    minWidth: "210mm",
+    width: "210mm",
     height: "297mm",
     margin: "0 auto",
-    padding: "10mm",
+    // padding: "10mm",
     fontFamily: "Arial, sans-serif",
     fontSize: "13px",
     lineHeight: "1.6",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
+    // border: "1px solid",
   },
   titleRow: {
     display: "flex",
     justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: "10px",
     fontWeight: "bold",
     fontSize: "14px",
@@ -101,9 +103,7 @@ const UltrasoundBiophysicalPrint = forwardRef(
           <PrintHeader />
 
           <div style={styles.titleRow}>
-            <div>
-              Examination: <strong>{data.type?.toUpperCase()}</strong>
-            </div>
+            <div>Examination: {data.type?.toUpperCase()}</div>
             <div>Date: {data.date}</div>
           </div>
 
@@ -264,9 +264,9 @@ const UltrasoundBiophysicalPrint = forwardRef(
 
           {/* Others & Impression */}
           <div style={styles.sectionTitle}>OTHERS:</div>
-          <p>{data.others}</p>
+          <p style={{ whiteSpace: "pre-line" }}>{data.others}</p>
           <div style={styles.sectionTitle}>IMPRESSION:</div>
-          <p>{data.impression}</p>
+          <p style={{ whiteSpace: "pre-line" }}>{data.impression}</p>
         </div>
 
         {/* Footer */}

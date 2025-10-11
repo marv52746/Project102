@@ -110,19 +110,62 @@ const MedicalCertificate = forwardRef(
         <div style={styles.title}>MEDICAL CERTIFICATE</div>
 
         {/* Body */}
-        <p>
-          This is to certify that <Field value={data.patientName} /> of
-          <Field value={data.address} /> has been examined / treated on
-          <Field value={data.date} />.
+        <p
+          style={{ fontSize: "12px", lineHeight: "1.5", textAlign: "justify" }}
+        >
+          This is to certify that{"  "}
+          <span
+            style={{
+              fontWeight: "bold",
+              textDecoration: "underline",
+              textUnderlineOffset: "3px",
+            }}
+          >
+            {data.patientName}
+          </span>
+          {"  "}
+          of{" "}
+          <span
+            style={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+          >
+            {data.address}
+          </span>
+          {"  "}
+          has been examined / treated on{"  "}
+          <span
+            style={{
+              fontWeight: "bold",
+              textDecoration: "underline",
+              textUnderlineOffset: "3px",
+            }}
+          >
+            {data.date}
+          </span>
+          .
         </p>
 
-        <p>
-          <strong>Diagnosis:</strong>
-          <Field value={data.diagnosis} width="400px" />
+        <p style={{ fontSize: "12px", lineHeight: "1.5", marginBottom: "4px" }}>
+          <span style={{ fontWeight: "bold" }}>Diagnosis: </span>
+          <span
+            style={{
+              textDecoration: "underline",
+              textUnderlineOffset: "3px", // 👈 lowers underline
+            }}
+          >
+            {data.diagnosis || "N/A"}
+          </span>
         </p>
-        <p>
-          <strong>Remarks:</strong>
-          <Field value={data.remarks} width="400px" />
+
+        <p style={{ fontSize: "12px", lineHeight: "1.5" }}>
+          <span style={{ fontWeight: "bold" }}>Remarks: </span>
+          <span
+            style={{
+              textDecoration: "underline",
+              textUnderlineOffset: "3px",
+            }}
+          >
+            {data.remarks || "N/A"}
+          </span>
         </p>
 
         <p style={{ marginTop: "40px" }}>

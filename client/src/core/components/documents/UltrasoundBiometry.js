@@ -199,9 +199,9 @@ const UltrasoundBiometryPrint = forwardRef(
 
           {/* Others & Impression */}
           <div style={styles.sectionTitle}>OTHERS:</div>
-          <p>{data.others}</p>
+          <p style={{ whiteSpace: "pre-line" }}>{data.others}</p>
           <div style={styles.sectionTitle}>IMPRESSION:</div>
-          <p>{data.impression}</p>
+          <p style={{ whiteSpace: "pre-line" }}>{data.impression}</p>
         </div>
 
         {/* Footer */}

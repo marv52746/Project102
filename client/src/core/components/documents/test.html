@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Prescription - Grid Patient Info (fixed)</title>
+    <style>
+      /* --- Page & Print setup --- */
+      @page {
+        size: 5.5in 8.5in portrait;
+        margin: 10mm;
+      }
+
+      html,
+      body {
+        background: #eee;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* --- Main container --- */
+      .container {
+        background: #fff;
+        color: #000;
+        width: calc(5.5in - 20mm);
+        min-height: calc(8.5in - 20mm);
+        margin: 10mm auto;
+        padding: 8mm;
+        font-family: Arial, sans-serif;
+        font-size: 11px;
+        line-height: 1.3;
+        position: relative;
+        box-sizing: border-box;
+      }
+
+      .header-name {
+        font-family: "Brush Script MT", cursive;
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .header-title {
+        font-size: 12px;
+        text-align: center;
+        margin-bottom: 6px;
+      }
+
+      .clinic-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        margin-bottom: 6px;
+      }
+
+      .divider {
+        border-top: 1px solid #000;
+        margin: 10px 0;
+      }
+
+      /* === Single grid for patient info ===
+         Row 1: name | age | sex
+         Row 2: address (spans col1) | date (col2 above) | (col3 empty)
+         This keeps Age above Date and prevents address wrapping from moving row1 items. */
+      .patient-grid {
+        display: grid;
+        grid-template-columns: 1fr 70px 60px; /* adjust widths if needed */
+        grid-template-rows: auto auto;
+        grid-template-areas:
+          "name age sex"
+          "address date date";
+        gap: 6px 10px; /* row-gap column-gap */
+        align-items: start; /* important so top items don't shift */
+        margin-bottom: 8px;
+        font-size: 11px;
+      }
+
+      .patient-grid .name {
+        grid-area: name;
+      }
+      .patient-grid .age {
+        grid-area: age;
+        align-self: start;
+      }
+      .patient-grid .sex {
+        grid-area: sex;
+        align-self: start;
+      }
+      .patient-grid .address {
+        grid-area: address;
+      }
+      .patient-grid .date {
+        grid-area: date;
+        align-self: start;
+      }
+
+      .label {
+        font-weight: bold;
+        margin-right: 4px;
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      /* value: allow wrapping only here; keep date/age compact */
+      .value {
+        display: inline-block;
+        border-bottom: 0.5px solid #000;
+        padding: 0 2px;
+        white-space: normal; /* allow wrap */
+        word-break: break-word; /* break long words if needed */
+        max-width: 100%;
+      }
+      .address-value {
+        word-break: break-word;
+      }
+
+      /* reduce visual noise when printing */
+      @media print {
+        .container {
+          box-shadow: none;
+        }
+      }
+
+      /* Rx table and footer */
+      .rx-symbol {
+        font-size: 36px;
+        font-weight: bold;
+        font-family: serif;
+        margin: 12px 0;
+      }
+      .rx-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 5px;
+        font-size: 10px;
+      }
+      .rx-table th,
+      .rx-table td {
+        border: 1px solid #000;
+        padding: 4px 6px;
+        text-align: left;
+      }
+      .footer {
+        position: absolute;
+        bottom: 30px;
+        right: 40px;
+        text-align: center;
+        font-size: 10px;
+        border-top: 1px solid #000;
+        width: 250px;
+        padding-top: 4px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header-name">Dr. Marvin Las Piñas</div>
+      <div class="header-title">Cardiologist</div>
+
+      <div class="clinic-row">
+        <div>
+          <strong>Clinic Address:</strong> <br />
+          Heart Care Clinic <br />
+          123 Wellness St., Las Piñas City <br />
+          <strong>Mon-Fri</strong> 9AM - 5PM <br />
+          <strong>Cell No:</strong> 0917-123-4567 <br />
+          www.heartcare.ph
+        </div>
+        <div style="text-align: right">
+          <strong>Clinic Address:</strong> <br />
+          South Medical Center <br />
+          Alabang-Zapote Rd., Las Piñas <br />
+          <strong>Sat</strong> 10AM - 2PM <br />
+          <strong>Cell No:</strong> 0999-888-7777 <br />
+          www.southmed.ph
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Single patient grid -->
+      <div class="patient-grid" aria-label="Patient information">
+        <div class="name">
+          <span class="label">Name:</span>
+          <span class="value">Juan Dela Cruz</span>
+        </div>
+
+        <div class="age">
+          <span class="label">Age:</span>
+          <span class="value">32</span>
+        </div>
+
+        <div class="sex">
+          <span class="label">Sex:</span>
+          <span class="value">M</span>
+        </div>
+
+        <div class="address">
+          <span class="label">Address:</span>
+          <span class="address-value">
+            <!-- long address to illustrate wrapping — only this value will expand downward -->
+            123 Mabuhay St., Barangay Example, Brgy. Example, Las Piñas City —
+            Barangay hall next to the market, beside the long compound that
+            sometimes has extra information to show wrapping behavior.
+          </span>
+        </div>
+
+        <div class="date">
+          <span class="label">Date:</span>
+          <span class="value">Oct 9, 2025</span>
+        </div>
+      </div>
+
+      <div class="rx-symbol">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/4/48/Rx_symbol.svg"
+          alt="Rx"
+          style="max-height: 36px; object-fit: contain; display: block"
+        />
+      </div>
+
+      <table class="rx-table">
+        <thead>
+          <tr>
+            <th>Medicine</th>
+            <th>Dose</th>
+            <th>Frequency</th>
+            <th>Instructions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Losartan</td>
+            <td>50mg</td>
+            <td>1x/day</td>
+            <td>After breakfast</td>
+          </tr>
+          <tr>
+            <td>Aspirin</td>
+            <td>100mg</td>
+            <td>1x/day</td>
+            <td>With food</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="footer">
+        <div style="font-weight: bold">Dr. Marvin Las Piñas</div>
+        <div>Cardiologist</div>
+        <div>License No.: 123456</div>
+      </div>
+    </div>
+  </body>
+</html>

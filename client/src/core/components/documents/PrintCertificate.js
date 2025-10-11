@@ -8,6 +8,7 @@ import UltrasoundPhysicalPrint from "./UltrasoundBiophysical";
 import UltrasoundTransvaginalOBPrint from "./UltrasoundTVSOB";
 import TransvaginalUltrasoundGynePrint from "./UltrasoundTVSGyne";
 import LabRequestPrint from "./LabRequestPrint";
+import html2canvas from "html2canvas";
 
 export default function PrintActionButtons({ data }) {
   const certRef = useRef(); // separate ref for certificate
@@ -66,81 +67,66 @@ export default function PrintActionButtons({ data }) {
     }).format(date);
   };
 
-  const handlePrint = (ref, title, orientation = "portrait") => {
+  const handlePrintPrescription = (ref, title, orientation = "portrait") => {
     if (!ref.current) return;
 
     const printContent = ref.current.innerHTML;
 
-    const pageSize =
-      orientation === "landscape" ? "297mm 210mm" : "210mm 297mm";
+    // ✅ Swap dimensions dynamically based on orientation
+    const isLandscape = orientation === "landscape";
+    const pageWidth = isLandscape ? "8.5in" : "5.5in";
+    const pageHeight = isLandscape ? "5.5in" : "8.5in";
 
-    const win = window.open("", "", "width=1000,height=600");
+    const win = window.open("", "", "width=800,height=1000");
     win.document.write(`
     <html>
       <head>
         <title>${title} - ${patientName}</title>
         <link rel="stylesheet" href="/output.css" />
         <style>
-          @page { size: ${pageSize}; margin: 5mm; }
-
-          html, body {
-            margin: 5mm;
-            padding: 0;
-            height: 100%;
-          }
-
-          body {
-            display: flex;
-            justify-content: center; /* horizontal center */
-            align-items: center;    /* vertical center */
-          }
-
-          #print-container {
-            width: 100%;
-            height: 100%;
-          }
-
-          /* Optional: scale down if content is too big */
-          #print-container > * {
-            max-width: 100%;
-            max-height: 100%;
-          }
-        </style>
-      </head>
-      <body>
-        <div id="print-container">${printContent}</div>
-      </body>
-    </html>
-  `);
-
-    win.document.close();
-    win.focus();
-    win.print();
-    win.close();
-  };
-
-  const handlePrintA4 = (ref, title) => {
-    if (!ref.current) return;
-    const printContent = ref.current.innerHTML;
-
-    const win = window.open("", "", "width=1000,height=600");
-    win.document.write(`
-    <html>
-      <head>
-        <title>${title}</title>
-        <link rel="stylesheet" href="/output.css" />
-        <style>
-          @page {
-            size: A4 portrait;   /* or 'A4 landscape' */
+          @page { 
+            size: 5.5in 8.5in portrait; /* Half Letter size */
+            margin: 5mm; 
           }
 
           html, body {
             margin: 0;
             padding: 0;
-            width: 210mm;   /* A4 width */
-            height: 297mm;  /* A4 height */
+            width: ${pageWidth};
+            height: ${pageHeight};
           }
 
+           body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            background: white;
+          }
+
+           #print-container {
+            width: calc(${pageWidth} - 10mm);
+            height: calc(${pageHeight} - 10mm);
+            box-sizing: border-box;
+            padding: 3mm;
+            font-family: 'Arial', sans-serif;
+            font-size: 11px; /* scaled down */
+            line-height: 1.3;
+            position: relative;
+          }
+
+          #print-container * {
+            page-break-inside: avoid;
+            box-sizing: border-box;
+          }
+
+          table, th, td {
+            font-size: 10px !important; /* fix table text size */
+          }
+
+          h1, h2, h3, h4 {
+            margin: 0;
+            font-weight: normal;
+          }
         </style>
       </head>
       <body>
@@ -151,43 +137,20 @@ export default function PrintActionButtons({ data }) {
 
     win.document.close();
     win.focus();
-    win.print();
-    win.close();
+    // win.print();
+    // win.close();
+    // ✅ Wait a short delay before printing to ensure styles load
+    win.onload = () => {
+      win.focus();
+      win.print();
+
+      // ✅ Clear document content before closing to avoid cache
+      setTimeout(() => {
+        win.document.body.innerHTML = "";
+        win.close();
+      }, 500);
+    };
   };
-
-  // const handlePrintIframe = (ref, title) => {
-  //   if (!ref.current) return;
-
-  //   const patientName = data.patient?.name || "Patient"; // fallback
-  //   const dynamicTitle = `${title} - ${patientName}`;
-
-  //   const printContent = ref.current.innerHTML;
-  //   const iframe = document.createElement("iframe");
-  //   iframe.style.position = "absolute";
-  //   iframe.style.left = "-9999px";
-  //   document.body.appendChild(iframe);
-
-  //   const doc = iframe.contentWindow.document;
-  //   doc.open();
-  //   doc.write(`
-  //   <html>
-  //     <head>
-  //       <title>${dynamicTitle}</title>
-  //       <link rel="stylesheet" href="/output.css" />
-  //     </head>
-  //     <body>${printContent}</body>
-  //   </html>
-  // `);
-  //   doc.close();
-
-  //   // Set the dynamic title for the print dialog
-  //   iframe.contentWindow.document.title = dynamicTitle;
-
-  //   iframe.contentWindow.focus();
-  //   iframe.contentWindow.print();
-
-  //   document.body.removeChild(iframe);
-  // };
 
   const handlePDFDownload = (ref, fileName) => {
     if (!ref.current) return;
@@ -201,6 +164,7 @@ export default function PrintActionButtons({ data }) {
       x: 10,
       y: 10,
       html2canvas: { scale: 0.5 },
+      margin: 11,
     });
   };
 
@@ -210,7 +174,9 @@ export default function PrintActionButtons({ data }) {
         {/* Only show Prescription button if data.medication exists */}
         {data.medication && data.medication.length > 0 && (
           <button
-            onClick={() => handlePrint(prescRef, "Prescription", "portrait")}
+            onClick={() =>
+              handlePrintPrescription(prescRef, "Prescription", "portrait")
+            }
             className="px-4 py-2 rounded-lg bg-blue-50 border text-blue-600 border-blue-100 text-sm"
           >
             🖨️ Prescription
@@ -220,7 +186,9 @@ export default function PrintActionButtons({ data }) {
         {/* Only show Lab Request button if data.labrequest exists */}
         {data.labrequest && data.labrequest.length > 0 && (
           <button
-            onClick={() => handlePrint(labreqRef, "Lab Request", "portrait")}
+            onClick={() =>
+              handlePrintPrescription(labreqRef, "Lab Request", "portrait")
+            }
             className="px-4 py-2 rounded-lg bg-blue-50 border text-blue-600 border-blue-100 text-sm"
           >
             🖨️ Lab Request
@@ -231,7 +199,11 @@ export default function PrintActionButtons({ data }) {
         {data.diagnosis && data.diagnosis.length > 0 && (
           <button
             onClick={() =>
-              handlePrint(certRef, "Medical Certificate", "landscape")
+              handlePrintPrescription(
+                certRef,
+                "Medical Certificate",
+                "landscape"
+              )
             }
             className="px-4 py-2 rounded-lg bg-blue-50 border text-blue-600 border-blue-100 text-sm"
           >

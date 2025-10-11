@@ -5,15 +5,18 @@ export const ultrasoundsForm = {
     condition: null, // always visible
     fields: [
       {
-        name: "patient.name",
+        name: "patient",
         label: "Patient",
-        type: "text",
+        type: "link",
+        link: "user",
+        display: true,
         readOnly: true,
       },
       {
         name: "patient.age",
         label: "Age",
         type: "text",
+        display: true,
         readOnly: true,
         // default: (data) => getAbsoluteAge(data?.patient?.date_of_birth),
       },
@@ -22,6 +25,7 @@ export const ultrasoundsForm = {
         label: "Chief complaint",
         type: "text",
         colSpan: 2,
+        showOnly: ["Transvaginal Ultrasound - Gyne"],
       },
       { type: "break", name: "__break__" },
       {
@@ -76,29 +80,45 @@ export const ultrasoundsForm = {
 
   ob_data: {
     condition: {
-      type: ["Biometry", "Biophysical Score", "Transvaginal Ultrasound - Gyne"],
+      type: [
+        "Biometry",
+        "Biophysical Score",
+        "Transvaginal Ultrasound - Gyne",
+        "Transvaginal Ultrasound - OB",
+      ],
     },
     fields: [
-      { name: "ob_data.lmp", label: "LMP", type: "date" },
-      { name: "ob_data.edd", label: "EDD", type: "date" },
+      {
+        name: "ob_data.lmp",
+        label: "LMP",
+        type: "date",
+        showOnly: [
+          "Biometry",
+          "Biophysical Score",
+          "Transvaginal Ultrasound - OB",
+        ],
+      },
+      {
+        name: "ob_data.edd",
+        label: "EDD",
+        type: "date",
+        showOnly: [
+          "Biometry",
+          "Biophysical Score",
+          "Transvaginal Ultrasound - OB",
+        ],
+      },
       {
         name: "ob_data.aog",
         label: "AOG",
         type: "text",
         placeholder: "e.g. 21W 4D",
+        showOnly: [
+          "Biometry",
+          "Biophysical Score",
+          "Transvaginal Ultrasound - OB",
+        ],
       },
-      {
-        name: "ob_data.gravida_para",
-        label: "Gravida / Para",
-        type: "text",
-        placeholder: "e.g. G3P1(1011)",
-      },
-    ],
-  },
-
-  ob_data: {
-    condition: { type: "Transvaginal Ultrasound - Gyne" },
-    fields: [
       {
         name: "ob_data.gravida_para",
         label: "Gravida / Para",
@@ -109,6 +129,7 @@ export const ultrasoundsForm = {
         name: "ob_data.day_of_cycle",
         label: "Day of Cycle",
         type: "text",
+        showOnly: ["Transvaginal Ultrasound - Gyne"],
       },
     ],
   },
@@ -187,12 +208,14 @@ export const ultrasoundsForm = {
         label: "AFI - Total",
         type: "text",
         placeholder: "e.g. 11.4 cm",
+        showOnly: ["Biophysical Score"],
       },
       {
         name: "fetal_survey.amniotic_fluid.svp",
         label: "Single Vertical Pocket (SVP)",
         type: "text",
         placeholder: "e.g. 3.2 cm",
+        showOnly: ["Biometry"],
       },
     ],
   },
@@ -202,61 +225,65 @@ export const ultrasoundsForm = {
     fields: [
       {
         name: "fetal_biometry.bpd.measurement",
-        label: "BPD (cm)", // Biparietal Diameter
+        label: "Biparietal Diameter - BPD (cm)", // Biparietal Diameter
         type: "text",
         placeholder: "e.g. 5.02 cm",
       },
       {
         name: "fetal_biometry.bpd.age_equiv",
-        label: "BPD (age equiv)",
+        label: "Biparietal Diameter - BPD (age equiv)",
         type: "text",
         placeholder: "e.g. 21W 1D",
       },
+      { type: "break", name: "__break__" },
       {
         name: "fetal_biometry.ofd.measurement",
-        label: "OFD (cm)", // Occipito-Frontal Diameter
+        label: "Occipito-Frontal Diameter - OFD (cm)", // Occipito-Frontal Diameter
         type: "text",
         placeholder: "e.g. 6.10 cm",
       },
       {
         name: "fetal_biometry.ofd.age_equiv",
-        label: "OFD (age equiv)",
+        label: "Occipito-Frontal Diameter - OFD (age equiv)",
         type: "text",
         placeholder: "e.g. 22W 0D",
       },
+      { type: "break", name: "__break__" },
       {
         name: "fetal_biometry.hc.measurement",
-        label: "HC (cm)", // Head Circumference
+        label: "Head Circumference - HC (cm)", // Head Circumference
         type: "text",
         placeholder: "e.g. 17.5 cm",
       },
       {
         name: "fetal_biometry.hc.age_equiv",
-        label: "HC (age equiv)",
+        label: "Head Circumference - HC (age equiv)",
         type: "text",
         placeholder: "e.g. 22W 4D",
       },
+      { type: "break", name: "__break__" },
       {
         name: "fetal_biometry.ac.measurement",
-        label: "AC (cm)", // Abdominal Circumference
+        label: "Abdominal Circumference - AC (cm)", // Abdominal Circumference
         type: "text",
         placeholder: "e.g. 15.2 cm",
       },
       {
         name: "fetal_biometry.ac.age_equiv",
-        label: "AC (age equiv)",
+        label: "Abdominal Circumference - AC (age equiv)",
         type: "text",
         placeholder: "e.g. 21W 6D",
       },
+      { type: "break", name: "__break__" },
       {
         name: "fetal_biometry.fl.measurement",
-        label: "FL (cm)", // Femur Length
+        label: "Femoral Length - FL (cm)", // Femoral Length
         type: "text",
         placeholder: "e.g. 3.8 cm",
       },
       {
         name: "fetal_biometry.fl.age_equiv",
-        label: "FL (age equiv)",
+        label: "Femoral Length - FL (age equiv)",
         type: "text",
         placeholder: "e.g. 22W 2D",
       },
@@ -269,31 +296,31 @@ export const ultrasoundsForm = {
       {
         name: "biophysical_profile.fetal_breathing",
         label: "Fetal Breathing (0/2)",
-        type: "number",
+        type: "text",
         placeholder: "0 or 2",
       },
       {
         name: "biophysical_profile.fetal_tone",
         label: "Fetal Tone (0/2)",
-        type: "number",
+        type: "text",
         placeholder: "0 or 2",
       },
       {
         name: "biophysical_profile.fetal_movement",
         label: "Fetal Movement (0/2)",
-        type: "number",
+        type: "text",
         placeholder: "0 or 2",
       },
       {
         name: "biophysical_profile.afi_score",
         label: "AFI Score (0/2)",
-        type: "number",
+        type: "text",
         placeholder: "0 or 2",
       },
       {
         name: "biophysical_profile.total",
         label: "Total BPS Score",
-        type: "number",
+        type: "text",
       },
     ],
   },
@@ -314,6 +341,7 @@ export const ultrasoundsForm = {
         type: "text",
         placeholder: "e.g. 6W 3D",
       },
+      { type: "break", name: "__break__" },
 
       // Crown-Rump Length
       {
@@ -328,12 +356,14 @@ export const ultrasoundsForm = {
         type: "text",
         placeholder: "e.g. 7W 2D",
       },
+      { type: "break", name: "__break__" },
 
       // Yolk Sac
       {
         name: "early_pregnancy.yolk_sac",
         label: "Yolk Sac",
         type: "text",
+        colSpan: 2,
         placeholder: "present / absent / size",
       },
 
@@ -343,11 +373,11 @@ export const ultrasoundsForm = {
         label: "Fetal Heart Rate",
         type: "text",
         placeholder: "e.g. 165 bpm",
-        colSpan: 1,
+        colSpan: 2,
       },
 
       // force new row here
-      { name: "", type: "break" },
+      { type: "break", name: "__break__" },
 
       // Summary
       {
@@ -363,32 +393,40 @@ export const ultrasoundsForm = {
       },
 
       // force new row here
-      { name: "", type: "break" },
+      { type: "break", name: "__break__" },
 
       // Uterus
       {
         name: "early_pregnancy.uterus",
         label: "Uterus",
-        type: "text",
+        type: "textarea",
         placeholder: "e.g. anteverted",
+        colSpan: 2,
       },
 
       // Adnexae
+      // {
+      //   name: "early_pregnancy.adnexae.right_ovary",
+      //   label: "Right Ovary",
+      //   type: "text",
+      //   placeholder: "e.g. normal",
+      // },
+      // {
+      //   name: "early_pregnancy.adnexae.left_ovary",
+      //   label: "Left Ovary",
+      //   type: "text",
+      //   placeholder: "e.g. normal",
+      // },
       {
-        name: "early_pregnancy.adnexae.right_ovary",
-        label: "Right Ovary",
-        type: "text",
-        placeholder: "e.g. normal",
-      },
-      {
-        name: "early_pregnancy.adnexae.left_ovary",
-        label: "Left Ovary",
-        type: "text",
-        placeholder: "e.g. normal",
+        name: "early_pregnancy.adnexae.notes",
+        label: "Adnexae",
+        type: "textarea",
+        placeholder: "e.g. Right Ovary: normal",
+        colSpan: 2,
       },
 
       // force new row here
-      { name: "", type: "break" },
+      { type: "break", name: "__break__" },
 
       // Cervix
       {
@@ -403,6 +441,7 @@ export const ultrasoundsForm = {
         type: "text",
         placeholder: "e.g. 7.64 ml",
       },
+      { type: "break", name: "__break__" },
       {
         name: "early_pregnancy.cervix.notes",
         label: "Cervix Notes",
@@ -440,29 +479,30 @@ export const ultrasoundsForm = {
         type: "text",
         placeholder: "e.g. 7.2 x 4.5 x 3.8 cm",
       },
-      {
-        name: "gyn_findings.uterus.orientation",
-        label: "Uterus Orientation",
-        type: "text",
-        placeholder: "e.g. anteverted",
-      },
+      // {
+      //   name: "gyn_findings.uterus.orientation",
+      //   label: "Uterus Orientation",
+      //   type: "text",
+      //   placeholder: "e.g. anteverted",
+      // },
 
-      {
-        name: "gyn_findings.uterus.wall_thickness.anterior",
-        label: "Anterior Wall Thickness",
-        type: "text",
-        placeholder: "e.g. 1.2 cm",
-      },
-      {
-        name: "gyn_findings.uterus.wall_thickness.posterior",
-        label: "Posterior Wall Thickness",
-        type: "text",
-        placeholder: "e.g. 1.3 cm",
-      },
+      // {
+      //   name: "gyn_findings.uterus.wall_thickness.anterior",
+      //   label: "Anterior Wall Thickness",
+      //   type: "text",
+      //   placeholder: "e.g. 1.2 cm",
+      // },
+      // {
+      //   name: "gyn_findings.uterus.wall_thickness.posterior",
+      //   label: "Posterior Wall Thickness",
+      //   type: "text",
+      //   placeholder: "e.g. 1.3 cm",
+      // },
       {
         name: "gyn_findings.uterus.notes",
         label: "Uterus Notes",
         type: "textarea",
+        colSpan: 2,
         placeholder: "e.g. homogeneous, adenomyosis",
       },
       { type: "break", name: "__break__" },
@@ -487,16 +527,16 @@ export const ultrasoundsForm = {
       // RIGHT OVARY
       {
         name: "gyn_findings.right_ovary.dimensions",
-        label: "Right Ovary Dimensions",
+        label: "Right Ovary Dimensions/Volume",
         type: "text",
-        placeholder: "e.g. 3.1 x 2.5 x 2.8 cm",
+        placeholder: "e.g. 3.1 x 2.5 x 2.8 cm (9.2 ml)",
       },
-      {
-        name: "gyn_findings.right_ovary.volume",
-        label: "Right Ovary Volume",
-        type: "text",
-        placeholder: "e.g. 9.2 ml",
-      },
+      // {
+      //   name: "gyn_findings.right_ovary.volume",
+      //   label: "Right Ovary Volume",
+      //   type: "text",
+      //   placeholder: "e.g. 9.2 ml",
+      // },
       {
         name: "gyn_findings.right_ovary.notes",
         label: "Right Ovary Notes",
@@ -510,16 +550,16 @@ export const ultrasoundsForm = {
       // LEFT OVARY
       {
         name: "gyn_findings.left_ovary.dimensions",
-        label: "Left Ovary Dimensions",
+        label: "Left Ovary Dimensions/Volume",
         type: "text",
-        placeholder: "e.g. 2.9 x 2.1 x 2.6 cm",
+        placeholder: "e.g. 2.9 x 2.1 x 2.6 cm (8.5 ml)",
       },
-      {
-        name: "gyn_findings.left_ovary.volume",
-        label: "Left Ovary Volume",
-        type: "text",
-        placeholder: "e.g. 8.5 ml",
-      },
+      // {
+      //   name: "gyn_findings.left_ovary.volume",
+      //   label: "Left Ovary Volume",
+      //   type: "text",
+      //   placeholder: "e.g. 8.5 ml",
+      // },
       {
         name: "gyn_findings.left_ovary.notes",
         label: "Left Ovary Notes",
