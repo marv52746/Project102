@@ -107,7 +107,7 @@ const trimesters = [
 
 export default function TrimesterChart() {
   return (
-    <section id="trimester" className="w-full">
+    <section id="trimester" className="w-full py-6 sm:py-8 bg-white">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-10">
