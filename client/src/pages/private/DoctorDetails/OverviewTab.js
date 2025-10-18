@@ -22,17 +22,20 @@ import NewPatientModal from "../FormDetails/NewPatientModal";
 import NewBaseModal from "../FormDetails/NewBaseModal";
 import ActivitiesTimeline from "../FormDetails/ActivitiesTimeline";
 import { useParams } from "react-router-dom";
+import OngoingCheckup from "../FormDetails/OngoingCheckup";
 
 export default function OverviewTab({ appointments }) {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [stats, setStats] = useState({
+    today: 0,
     upcoming: 0,
     completed: 0,
     cancelled: 0,
   });
   const [activities, setActivities] = useState([]);
   const [upcomingAppointments, setupcomingAppointments] = useState([]);
+  const [todayAppointments, setuptodayAppointments] = useState([]);
   const [inLobbyAppointments, setInLobbyAppointments] = useState([]);
   const [manualRefresh, setManualRefresh] = useState(0);
 
@@ -63,6 +66,7 @@ export default function OverviewTab({ appointments }) {
         let upcomingCount = 0;
         let completedCount = 0;
         let cancelledCount = 0;
+        let todayTotal = 0;
 
         const recentActivities = appointments
           .filter((a) => {
@@ -91,6 +95,7 @@ export default function OverviewTab({ appointments }) {
           });
 
         const upcomingAppointmentsArr = [];
+        const todayAppointmentsArr = [];
         const inLobbyArr = [];
 
         appointments.forEach((a) => {
@@ -100,6 +105,8 @@ export default function OverviewTab({ appointments }) {
             appointmentDate >= startOfDayPH &&
             appointmentDate <= endOfDayPH
           ) {
+            todayTotal++;
+            todayAppointmentsArr.push(a);
             if (a.status === "scheduled") {
               upcomingAppointmentsArr.push(a);
               upcomingCount++;
@@ -113,6 +120,7 @@ export default function OverviewTab({ appointments }) {
         });
 
         setStats({
+          today: todayTotal,
           upcoming: upcomingCount,
           completed: completedCount,
           cancelled: cancelledCount,
@@ -120,6 +128,7 @@ export default function OverviewTab({ appointments }) {
 
         setActivities(recentActivities);
         setupcomingAppointments(upcomingAppointmentsArr);
+        setuptodayAppointments(todayAppointmentsArr);
         setInLobbyAppointments(inLobbyArr);
       } catch (err) {
         console.error("Error fetching appointments:", err);
@@ -138,7 +147,7 @@ export default function OverviewTab({ appointments }) {
 
   // 👇 Update to only include today's completed & cancelled
   const statAppointmentsMap = {
-    Upcoming: upcomingAppointments,
+    "Today’s": todayAppointments,
     Completed: appointments.filter(
       (a) =>
         a.status === "completed" &&
@@ -157,8 +166,8 @@ export default function OverviewTab({ appointments }) {
 
   const statCards = [
     {
-      label: "Upcoming",
-      value: stats.upcoming,
+      label: "Today’s",
+      value: stats.today,
       color: "bg-blue-100 text-blue-800",
       icon: <CalendarClock className="w-6 h-6 text-blue-600" />,
     },
@@ -219,18 +228,6 @@ export default function OverviewTab({ appointments }) {
 
         {/* Appointment Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* {statCards.map((card, idx) => (
-            <div
-              key={idx}
-              className={`flex items-center gap-4 p-4 rounded-lg shadow bg-white border-l-4 ${card.color}`}
-            >
-              <div>{card.icon}</div>
-              <div>
-                <p className="text-sm">{card.label} Appointments</p>
-                <p className="text-2xl font-bold">{card.value}</p>
-              </div>
-            </div>
-          ))} */}
           {statCards.map((card, idx) => (
             <div
               key={idx}
@@ -264,7 +261,7 @@ export default function OverviewTab({ appointments }) {
             />
 
             <UpcomingAppointments
-              title={"Upcoming Appointments"}
+              title={"Appointments Scheduled Today"}
               appointments={upcomingAppointments}
               onSelect={(app) => {
                 setViewType("appointments");
@@ -274,29 +271,27 @@ export default function OverviewTab({ appointments }) {
             />
           </div>
 
-          {/* Activity Timeline */}
-          <ActivitiesTimeline userID={id} />
-          {/* <div className="space-y-4">
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-medium mb-4 text-gray-800">
-                Recent Activity
-              </h3>
-              <ul className="space-y-4 text-sm text-gray-700">
-                {doctor.recentActivities.map((item, idx) => (
-                  <li key={idx} className="flex gap-3 items-start">
-                    <div className="mt-1">{item.icon}</div>
-                    <div>
-                      <p>{item.action}</p>
-                      <p className="text-xs text-gray-500 flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {item.time}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div> */}
+          <div className="space-y-4">
+            {/* 🩺 Ongoing Checkup */}
+            <OngoingCheckup
+              appointments={appointments.filter(
+                (a) =>
+                  a.status === "in-progress" &&
+                  dayBounds.start &&
+                  new Date(a.date) >= dayBounds.start &&
+                  new Date(a.date) <= dayBounds.end
+              )}
+              // appointments={upcomingAppointments}
+              onSelect={(app) => {
+                setViewType("appointments");
+                setViewData(app);
+                setOpenViewModal(true);
+              }}
+            />
+
+            {/* Activity Timeline */}
+            {/* <ActivitiesTimeline userID={id} /> */}
+          </div>
         </div>
       </div>
 
@@ -407,7 +402,7 @@ export default function OverviewTab({ appointments }) {
                           {app.patient?.name || "Unknown Patient"}
                         </td>
                         <td className="border border-gray-200 px-3 py-2">
-                          {new Date(app.date).toLocaleString()}
+                          {new Date(app.date).toLocaleDateString()}
                         </td>
                         <td className="border border-gray-200 px-3 py-2 capitalize">
                           {app.status}

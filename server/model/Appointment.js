@@ -54,6 +54,7 @@ const appointmentSchema = new Schema(
         "scheduled",
         "completed",
         "cancelled",
+        "in-progress",
         "no-show",
         "rescheduled",
         "ready",

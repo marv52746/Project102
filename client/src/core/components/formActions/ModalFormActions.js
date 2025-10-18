@@ -60,6 +60,16 @@ export default function ModalFormActions({
     onClose();
   };
 
+  const onInProgress = async () => {
+    handleCompleteAppointment({
+      dispatch,
+      tablename: "appointments",
+      id: report._id,
+      data: { status: "in-progress" },
+    });
+    onClose();
+  };
+
   const onCancel = async () => {
     handleCompleteAppointment({
       dispatch,
@@ -95,7 +105,8 @@ export default function ModalFormActions({
   };
 
   // Example restriction: only doctor can complete
-  const canComplete = userInfo.role === "doctor" && report.status === "ready";
+  const canComplete =
+    userInfo.role === "doctor" && report.status === "in-progress";
 
   return (
     <>
@@ -148,13 +159,29 @@ export default function ModalFormActions({
         </button>
       )}
 
+      {report.status === "ready" && (
+        <button
+          onClick={() => {
+            setModalConfig({
+              title: "Move to Ongoing Checkup",
+              description:
+                "Do you want to move this appointment to ongoing checkup?",
+              confirmText: "Move to Ongoing",
+              confirmColor: "bg-blue-600",
+              icon: <RefreshCw className="w-5 h-5 text-blue-600" />,
+              onConfirm: onInProgress,
+            }) || setIsModalOpen(true);
+          }}
+          className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+        >
+          <RefreshCw size={18} />
+          Move to Ongoing
+        </button>
+      )}
+
       {canComplete && (
         <button
           onClick={() => {
-            // if (!report.notes || report.notes.trim() === "") {
-            //   openErrorModal("⚠️ Please add doctor notes before completing.");
-            //   return;
-            // }
             setModalConfig({
               title: "Mark as Complete",
               description: "Do you want to mark this appointment as completed?",
@@ -171,11 +198,6 @@ export default function ModalFormActions({
         </button>
       )}
 
-      {/* Example: reschedule */}
-      {/* <button className="px-5 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 flex items-center gap-2">
-        <RefreshCw size={18} />
-        Reschedule
-      </button> */}
       <ConfirmModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import Card from "./Card";
+import { useEffect, useState, useMemo } from "react";
 import {
   ShieldAlert,
   Pill,
@@ -9,6 +8,8 @@ import {
   Baby,
   Stethoscope,
   FlaskConical,
+  LayoutList,
+  LayoutGrid,
 } from "lucide-react";
 import apiService from "../../../core/services/apiService";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,22 +18,28 @@ import { formatFullDate } from "../../../core/utils/tableUtils";
 import { adminOnlyRoles } from "../../../core/constants/rolePresets";
 import UltrasoundModalNew from "../../../core/components/modal/UltrasoundModalNew";
 import { handleFormSubmit } from "../../../core/components/formActions/formSubmit";
+import { handleUltrasoundSubmit } from "../../../core/components/formActions/handleUltrasoundSubmit";
 
 export default function ClinicalRecordTab({ patientId }) {
   const [clinicalTab, setClinicalTab] = useState("conditions");
+  const [viewMode, setViewMode] = useState("list");
+  const [search, setSearch] = useState("");
+
   const { refreshKey } = useSelector((state) => state.utils);
   const currentUser = useSelector((state) => state.user.userInfo);
   const hasPermission =
     currentUser && adminOnlyRoles.includes(currentUser.role);
 
-  const [vitals, setVitals] = useState([]);
-  const [conditions, setConditions] = useState([]);
-  const [medications, setMedications] = useState([]);
-  const [allergies, setAllergies] = useState([]);
-  const [surgeries, setSurgical] = useState([]);
-  const [pregnancies, setPregnancy] = useState([]);
-  const [ultrasounds, setUltrasound] = useState([]);
-  const [labrequest, setLabrequest] = useState([]);
+  const [data, setData] = useState({
+    vitals: [],
+    conditions: [],
+    medications: [],
+    allergies: [],
+    surgeries: [],
+    pregnancies: [],
+    ultrasounds: [],
+    labrequest: [],
+  });
 
   const [openViewModal, setOpenViewModal] = useState(false);
   const [openUltrasound, setOpenUltrasound] = useState(false);
@@ -43,18 +50,17 @@ export default function ClinicalRecordTab({ patientId }) {
 
   useEffect(() => {
     if (!patientId) return;
-
     const fetchData = async () => {
       try {
         const [
-          vitalData,
-          conditionData,
-          medicationData,
-          allergyData,
-          surgicalData,
-          prenancyData,
-          ultrasoundData,
-          labrequestData,
+          vitals,
+          conditions,
+          medications,
+          allergies,
+          surgeries,
+          pregnancies,
+          ultrasounds,
+          labrequest,
         ] = await Promise.all([
           apiService.get(dispatch, "vitals", { patient: patientId }),
           apiService.get(dispatch, "conditions", { patient: patientId }),
@@ -66,538 +72,306 @@ export default function ClinicalRecordTab({ patientId }) {
           apiService.get(dispatch, "labrequest", { patient: patientId }),
         ]);
 
-        setVitals(vitalData);
-        setConditions(conditionData);
-        setMedications(medicationData);
-        setAllergies(allergyData);
-        setSurgical(surgicalData);
-        setPregnancy(prenancyData);
-        setUltrasound(ultrasoundData);
-        setLabrequest(labrequestData);
+        setData({
+          vitals,
+          conditions,
+          medications,
+          allergies,
+          surgeries,
+          pregnancies,
+          ultrasounds,
+          labrequest,
+        });
       } catch (error) {
         console.error("Error fetching clinical data:", error);
       }
     };
-
     fetchData();
   }, [dispatch, patientId, refreshKey]);
 
   const tabConfig = {
-    conditions: {
-      label: `Diagnosis(${conditions.length})`,
-      icon: ShieldAlert,
-    },
-    medications: {
-      label: `Medications(${medications.length})`,
-      icon: Pill,
-    },
-    ultrasound: {
-      label: `Ultrasound(${ultrasounds.length})`,
-      icon: Stethoscope,
-    },
-    labrequest: {
-      label: `Lab Requests(${labrequest.length})`,
-      icon: Pill,
-    },
-
-    allergies: {
-      label: `Allergies(${allergies.length})`,
-      icon: AlertTriangle,
-    },
-    vitals: {
-      label: `Vitals Log(${vitals.length})`,
-      icon: Activity,
-    },
-    surgeries: {
-      label: `Surgical History(${surgeries.length})`,
-      icon: Scissors,
-    },
-    pregnancies: {
-      label: `Pregnancy(${pregnancies.length})`,
-      icon: Baby,
-    },
+    conditions: { label: "Diagnosis", icon: ShieldAlert, color: "yellow" },
+    medications: { label: "Medications", icon: Pill, color: "green" },
+    ultrasounds: { label: "Ultrasound", icon: Stethoscope, color: "indigo" },
+    labrequest: { label: "Lab Requests", icon: FlaskConical, color: "purple" },
+    allergies: { label: "Allergies", icon: AlertTriangle, color: "red" },
+    vitals: { label: "Vitals Log", icon: Activity, color: "blue" },
+    surgeries: { label: "Surgical History", icon: Scissors, color: "gray" },
+    pregnancies: { label: "Pregnancy", icon: Baby, color: "pink" },
   };
 
-  const handleSave = async (type, data) => {
-    // console.log(data);
-    // console.log(type);
+  const fieldMap = {
+    vitals: [
+      { key: "blood_pressure", label: "BP" },
+      { key: "heart_rate", label: "HR" },
+      { key: "temperature", label: "Temp" },
+      { key: "weight", label: "Weight" },
+      { key: "height", label: "Height" },
+    ],
+    conditions: [
+      { key: "name", label: "Diagnosis" },
+      { key: "notes", label: "Notes" },
+    ],
+    medications: [
+      { key: "name", label: "Medicine" },
+      { key: "dose", label: "Dosage" },
+      { key: "frequency", label: "Frequency" },
+    ],
+    allergies: [
+      { key: "reaction", label: "Reaction" },
+      { key: "notes", label: "Notes" },
+    ],
+    surgeries: [
+      { key: "year", label: "Year" },
+      { key: "surgeon", label: "Surgeon" },
+      { key: "notes", label: "Notes" },
+    ],
+    pregnancies: [
+      { key: "gravida_para", label: "Gravida / Para" },
+      { key: "lmp", label: "LMP" },
+      { key: "edd", label: "EDD" },
+      { key: "status", label: "Status" },
+    ],
+    ultrasounds: [
+      { key: "others", label: "Findings" },
+      { key: "impression", label: "Impression" },
+    ],
+    labrequest: [
+      { key: "status", label: "Status" },
+      { key: "result", label: "Results" },
+      { key: "notes", label: "Notes" },
+    ],
+  };
 
-    if (data._id) {
-      // update existing
-      return handleFormSubmit({
+  const currentData = useMemo(() => {
+    const list = data[clinicalTab] || [];
+    if (!search.trim()) return list;
+
+    const searchTerm = search.toLowerCase();
+
+    // Only search among visible fields for the current tab
+    const searchKeys = [
+      "name",
+      "type",
+      "status",
+      "result",
+      ...fieldMap[clinicalTab]?.map((f) => f.key),
+    ];
+
+    return list.filter((item) =>
+      searchKeys.some((key) => {
+        const value = item[key];
+        if (value == null) return false;
+
+        // handle dates and other values gracefully
+        const text =
+          typeof value === "string"
+            ? value.toLowerCase()
+            : typeof value === "number"
+            ? String(value)
+            : value?.toString().toLowerCase();
+
+        return text.includes(searchTerm);
+      })
+    );
+  }, [clinicalTab, data, search]);
+
+  const handleSave = async (type, formData) => {
+    if (type === "ultrasound") {
+      await handleUltrasoundSubmit({ dispatch, data: formData });
+    }
+    if (formData._id) {
+      await handleFormSubmit({
         dispatch,
         tablename: type,
-        data: data,
-        id: data._id,
-        fields: [], // <-- pass an empty array if no fields
+        data: formData,
+        id: formData._id,
+        fields: [],
       });
     }
   };
 
-  // console.log(labrequest);
+  const { icon: TabIcon, color } = tabConfig[clinicalTab];
+  const textColor = `text-${color}-700`;
+  const bgColor = `bg-${color}-50 border-${color}-200`;
+  const iconColor = `text-${color}-500`;
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 w-full">
-      <div className="xl:col-span-3 space-y-4">
-        <Card
-          title={
-            <div className="flex flex-wrap items-center gap-6 text-sm pb-6">
-              {Object.keys(tabConfig).map((key) => {
-                const { label } = tabConfig[key];
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setClinicalTab(key)}
-                    className={`flex items-center gap-2 pb-1 border-b-2 -mb-1 transition-colors ${
-                      clinicalTab === key
-                        ? "border-blue-600 text-blue-600"
-                        : "border-transparent text-gray-500 hover:text-gray-700"
-                    }`}
-                  >
-                    {/* <Icon className="h-4 w-4" /> */}
-                    {label}
-                  </button>
-                );
-              })}
+    <div className="w-full space-y-4">
+      <div className="bg-white border rounded-lg p-4">
+        <div className="pb-4 border-b space-y-3 mb-5">
+          {/* Tabs */}
+          <div className="flex flex-wrap items-center gap-3 text-sm">
+            {Object.keys(tabConfig).map((key) => {
+              const { label } = tabConfig[key];
+              const count = data[key]?.length || 0;
+              const isActive = clinicalTab === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setClinicalTab(key)}
+                  className={`px-3 py-1.5 rounded-full border transition-all duration-150 ${
+                    isActive
+                      ? "bg-blue-100 border-blue-500 text-blue-700 font-medium"
+                      : "bg-gray-50 border-transparent text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  {label} <span className="text-xs opacity-70">({count})</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Search + Toggle */}
+          <div className="flex flex-wrap justify-end items-center gap-2">
+            <div className="relative w-full sm:w-64">
+              <input
+                type="text"
+                placeholder="Search records..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-3 pr-8 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 absolute right-2 top-2.5 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z"
+                />
+              </svg>
             </div>
-          }
-        >
-          {/* --- PREGNANCY TAB --- */}
-          {clinicalTab === "pregnancies" && (
-            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
-              {pregnancies
-                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on)) // 👈 recent first
-                .map((p, index) => {
-                  const gestationalWeeks = p.lmp
-                    ? Math.floor(
-                        (new Date() - new Date(p.lmp)) /
-                          (1000 * 60 * 60 * 24 * 7)
-                      )
-                    : null;
 
-                  return (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        setViewType(clinicalTab);
-                        setViewData(p);
-                        setOpenViewModal(true);
-                      }}
-                      className="cursor-pointer p-4 rounded-lg bg-pink-50 border border-pink-200 shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <Baby className="h-6 w-6 text-pink-500" />
-                        {/* <h4 className="text-sm font-semibold text-pink-700">
-                        {p.is_pregnant ? "Pregnant" : "Not Pregnant"}
-                      </h4> */}
-                      </div>
+            <button
+              onClick={() => setViewMode(viewMode === "list" ? "card" : "list")}
+              className="p-2 border rounded-lg hover:bg-gray-100 transition-colors"
+              title={
+                viewMode === "list"
+                  ? "Switch to Card View"
+                  : "Switch to List View"
+              }
+            >
+              {viewMode === "list" ? (
+                <LayoutGrid className="h-5 w-5 text-gray-600" />
+              ) : (
+                <LayoutList className="h-5 w-5 text-gray-600" />
+              )}
+            </button>
+          </div>
+        </div>
 
-                      {/* {p.is_pregnant && ( */}
-                      <>
-                        <div className="text-xs text-pink-800 mb-1">
-                          <strong>Gravida:</strong> {p.gravida || "0"} |{" "}
-                          <strong>Para:</strong> {p.para || "0"} |{" "}
-                          <strong>Code:</strong> {p.code || "0"}
-                        </div>
-                        <div className="text-xs text-pink-800 mb-1">
-                          <strong>LMP:</strong> {formatFullDate(p.lmp) || "N/A"}
-                        </div>
-                        <div className="text-xs text-pink-800 mb-1">
-                          <strong>EDD:</strong> {formatFullDate(p.edd) || "N/A"}
-                        </div>
-                        {/* <div className="text-xs text-pink-800 mb-1">
-                        <strong>Trimester:</strong> {p.trimester || "N/A"}
-                      </div> */}
-                        {gestationalWeeks !== null && (
-                          <div className="text-xs text-pink-800 mb-1">
-                            <strong>Gestational Age:</strong> {gestationalWeeks}{" "}
-                            weeks
-                          </div>
-                        )}
-                        {p.notes && (
-                          <p className="text-xs text-pink-900 mt-2">
-                            <strong>Notes:</strong> {p.notes}
-                          </p>
-                        )}
-                      </>
-                      {/* )} */}
-                    </div>
-                  );
-                })}
-            </div>
-          )}
-
-          {/* CONDITIONS */}
-          {clinicalTab === "conditions" && (
-            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
-              {conditions
-                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on)) // 👈 recent first
-                .map((c, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      setViewType(clinicalTab);
-                      setViewData(c);
-                      setOpenViewModal(true);
-                    }}
-                    className="cursor-pointer p-4 rounded-lg bg-yellow-50 border border-yellow-200 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <ShieldAlert className="h-6 w-6 text-yellow-500" />
-                      <h4 className="text-sm font-semibold text-yellow-700">
-                        {c.name}
-                      </h4>
-                    </div>
-
-                    <div className="text-xs text-yellow-800 mb-1">
-                      <strong>Diagnosed:</strong>{" "}
-                      {formatFullDate(c.diagnosed_date) || "N/A"}
-                    </div>
-
-                    <p className="text-xs text-yellow-900 mb-2">
-                      <strong>Notes:</strong>{" "}
-                      {c.notes ? c.notes : "No notes available."}
-                    </p>
-
-                    {c.code && (
-                      <span className="inline-block bg-yellow-200 text-yellow-900 text-xs font-medium px-2 py-0.5 rounded">
-                        Code: {c.code.toUpperCase()}
-                      </span>
-                    )}
+        {/* Content */}
+        {viewMode === "card" ? (
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {currentData
+              .sort((a, b) => new Date(b.created_on) - new Date(a.created_on))
+              .map((item, index) => (
+                <div
+                  key={index}
+                  onClick={() => {
+                    if (clinicalTab === "ultrasounds") setOpenUltrasound(true);
+                    else setOpenViewModal(true);
+                    setViewType(clinicalTab);
+                    setViewData(item);
+                  }}
+                  className={`cursor-pointer p-4 rounded-lg ${bgColor} shadow-sm hover:shadow-md transition-shadow`}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <TabIcon className={`h-6 w-6 ${iconColor}`} />
+                    <h4 className={`text-sm font-semibold ${textColor}`}>
+                      {item.name || item.type || "Record"}
+                    </h4>
                   </div>
-                ))}
-            </div>
-          )}
-
-          {/* MEDICATIONS */}
-          {clinicalTab === "medications" && (
-            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
-              {medications
-                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on)) // 👈 recent first
-                .map((m, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      setViewType(clinicalTab);
-                      setViewData(m);
-                      setOpenViewModal(true);
-                    }}
-                    className="cursor-pointer p-4 rounded-lg bg-green-50 border border-green-200 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <Pill className="h-6 w-6 text-green-500" />
-                      <h4 className="text-sm font-semibold text-green-700">
-                        {m.name}
-                      </h4>
-                    </div>
-
-                    <div className="text-xs text-green-800 mb-1">
-                      <strong>Dose:</strong> {m.dose || "N/A"}
-                    </div>
-                    <div className="text-xs text-green-800 mb-1">
-                      <strong>Frequency:</strong> {m.frequency || "N/A"}
-                    </div>
-
-                    <div className="text-xs text-green-800 mb-1">
-                      <strong>Start:</strong>{" "}
-                      {formatFullDate(m.start_date) || "N/A"}
-                    </div>
-                    <div className="text-xs text-green-800 mb-1">
-                      <strong>End:</strong>{" "}
-                      {formatFullDate(m.end_date) || "N/A"}
-                    </div>
-
-                    {m.notes && (
-                      <p className="text-xs text-green-900 mt-2">
-                        <strong>Notes:</strong> {m.notes}
+                  <p className="text-xs text-gray-600 mb-2">
+                    {formatFullDate(item.created_on)}
+                  </p>
+                  <div className="text-xs space-y-1">
+                    {fieldMap[clinicalTab]?.map((f) => (
+                      <p key={f.key}>
+                        <strong>{f.label}:</strong>{" "}
+                        {["lmp", "edd"].includes(f.key)
+                          ? formatFullDate(item[f.key])
+                          : item[f.key] || "—"}
                       </p>
-                    )}
+                    ))}
                   </div>
-                ))}
-            </div>
-          )}
-
-          {/* ALLERGIES */}
-          {clinicalTab === "allergies" && (
-            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
-              {allergies
-                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on)) // 👈 recent first
-                .map((a, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      setViewType(clinicalTab);
-                      setViewData(a);
-                      setOpenViewModal(true);
-                    }}
-                    className="cursor-pointer p-4 rounded-lg bg-red-50 border border-red-200 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <AlertTriangle className="h-6 w-6 text-red-500" />
-                      <h4 className="text-sm font-semibold text-red-700">
-                        {a.name}
-                      </h4>
-                    </div>
-
-                    <div className="text-xs text-red-800 mb-1">
-                      <strong>Reaction:</strong> {a.reaction || "N/A"}
-                    </div>
-
-                    <div className="text-xs text-red-800 mb-1">
-                      <strong>Severity:</strong> {a.severity || "Unknown"}
-                    </div>
-
-                    <div className="text-xs text-red-800 mb-2">
-                      <strong>Recorded:</strong>{" "}
-                      {a.created_on
-                        ? new Date(a.created_on).toLocaleDateString(undefined, {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })
-                        : "N/A"}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          )}
-
-          {/* SURGERIES */}
-          {clinicalTab === "surgeries" && (
-            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
-              {surgeries
-                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on)) // 👈 recent first
-                .map((s, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      setViewType(clinicalTab);
-                      setViewData(s);
-                      setOpenViewModal(true);
-                    }}
-                    className="cursor-pointer p-4 rounded-lg bg-gray-50 border border-gray-300 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <Scissors className="h-6 w-6 text-gray-600" />
-                      <h4 className="text-sm font-semibold text-gray-700">
-                        {s.name}
-                      </h4>
-                    </div>
-
-                    <div className="text-xs text-gray-600 mb-1">
-                      <strong>Year:</strong> {s.year || "N/A"}
-                    </div>
-
-                    {s.surgeon && (
-                      <div className="text-xs text-gray-600 mb-1">
-                        <strong>Surgeon:</strong> {s.surgeon}
-                      </div>
-                    )}
-
-                    {s.notes && (
-                      <p className="text-xs text-gray-700 mt-2">
-                        <strong>Notes:</strong> {s.notes}
-                      </p>
-                    )}
-                  </div>
-                ))}
-            </div>
-          )}
-
-          {/* VITALS LOG */}
-          {clinicalTab === "vitals" && (
-            <ul className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
-              {vitals
-                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on)) // 👈 recent first
-                .map((v, index) => {
-                  const heightMeters = v.height ? v.height / 100 : null;
-                  const bmi =
-                    heightMeters && v.weight
-                      ? (v.weight / (heightMeters * heightMeters)).toFixed(2)
-                      : null;
-
-                  // Determine BMI category and color
-                  let bmiCategory = "";
-                  let bmiColor = "";
-
-                  if (bmi) {
-                    const bmiValue = parseFloat(bmi);
-                    if (bmiValue < 18.5) {
-                      bmiCategory = "Underweight";
-                      bmiColor = "text-yellow-600";
-                    } else if (bmiValue < 25) {
-                      bmiCategory = "Normal";
-                      bmiColor = "text-green-600";
-                    } else if (bmiValue < 30) {
-                      bmiCategory = "Overweight";
-                      bmiColor = "text-orange-600";
-                    } else {
-                      bmiCategory = "Obese";
-                      bmiColor = "text-red-600";
-                    }
-                  }
-
-                  return (
-                    <li
-                      key={index}
-                      onClick={() => {
-                        setViewType(clinicalTab);
-                        setViewData(v);
-                        setOpenViewModal(true);
-                      }}
-                      className="p-3 rounded-md bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer"
-                    >
-                      <div className="flex justify-between items-center mb-1 text-blue-700 font-semibold text-sm">
-                        <div className="flex items-center gap-2">
-                          <Activity className="h-4 w-4" />
-                          <span>{formatFullDate(v.date)}</span>
-                        </div>
-                        <span className="text-xs text-blue-600">
-                          {v.time || ""}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-gray-700 text-xs">
-                        <div>
-                          <strong>BP:</strong> {v.blood_pressure || "-"}
-                        </div>
-                        <div>
-                          <strong>HR:</strong>{" "}
-                          {v.heart_rate ? `${v.heart_rate} bpm` : "-"}
-                        </div>
-                        <div>
-                          <strong>Temp:</strong>{" "}
-                          {v.temperature ? `${v.temperature} °C` : "-"}
-                        </div>
-                        <div>
-                          <strong>RR:</strong> {v.respiratory_rate || "-"}
-                        </div>
-                        <div>
-                          <strong>Weight:</strong>{" "}
-                          {v.weight ? `${v.weight} kg` : "-"}
-                        </div>
-                        <div>
-                          <strong>Height:</strong>{" "}
-                          {v.height ? `${v.height} cm` : "-"}
-                        </div>
-
-                        {bmi && (
-                          <div className="col-span-2">
-                            <strong>BMI:</strong> {bmi}{" "}
-                            <span className={`${bmiColor} font-semibold ml-2`}>
-                              ({bmiCategory})
-                            </span>
-                          </div>
-                        )}
-                        <div>
-                          <strong>Notes:</strong> {v.notes ? `${v.notes}` : "-"}
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })}
-            </ul>
-          )}
-
-          {/* --- Ultrasound TAB --- */}
-          {clinicalTab === "ultrasound" && (
-            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
-              {ultrasounds
-                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on))
-                .map((p, index) => {
-                  return (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        setViewType(clinicalTab);
-                        setViewData(p);
-                        setOpenUltrasound(true);
-                      }}
-                      className="cursor-pointer p-4 rounded-lg bg-indigo-50 border border-indigo-200 shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <Stethoscope className="h-6 w-6 text-indigo-500" />
-                        <h4 className="text-sm font-semibold text-indigo-700">
-                          {p.type || "Ultrasound"}
-                        </h4>
-                      </div>
-
-                      <div className="text-xs text-indigo-800 mb-1">
-                        <strong>Date:</strong> {formatFullDate(p.date) || "N/A"}
-                      </div>
-                      {p.impression && (
-                        <div className="text-xs text-indigo-800 mb-1">
-                          <strong>Impression:</strong> {p.impression}
-                        </div>
-                      )}
-                      {p.others && (
-                        <p className="text-xs text-indigo-900 mt-2">
-                          <strong>Others:</strong> {p.others}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
-            </div>
-          )}
-
-          {/* --- LAB REQUEST TAB --- */}
-          {clinicalTab === "labrequest" && (
-            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 w-full">
-              {labrequest
-                .sort((a, b) => new Date(b.created_on) - new Date(a.created_on))
-                .map((lab, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      setViewType(clinicalTab);
-                      setViewData({
-                        ...lab,
-                        type: "labrequests",
-                      });
-                      setOpenViewModal(true);
-                    }}
-                    className="cursor-pointer p-4 rounded-lg bg-purple-50 border border-purple-200 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <FlaskConical className="h-6 w-6 text-purple-600" />
-                      <h4 className="text-sm font-semibold text-purple-700">
-                        {lab.name || "Laboratory Test"}
-                      </h4>
-                    </div>
-
-                    <div className="text-xs text-purple-800 mb-1">
-                      <strong>Status:</strong>{" "}
-                      <span
-                        className={`font-medium ${
-                          lab.status === "Completed"
-                            ? "text-green-600"
-                            : lab.status === "Pending"
-                            ? "text-orange-600"
-                            : "text-gray-600"
-                        }`}
+                </div>
+              ))}
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border">
+              <thead>
+                <tr className="bg-gray-100 text-left">
+                  <th className="p-2">Name / Type</th>
+                  {fieldMap[clinicalTab]?.map((f) => (
+                    <th key={f.key} className="p-2 truncate max-w-[250px]">
+                      {f.label}
+                    </th>
+                  ))}
+                  <th className="p-2">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentData.length > 0 ? (
+                  currentData
+                    .sort(
+                      (a, b) => new Date(b.created_on) - new Date(a.created_on)
+                    )
+                    .map((item, i) => (
+                      <tr
+                        key={i}
+                        onClick={() => {
+                          if (clinicalTab === "ultrasounds")
+                            setOpenUltrasound(true);
+                          else setOpenViewModal(true);
+                          setViewType(clinicalTab);
+                          setViewData(item);
+                        }}
+                        className="cursor-pointer hover:bg-gray-50"
                       >
-                        {lab.status || "Unknown"}
-                      </span>
-                    </div>
-
-                    <div className="text-xs text-purple-800 mb-1">
-                      <strong>Date:</strong>{" "}
-                      {formatFullDate(lab.created_on) || "N/A"}
-                    </div>
-
-                    {lab.notes && (
-                      <p className="text-xs text-purple-900 mt-2">
-                        <strong>Notes:</strong> {lab.notes}
-                      </p>
-                    )}
-                  </div>
-                ))}
-            </div>
-          )}
-        </Card>
+                        <td className="p-2 flex items-center gap-2 ">
+                          <TabIcon className={`h-4 w-4 ${iconColor}`} />
+                          {item.name || item.type || "Record"}
+                        </td>
+                        {fieldMap[clinicalTab]?.map((f) => (
+                          <td
+                            key={f.key}
+                            className="p-2 truncate max-w-[250px]"
+                          >
+                            {["lmp", "edd"].includes(f.key)
+                              ? formatFullDate(item[f.key])
+                              : item[f.key] || "—"}
+                          </td>
+                        ))}
+                        <td className="p-2">
+                          {formatFullDate(item.created_on) || "N/A"}
+                        </td>
+                      </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={fieldMap[clinicalTab]?.length + 2}
+                      className="p-4 text-center text-gray-500"
+                    >
+                      No records found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
+      {/* Modals */}
       {openViewModal && (
         <ClinicalFormModal
           onClose={() => {
@@ -612,16 +386,15 @@ export default function ClinicalRecordTab({ patientId }) {
         />
       )}
 
-      {/* Modal */}
       {openUltrasound && (
         <UltrasoundModalNew
-          title={"Ultrasound Data"}
+          title="Ultrasound Data"
           hasPermission={hasPermission}
           isOpen={openUltrasound}
           onClose={() => setOpenUltrasound(false)}
           onSave={(data) => handleSave("ultrasound", data)}
-          initialData={viewData} // empty array
-          patient={viewData.patient}
+          initialData={viewData}
+          patient={viewData?.patient}
         />
       )}
     </div>

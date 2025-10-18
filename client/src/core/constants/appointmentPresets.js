@@ -15,8 +15,8 @@ const appointmentStatusOptions = [
   { label: "Ready", value: "ready" },
   { label: "Completed", value: "completed" },
   { label: "Cancelled", value: "cancelled" },
-  { label: "No-show", value: "no-show" },
-  { label: "Rescheduled", value: "rescheduled" },
+  { label: "In-progress", value: "in-progress" },
+  // { label: "Rescheduled", value: "rescheduled" },
 ];
 
 // Form fields with conditional visibility

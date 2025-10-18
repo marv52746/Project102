@@ -3,16 +3,21 @@ const { ObjectId } = mongoose.Schema;
 
 const pregnancySchema = new mongoose.Schema({
   patient: { type: ObjectId, ref: "user", required: true },
-  appointment: { type: ObjectId, ref: "appointment" },
+  ultrasound: { type: ObjectId, ref: "ultrasound" },
 
-  is_pregnant: { type: Boolean, default: false },
-  gravida: { type: Number, default: 0 }, // total pregnancies
-  para: { type: Number, default: 0 }, // total births
-  code: { type: String },
+  gravida_para: { type: String }, // Example: "G3P1(1011)"
   lmp: { type: Date }, // Last Menstrual Period
   edd: { type: Date }, // Expected Due Date
-  trimester: { type: String, enum: ["First", "Second", "Third"] },
-  notes: String, // Pregnancy-related notes or risks
+  aog: { type: String }, // Age of Gestation ex. "21W 4D"
+  day_of_cycle: { type: String },
+
+  // 🧾 Notes and status
+  status: {
+    type: String,
+    enum: ["active", "delivered", "archived"],
+    default: "active",
+  },
+  notes: { type: String },
 
   created_on: { type: Date, default: Date.now },
   created_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },

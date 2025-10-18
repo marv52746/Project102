@@ -7,6 +7,7 @@ import {
   UserPlus,
   CalendarPlus,
   FlaskConical,
+  CalendarX2,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
@@ -18,11 +19,13 @@ import NewPatientModal from "./NewPatientModal";
 import NewBaseModal from "./NewBaseModal";
 import ActivitiesTimeline from "./ActivitiesTimeline";
 import { useParams } from "react-router-dom";
+import OngoingCheckup from "./OngoingCheckup";
 
 export default function DashboardTabStaff() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { refreshKey } = useSelector((state) => state.utils);
+  const [appointmentsToday, setAppointmentsToday] = useState([]);
   const [stats, setStats] = useState({
     upcoming: 0,
     completed: 0,
@@ -31,6 +34,7 @@ export default function DashboardTabStaff() {
 
   const [activities, setActivities] = useState([]);
   const [upcomingAppointments, setupcomingAppointments] = useState([]);
+  const [cancelledAppointments, setcancelledAppointments] = useState([]);
   const [completedAppointments, setCompletedAppointments] = useState([]);
   const [inLobbyAppointments, setInLobbyAppointments] = useState([]);
 
@@ -50,6 +54,14 @@ export default function DashboardTabStaff() {
   // Add new states
   const [showStatListModal, setShowStatListModal] = useState(false);
   const [selectedStat, setSelectedStat] = useState(null);
+  const [dayBounds, setDayBounds] = useState({ start: null, end: null });
+
+  useEffect(() => {
+    const now = new Date();
+    const start = new Date(now.setHours(0, 0, 0, 0));
+    const end = new Date(now.setHours(23, 59, 59, 999));
+    setDayBounds({ start, end });
+  }, []);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -57,12 +69,14 @@ export default function DashboardTabStaff() {
         const appointments = await apiService.get(dispatch, "appointments", {
           date: "today",
         });
+        setAppointmentsToday(appointments);
 
         // console.log(appointments);
 
         let upcomingCount = 0;
         let completedTodayCount = 0;
         let inlobbyCount = 0;
+        let cancelledCount = 0;
 
         const recentActivities = appointments
           .slice(-5) // last 5 appointments
@@ -88,6 +102,7 @@ export default function DashboardTabStaff() {
 
         var upcomingAppointmentsArr = [];
         var completedAppointmentsArr = [];
+        var cancelledAppointmentsArr = [];
         var inLobbyArr = [];
 
         appointments.forEach((a) => {
@@ -105,17 +120,23 @@ export default function DashboardTabStaff() {
             completedAppointmentsArr.push(a);
             completedTodayCount++;
           }
+          if (a.status === "cancelled") {
+            cancelledAppointmentsArr.push(a);
+            cancelledCount++;
+          }
         });
 
         setStats({
           upcoming: upcomingCount,
           completed: completedTodayCount,
           inLobby: inlobbyCount,
+          cancelled: cancelledCount,
         });
 
         setActivities(recentActivities);
         setupcomingAppointments(upcomingAppointmentsArr);
         setCompletedAppointments(completedAppointmentsArr);
+        setcancelledAppointments(cancelledAppointmentsArr);
         setInLobbyAppointments(inLobbyArr);
         // console.log(upcomingAppointmentsArr);
       } catch (err) {
@@ -127,31 +148,39 @@ export default function DashboardTabStaff() {
   }, [dispatch, manualRefresh, refreshKey]);
 
   const statCards = [
+    // {
+    //   label: "In Lobby",
+    //   value: stats.inLobby,
+    //   color: "bg-green-100 text-green-800",
+    //   icon: <ClipboardList className="w-6 h-6 text-green-600" />,
+    // },
     {
-      label: "In Lobby",
-      value: stats.inLobby,
-      color: "bg-green-100 text-green-800",
-      icon: <ClipboardList className="w-6 h-6 text-green-600" />,
+      label: "Upcoming Appointments",
+      value: stats.upcoming,
+      color: "bg-blue-100 text-blue-800",
+      icon: <CalendarClock className="w-6 h-6 text-blue-600" />,
     },
     {
-      label: "Completed Appointments (Today)",
+      label: "Completed Appointments",
       value: stats.completed,
       color: "bg-green-100 text-green-800",
       icon: <CalendarCheck2 className="w-6 h-6 text-green-600" />,
     },
+
     {
-      label: "Upcoming Appointments (Today)",
-      value: stats.upcoming,
-      color: "bg-blue-100 text-blue-800",
-      icon: <CalendarClock className="w-6 h-6 text-blue-600" />,
+      label: "Cancelled Appointments",
+      value: stats.cancelled,
+      color: "bg-red-100 text-red-800",
+      icon: <CalendarX2 className="w-6 h-6 text-red-600" />,
     },
   ];
 
   // Map stats to appointments
   const statAppointmentsMap = {
-    "In Lobby": inLobbyAppointments,
-    "Completed Appointments (Today)": completedAppointments,
-    "Upcoming Appointments (Today)": upcomingAppointments,
+    // "In Lobby": inLobbyAppointments,
+    "Completed Appointments": completedAppointments,
+    "Upcoming Appointments": upcomingAppointments,
+    "Cancelled Appointments": cancelledAppointments,
   };
 
   const quickActions = [
@@ -196,7 +225,7 @@ export default function DashboardTabStaff() {
         </div>
 
         {/* Appointment Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {statCards.map((card, idx) => (
             <div
               key={idx}
@@ -219,7 +248,18 @@ export default function DashboardTabStaff() {
           {/* Upcoming Appointments */}
           <div className="xl:col-span-2 space-y-4">
             <UpcomingAppointments
-              title={"Upcoming Appointments (Today)"}
+              title={"In Lobby"}
+              appointments={inLobbyAppointments}
+              // scheduleAppointment={true}
+              onSelect={(app) => {
+                setViewType("appointments");
+                setViewData(app);
+                setOpenViewModal(true);
+              }}
+            />
+
+            <UpcomingAppointments
+              title={"Appointments Scheduled Today"}
               appointments={upcomingAppointments}
               // scheduleAppointment={true}
               onSelect={(app) => {
@@ -230,7 +270,27 @@ export default function DashboardTabStaff() {
             />
           </div>
 
-          <ActivitiesTimeline userID={id} />
+          <div className="space-y-4">
+            {/* 🩺 Ongoing Checkup */}
+            <OngoingCheckup
+              appointments={appointmentsToday.filter(
+                (a) =>
+                  a.status === "in-progress" &&
+                  dayBounds.start &&
+                  new Date(a.date) >= dayBounds.start &&
+                  new Date(a.date) <= dayBounds.end
+              )}
+              // appointments={upcomingAppointments}
+              onSelect={(app) => {
+                setViewType("appointments");
+                setViewData(app);
+                setOpenViewModal(true);
+              }}
+            />
+
+            {/* Activity Timeline */}
+            {/* <ActivitiesTimeline userID={id} /> */}
+          </div>
         </div>
       </div>
 

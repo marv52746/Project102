@@ -120,7 +120,7 @@ export default function TrimesterChart() {
         </div>
 
         {/* Trimesters */}
-        <div className="grid  grid-cols-1 sm:grid-cols-1 md:grid-cols-3">
+        <div className="grid  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {trimesters.map((tri, i) => (
             <div key={i} className="rounded-lg flex flex-col items-center">
               <div className="flex justify-center">

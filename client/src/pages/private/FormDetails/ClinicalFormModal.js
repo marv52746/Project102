@@ -80,28 +80,6 @@ export default function ClinicalFormModal({
         </div>
 
         <form onSubmit={handleSubmit}>
-          {/* {type !== "appointments" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Record Type
-              </label>
-              <select
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                disabled={mode === "view"}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm"
-              >
-                <option value="vitals">Vital</option>
-                <option value="conditions">Condition</option>
-                <option value="medications">Medication</option>
-                <option value="allergies">Allergy</option>
-                <option value="surgeries">Surgical History</option>
-                <option value="pregnancies">Pregnancy</option>
-                <option value="others">Others</option>
-              </select>
-            </div>
-          )} */}
           <div className="grid grid-cols-2 gap-4">
             {currentFields.map((field, idx) => {
               if (!field.name) return null;
@@ -264,30 +242,3 @@ function InputField({
     </div>
   );
 }
-
-// function InputField({
-//   label,
-//   name,
-//   value,
-//   onChange,
-//   placeholder,
-//   type,
-//   required,
-//   disabled,
-// }) {
-//   return (
-//     <div>
-//       <label className="block text-sm font-medium text-gray-700">{label}</label>
-//       <input
-//         type={type}
-//         name={name}
-//         value={value || ""}
-//         onChange={onChange}
-//         placeholder={placeholder}
-//         required={required}
-//         disabled={disabled}
-//         className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm"
-//       />
-//     </div>
-//   );
-// }

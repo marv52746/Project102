@@ -8,16 +8,14 @@ import CalendarDayModal from "../../../core/components/calendar/CalendarDayModal
 import CalendarModal from "../../../core/components/calendar/CalendarModal";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
 
-export default function CalendarTab({ id, tablename }) {
+export default function CalendarMain({ id, tablename }) {
   const dispatch = useDispatch();
   const today = useMemo(() => new Date(), []);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [appointments, setAppointments] = useState({});
   const [selectedDayAppointments, setSelectedDayAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
-  // const [showDayModal, setShowDayModal] = useState(false);
-
-  // console.log(id);
+  const [filter, setFilter] = useState("ALL"); // 🟢 Filter state
 
   const month = currentDate.getMonth() + 1;
   const year = currentDate.getFullYear();
@@ -32,37 +30,30 @@ export default function CalendarTab({ id, tablename }) {
         ...(tablename === "patients" && { patient: id }),
       };
 
-      // console.log(tablename);
-      // console.log(params);
-
-      // 1. Fetch appointments
       const data = (await apiService.get(dispatch, "calendar", params)) ?? [];
-
-      // 2. Fetch EDD schedules
       const eddData =
         (await apiService.get(dispatch, "pregnancies", { patient: id })) ?? [];
 
-      // console.log(data);
-
       const grouped = {};
+
       // Appointments
       (data || []).forEach((a) => {
-        if (!a?.date) return; // skip invalid records
+        if (!a?.date) return;
         const d = a.date.split("T")[0];
         if (!grouped[d]) grouped[d] = [];
         grouped[d].push(a);
       });
 
-      // EDDs
+      // Pregnancies / EDDs
       (eddData || []).forEach((e) => {
-        if (!e?.edd) return; // skip if no EDD
+        if (!e?.edd) return;
         const d = e.edd.split("T")[0];
         if (!grouped[d]) grouped[d] = [];
         grouped[d].push({
           ...e,
-          date: e.edd, // so modal knows the date
+          date: e.edd,
           mode: "EDD",
-          title: "Estimated Due Date", // optional extra label for modal
+          title: "Estimated Due Date",
         });
       });
 
@@ -80,21 +71,30 @@ export default function CalendarTab({ id, tablename }) {
   }, [fetchData]);
 
   const daysInMonth = useMemo(() => {
-    return generateDaysInMonth(currentDate, appointments, []);
-  }, [appointments, currentDate]);
+    // 🟢 Apply filter logic
+    const filteredAppointments = {};
+    Object.entries(appointments).forEach(([date, appts]) => {
+      if (filter === "ALL") {
+        filteredAppointments[date] = appts;
+      } else if (filter === "Appointments") {
+        filteredAppointments[date] = appts.filter((a) => a.mode !== "EDD");
+      } else if (filter === "Pregnancy EDD") {
+        filteredAppointments[date] = appts.filter((a) => a.mode === "EDD");
+      }
+    });
+
+    return generateDaysInMonth(currentDate, filteredAppointments, []);
+  }, [appointments, currentDate, filter]);
 
   const openDayModal = (dayAppointments) => {
     setSelectedDayAppointments(dayAppointments);
-    // setShowDayModal(true);
   };
 
   const handleSelectAppointment = async (appt) => {
     try {
       if (appt.mode === "EDD") {
-        // console.log(appt);
         setSelectedAppointment(appt);
       } else {
-        // ✅ Query full appointment data by ID
         const fullData = await apiService.get(
           dispatch,
           `appointments/${appt._id}`
@@ -103,13 +103,11 @@ export default function CalendarTab({ id, tablename }) {
       }
     } catch (error) {
       console.error("Failed to load appointment:", error);
-      // fallback to using existing appt data if fetch fails
       setSelectedAppointment(appt);
     }
   };
 
   const closeModal = () => {
-    // setShowDayModal(false);
     setSelectedDayAppointments([]);
     setSelectedAppointment(null);
   };
@@ -123,7 +121,8 @@ export default function CalendarTab({ id, tablename }) {
   return (
     <div className="flex gap-4">
       <div className="w-full p-2">
-        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        {/* 🔹 Header Controls */}
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setCurrentDate(today)}
@@ -151,6 +150,23 @@ export default function CalendarTab({ id, tablename }) {
 
           <div className="text-xl font-medium text-gray-800">
             {monthLabel} {year}
+          </div>
+
+          {/* 🟢 Filter Pills */}
+          <div className="flex gap-2 flex-wrap">
+            {["ALL", "Appointments", "Pregnancy EDD"].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-3 py-1 rounded-full text-sm border transition ${
+                  filter === f
+                    ? "bg-blue-100 text-blue-700 border-blue-300"
+                    : " text-gray-700 border-gray-300 hover:bg-gray-100"
+                }`}
+              >
+                {f}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -195,16 +211,14 @@ export default function CalendarTab({ id, tablename }) {
 
                 <div className="flex flex-wrap gap-2 text-xs mt-1">
                   {Object.entries(typeCounts).map(([type, count], i) => {
-                    let icon;
-                    if (type === "video") {
-                      icon = "📹";
-                    } else if (type === "in-person") {
-                      icon = "😷";
-                    } else if (type === "EDD") {
-                      icon = "👶";
-                    } else {
-                      icon = "📅";
-                    }
+                    let icon =
+                      type === "EDD"
+                        ? "👶"
+                        : type === "video"
+                        ? "📹"
+                        : type === "in-person"
+                        ? "😷"
+                        : "📅";
 
                     return (
                       <span
@@ -223,6 +237,7 @@ export default function CalendarTab({ id, tablename }) {
         </div>
       </div>
 
+      {/* 🟢 Modals */}
       {(selectedAppointment || selectedDayAppointments.length > 0) && (
         <div
           className="fixed inset-0 bg-black bg-opacity-30 z-40 flex items-center justify-center"
@@ -236,19 +251,13 @@ export default function CalendarTab({ id, tablename }) {
               selectedAppointment.title === "Estimated Due Date" ? (
                 <CalendarModal
                   report={selectedAppointment}
-                  onClose={() => {
-                    setSelectedDayAppointments([]);
-                    setSelectedAppointment(null);
-                  }}
+                  onClose={closeModal}
                   isOpen={true}
                 />
               ) : (
                 <CalendarModalDetails
                   report={selectedAppointment}
-                  onClose={() => {
-                    setSelectedDayAppointments([]);
-                    setSelectedAppointment(null);
-                  }}
+                  onClose={closeModal}
                   isOpen={true}
                 />
               )

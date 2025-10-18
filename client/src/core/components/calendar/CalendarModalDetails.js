@@ -41,6 +41,7 @@ import VitalItem from "./VitalItem";
 import PrintActionButtons from "../documents/PrintCertificate";
 import UltrasoundModalNew from "../modal/UltrasoundModalNew";
 import { adminOnlyRoles } from "../../constants/rolePresets";
+import { handleUltrasoundSubmit } from "../formActions/handleUltrasoundSubmit";
 
 function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
   const [report, setReport] = useState(initialReport);
@@ -138,28 +139,42 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
       }));
 
       // save in batch
-      const savedRecords = await Promise.all(
-        enrichedRecords.map((rec) => {
-          if (rec._id) {
-            // update existing
-            return handleFormSubmit({
-              dispatch,
-              tablename: type,
-              data: rec,
-              id: rec._id,
-              fields,
-            });
-          } else {
-            // create new
-            return handleFormSubmit({
-              dispatch,
-              tablename: type,
-              data: rec,
-              fields,
-            });
-          }
-        })
-      );
+      let savedRecords;
+      if (type !== "ultrasound") {
+        savedRecords = await Promise.all(
+          enrichedRecords.map((rec) => {
+            if (rec._id) {
+              // update existing
+              return handleFormSubmit({
+                dispatch,
+                tablename: type,
+                data: rec,
+                id: rec._id,
+                fields,
+              });
+            } else {
+              // create new
+              return handleFormSubmit({
+                dispatch,
+                tablename: type,
+                data: rec,
+                fields,
+              });
+            }
+          })
+        );
+      } else {
+        const savedUltrasound = await handleUltrasoundSubmit({
+          dispatch,
+          appointmentData: report,
+          data,
+          patient: report.patient,
+          onClose: () => setActiveModal(null),
+          onRefresh,
+        });
+
+        savedRecords = [savedUltrasound]; // ✅ wrap in array for consistency
+      }
 
       const existingList = Array.isArray(
         report[mapTypeToAppointmentField(type)]
@@ -242,13 +257,13 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
           iconColor: "text-blue-600",
           borderColor: "border-gray-200",
         };
-      case "pregnancy":
-        return {
-          Icon: Baby,
-          bgColor: "bg-blue-100",
-          iconColor: "text-blue-600",
-          borderColor: "border-gray-200",
-        };
+      // case "pregnancy":
+      //   return {
+      //     Icon: Baby,
+      //     bgColor: "bg-blue-100",
+      //     iconColor: "text-blue-600",
+      //     borderColor: "border-gray-200",
+      //   };
       case "surgery":
         return {
           Icon: Scissors,
@@ -316,11 +331,11 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
     //   desc: "Record medical conditions and diagnosis",
     // },
 
-    {
-      type: "pregnancy",
-      title: "Pregnancy",
-      desc: "Record pregnancy details",
-    },
+    // {
+    //   type: "pregnancy",
+    //   title: "Pregnancy",
+    //   desc: "Record pregnancy details",
+    // },
 
     {
       type: "labrequest",
@@ -480,7 +495,9 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
         </div>
         {/* Footer */}
         <div className="flex justify-end gap-3 border-t p-4 bg-gray-50">
-          {(report.status === "scheduled" || report.status === "ready") && (
+          {(report.status === "scheduled" ||
+            report.status === "ready" ||
+            report.status === "in-progress") && (
             <ModalFormActions
               setError
               report={report}
@@ -512,13 +529,13 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
           onSave={(data) => handleSave("allergies", data)}
           initialData={report.allergy}
         />
-        <PregnanciesModal
+        {/* <PregnanciesModal
           status={report.status}
           isOpen={activeModal === "pregnancy"}
           onClose={() => setActiveModal(null)}
           onSave={(data) => handleSave("pregnancies", data)}
           initialData={report.pregnancy}
-        />
+        /> */}
         <SurgeriesModal
           status={report.status}
           isOpen={activeModal === "surgery"}

@@ -12,12 +12,6 @@ import { formConfigMap } from "../../../core/constants/FieldConfigMap";
 import VitalItem from "../../../core/components/calendar/VitalItem";
 import UpcomingAppointments from "./UpcomingAppointments";
 
-const documentsSeed = [
-  { id: 1, name: "Check In" },
-  { id: 2, name: "Consent Form" },
-  { id: 3, name: "Lab Results" },
-];
-
 // Main Component
 export default function DashboardTab({ patientId, data }) {
   const { refreshKey } = useSelector((state) => state.utils);
@@ -57,8 +51,6 @@ export default function DashboardTab({ patientId, data }) {
         );
 
         const filteredAppointments = filterByPatient(appointmentData)
-          // .filter((app) => new Date(app.date) >= new Date())
-          // .sort((a, b) => new Date(a.date) - new Date(b.date))
           .filter((app) => {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -132,6 +124,8 @@ export default function DashboardTab({ patientId, data }) {
           <UpcomingAppointments
             title={"Upcoming Appointments"}
             appointments={appointments}
+            isCollapse={false} // start expanded
+            viewMode="card" // start in card view
             onSelect={(app) => {
               setViewType("appointments");
               setViewData(app);
@@ -143,32 +137,6 @@ export default function DashboardTab({ patientId, data }) {
         {/* TIMELINE + DOCUMENTS */}
         <div className="space-y-4">
           <ActivitiesTimeline patientId={patientId} />
-          {/* <Card title="Documents">
-            <ul className="divide-y text-sm">
-              {documentsSeed.map((d) => (
-                <li
-                  key={d.id}
-                  className="py-2 flex items-center justify-between"
-                >
-                  <span className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-blue-500" /> {d.name}
-                  </span>
-                  <span className="flex items-center gap-2 text-gray-400">
-                    <button
-                      // onClick={reactToPrintFn}
-                      className="hover:text-gray-600"
-                      title="Print"
-                    >
-                      🖨️
-                    </button>
-                    <button className="hover:text-gray-600" title="Download">
-                      ⬇️
-                    </button>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </Card> */}
         </div>
       </div>
       {openViewModal && (

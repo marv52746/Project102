@@ -14,6 +14,8 @@ import ConsultationHistoryTab from "./ConsultationHistoryTab";
 import DashboardTabStaff from "./DashboardTabStaff";
 import PatientsList from "./PatientsList";
 import UltrasoundTab from "./UltrasoundTab";
+import ALLAppointments from "./ALLAppointments";
+import CalendarMain from "../Calendar/CalendarMain";
 
 export default function UserDashboardPage({ data }) {
   const { id } = useParams();
@@ -63,6 +65,8 @@ export default function UserDashboardPage({ data }) {
         return [
           { key: "staff-dashboard", label: "Overview" },
           { key: "patients-all", label: "Patient List" },
+          { key: "calendar-main", label: "Calendar" },
+          { key: "appointment-history", label: "Apppointments" },
         ];
 
       case "doctor":
@@ -131,6 +135,10 @@ export default function UserDashboardPage({ data }) {
         return <DashboardTabStaff appointments={appointments} />;
       case "patients-all":
         return <PatientsList />;
+      case "appointment-history":
+        return <ALLAppointments data={data} />;
+      case "calendar-main":
+        return <CalendarMain />;
 
       default:
         return (

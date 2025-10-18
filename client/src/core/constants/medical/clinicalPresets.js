@@ -113,7 +113,7 @@ export const medicationFormFields = [
     type: "date",
     // default: new Date(),
   },
-  { name: "end_date", label: "End Date", type: "date" },
+
   {
     name: "notes",
     label: "Instructions",
@@ -121,6 +121,7 @@ export const medicationFormFields = [
     placeholder: "Instructions or additional info",
     required: true,
   },
+  { name: "end_date", label: "End Date", type: "date" },
 ];
 
 export const allergyFormFields = [
@@ -252,35 +253,38 @@ export const pregnancyFormFields = [
   //   required: true,
   // },
   {
-    name: "gravida",
-    label: "Gravida",
-    type: "number",
-    placeholder: "e.g. 2 (total pregnancies)",
-    min: 0,
-    required: true,
-  },
-  {
-    name: "para",
-    label: "Para",
-    type: "number",
-    placeholder: "e.g. 1 (total births)",
-    min: 0,
-    required: true,
-  },
-  {
-    name: "code",
-    label: "Code",
+    name: "gravida_para",
+    label: "Gravida / Para",
     type: "text",
+    placeholder: "e.g. G3P1(1011)",
+    required: true,
+  },
+  {
+    name: "aog",
+    label: "AOG",
+    type: "text",
+    placeholder: "e.g. 21W 4D",
+    required: true,
   },
   {
     name: "lmp",
-    label: "Last Menstrual Period (LMP)",
+    label: "LMP",
     type: "date",
   },
   {
     name: "edd",
-    label: "Expected Due Date (EDD)",
+    label: "EDD",
     type: "date",
+  },
+  {
+    name: "status",
+    label: "Status",
+    type: "select",
+    options: [
+      { label: "Active", value: "active" },
+      { label: "Delivered", value: "delivered" },
+      { label: "Archived", value: "archived" },
+    ],
   },
 
   // {
@@ -996,7 +1000,7 @@ export const clinicalFormFieldMap = {
   conditions: conditionFormFields,
   appointments: appointmentsFormFields,
   pregnancies: pregnancyFormFields,
-  labrequests: labRequestFormFields,
+  labrequest: labRequestFormFields,
   ultrasounds: ultrasoundFormFields,
   others: othersFormFields,
 };

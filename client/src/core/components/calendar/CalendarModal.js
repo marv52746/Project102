@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   CheckCircle,
   XCircle,
@@ -8,6 +8,11 @@ import {
   HelpCircle,
   Baby,
 } from "lucide-react";
+import { capitalizeText } from "../../utils/stringUtils";
+import UltrasoundModalNew from "../modal/UltrasoundModalNew";
+import { useDispatch, useSelector } from "react-redux";
+import { adminOnlyRoles } from "../../constants/rolePresets";
+import { handleUltrasoundSubmit } from "../formActions/handleUltrasoundSubmit";
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "N/A";
@@ -31,6 +36,19 @@ const formatTime = (timeStr) => {
 };
 
 function CalendarModal({ report, onClose }) {
+  const currentUser = useSelector((state) => state.user.userInfo);
+  const hasPermission = adminOnlyRoles.includes(currentUser.role);
+
+  const [ultrasoundReport, setUltrasoundReport] = useState(null);
+  const dispatch = useDispatch();
+
+  const handleSave = async (type, data) => {
+    await handleUltrasoundSubmit({
+      dispatch,
+      data,
+    });
+  };
+
   // console.log(report);
   if (!report) return null;
 
@@ -38,6 +56,16 @@ function CalendarModal({ report, onClose }) {
   const statusMap = {
     completed: {
       text: "Completed",
+      color: "bg-green-500",
+      icon: CheckCircle,
+    },
+    active: {
+      text: "Active",
+      color: "bg-pink-500",
+      icon: Baby,
+    },
+    delivered: {
+      text: "Delivered",
       color: "bg-green-500",
       icon: CheckCircle,
     },
@@ -78,11 +106,11 @@ function CalendarModal({ report, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 "
       onClick={onClose}
     >
       <div
-        className="bg-white p-8 rounded-lg w-11/12 max-w-lg shadow-lg"
+        className="bg-white p-8 rounded-2xl w-11/12 sm:w-4/5 md:w-3/5 lg:w-1/2 xl:w-2/5 max-w-[900px] shadow-lg overflow-y-auto max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {report.appointment_no && (
@@ -126,16 +154,49 @@ function CalendarModal({ report, onClose }) {
             </h2>
 
             <div className="mt-8 border-t pt-6 space-y-4">
+              <div className="flex items-start">
+                <strong className="text-gray-700 w-1/3">Patient:</strong>
+                <a
+                  href={`/form/patients/view/${report.patient._id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 no-underline"
+                >
+                  {report.patient.fullname}
+                </a>
+              </div>
               <Detail
                 label="Expected Due Date"
                 value={formatDate(report.edd)}
               />
-              <Detail label="Trimester" value={report.trimester || "N/A"} />
-              <Detail label="Gravida" value={report.gravida ?? "N/A"} />
-              <Detail label="Para" value={report.para ?? "N/A"} />
               <Detail
-                label="Pregnancy Notes"
-                value={report.pregnancy_notes || "No pregnancy notes available"}
+                label="Gravida / Para"
+                value={report.gravida_para ?? "N/A"}
+              />
+              <Detail label="LMP" value={formatDate(report.lmp)} />
+              <Detail label="AOG" value={report.aog ?? "N/A"} />
+              <Detail label="Status" value={capitalizeText(report.status)} />
+
+              {report.ultrasound?._id && (
+                <div className="flex items-start">
+                  <strong className="text-gray-700 w-1/3">Ultrasound:</strong>
+                  <button
+                    onClick={() =>
+                      setUltrasoundReport({
+                        ...report.ultrasound,
+                        patient: report.patient, // ✅ Correct way to attach patient
+                      })
+                    }
+                    className="text-blue-600 no-underline"
+                  >
+                    {report.ultrasound.type}
+                  </button>
+                </div>
+              )}
+
+              <Detail
+                label="Notes"
+                value={report.notes || "No pregnancy notes available"}
               />
             </div>
           </>
@@ -150,6 +211,18 @@ function CalendarModal({ report, onClose }) {
           </button>
         </div>
       </div>
+
+      {ultrasoundReport && (
+        <UltrasoundModalNew
+          title={"Ultrasound Data"}
+          isOpen={ultrasoundReport}
+          hasPermission={hasPermission}
+          onClose={() => setUltrasoundReport(null)}
+          onSave={(data) => handleSave("ultrasound", data)}
+          initialData={ultrasoundReport} // empty array
+          patient={ultrasoundReport.patient}
+        />
+      )}
     </div>
   );
 }

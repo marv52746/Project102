@@ -25,7 +25,7 @@ const ConfirmDeleteModal = ({ isOpen, onClose, onConfirm }) => {
         </div>
         <h2 className="text-lg font-semibold mb-2">Confirm Delete</h2>
         <p className="text-gray-600 mb-6">
-          Are you sure you want to delete this data?
+          Are you sure you want to delete this?
         </p>
         <div className="flex justify-center gap-4">
           <button

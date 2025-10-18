@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { ultrasoundsForm } from "../../constants/medical/ultrasoundPresets";
 import { X, XCircle } from "lucide-react";
 import Select from "react-select";
@@ -7,13 +7,13 @@ import { capitalizeText } from "../../utils/stringUtils";
 import jsPDF from "jspdf";
 
 import UltrasoundBiophysicalPrint from "../documents/UltrasoundBiophysical";
-
 import UltrasoundTransvaginalOBPrint from "../documents/UltrasoundTVSOB";
 import TransvaginalUltrasoundGynePrint from "../documents/UltrasoundTVSGyne";
 import { handleFormDelete } from "../formActions/formHandlers";
 import { useDispatch } from "react-redux";
 import ConfirmModal from "./ConfirmModal";
 import { formatDateForInput } from "../../utils/dateUtils";
+import apiService from "../../services/apiService";
 
 // 🔹 Section Title
 function SectionTitle({ title }) {
@@ -316,6 +316,7 @@ export default function UltrasoundModalNew({
   patient,
 }) {
   const usRef = useRef(); // ✅ new ref for ultrasound
+  const dispatch = useDispatch();
 
   const [data, setData] = useState({
     ...initialData,
@@ -375,6 +376,39 @@ export default function UltrasoundModalNew({
 
   // console.log(data);
 
+  useEffect(() => {
+    // 🩺 Auto-load existing pregnancy data if this is an OB ultrasound
+    const fetchPregnancyData = async () => {
+      if (!data?.patient?._id) return; // patient must be selected first
+      try {
+        const pregnancies = await apiService.get(dispatch, `pregnancies`, {
+          patient: data?.patient?._id,
+          status: "active",
+        });
+
+        // ✅ Get the first pregnancy (if exists)
+        const pregnancy = pregnancies?.[0];
+        if (!pregnancy || !pregnancy.lmp) return;
+
+        // ✅ Pre-fill OB-related fields
+        setData((prev) => ({
+          ...prev,
+          ob_data: {
+            ...prev.ob_data,
+            lmp: pregnancy.lmp ? pregnancy.lmp.slice(0, 10) : "",
+            edd: pregnancy.edd ? pregnancy.edd.slice(0, 10) : "",
+            aog: pregnancy.aog || "",
+            gravida_para: pregnancy.gravida_para || "",
+          },
+        }));
+      } catch (err) {
+        console.error("Error fetching pregnancy data:", err);
+      }
+    };
+
+    fetchPregnancyData();
+  }, [dispatch, data?.patient?._id, data?.type]);
+
   const handlePDFDownload = (ref, fileName) => {
     if (!ref.current) return;
     const doc = new jsPDF("p", "px", "a4");
@@ -387,6 +421,7 @@ export default function UltrasoundModalNew({
       x: 10,
       y: 10,
       html2canvas: { scale: 0.5 },
+      margin: 11,
     });
   };
 
