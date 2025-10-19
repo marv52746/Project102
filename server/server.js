@@ -19,7 +19,11 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: ["https://kanvi.net", "http://localhost:3000"],
+    origin: [
+      "https://kanvi.net",
+      "http://localhost:3000",
+      "https://bisligpremier.com",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
