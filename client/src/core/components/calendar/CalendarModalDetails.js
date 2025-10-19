@@ -86,7 +86,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
     const records = Array.isArray(data) ? data : [data];
     const fields = (clinicalFormFieldMap[type] || []).filter((f) => f.name);
     // console.log(data);
-    // console.log(type);
+    // console.log(fields);
 
     if (type === "appointments") {
       const appointmentData = records[0];
@@ -169,6 +169,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
           appointmentData: report,
           data,
           patient: report.patient,
+          doctor: report.doctor,
           onClose: () => setActiveModal(null),
           onRefresh,
         });
@@ -573,6 +574,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
           onSave={(data) => handleSave("ultrasound", data)}
           initialData={report.ultrasound[0]} // empty array
           patient={report.patient}
+          doctor={report.doctor}
         />
       </div>
     </div>

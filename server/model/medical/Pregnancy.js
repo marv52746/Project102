@@ -3,6 +3,7 @@ const { ObjectId } = mongoose.Schema;
 
 const pregnancySchema = new mongoose.Schema({
   patient: { type: ObjectId, ref: "user", required: true },
+  doctor: { type: ObjectId, ref: "user" },
   ultrasound: { type: ObjectId, ref: "ultrasound" },
 
   gravida_para: { type: String }, // Example: "G3P1(1011)"

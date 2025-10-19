@@ -246,6 +246,13 @@ export const pregnancyFormFields = [
     ref: "users",
     hidden: true,
   },
+  {
+    name: "doctor",
+    label: "Doctor",
+    type: "reference",
+    ref: "users",
+    hidden: true,
+  },
   // {
   //   name: "is_pregnant",
   //   label: "Pregnancy Status",

@@ -47,6 +47,7 @@ export default function ClinicalRecordTab({ patientId }) {
   const [viewType, setViewType] = useState(null);
 
   const dispatch = useDispatch();
+  console.log(viewData);
 
   useEffect(() => {
     if (!patientId) return;
@@ -92,8 +93,8 @@ export default function ClinicalRecordTab({ patientId }) {
   const tabConfig = {
     conditions: { label: "Diagnosis", icon: ShieldAlert, color: "yellow" },
     medications: { label: "Medications", icon: Pill, color: "green" },
-    ultrasounds: { label: "Ultrasound", icon: Stethoscope, color: "indigo" },
-    labrequest: { label: "Lab Requests", icon: FlaskConical, color: "purple" },
+    ultrasounds: { label: "Ultrasound", icon: Stethoscope, color: "blue" },
+    labrequest: { label: "Lab Requests", icon: FlaskConical, color: "green" },
     allergies: { label: "Allergies", icon: AlertTriangle, color: "red" },
     vitals: { label: "Vitals Log", icon: Activity, color: "blue" },
     surgeries: { label: "Surgical History", icon: Scissors, color: "gray" },
@@ -395,6 +396,7 @@ export default function ClinicalRecordTab({ patientId }) {
           onSave={(data) => handleSave("ultrasound", data)}
           initialData={viewData}
           patient={viewData?.patient}
+          doctor={viewData?.appointment.doctor}
         />
       )}
     </div>

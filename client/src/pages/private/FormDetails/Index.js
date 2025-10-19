@@ -124,7 +124,7 @@ export default function UserDashboardPage({ data }) {
       case "patients":
         return <PatientsTab appointments={appointments} doctorID={userId} />;
       case "calendar":
-        return <CalendarTab id={userId} tablename={"doctors"} />;
+        return <CalendarMain id={userId} tablename={"doctors"} />;
       case "reviews":
         return <ReviewsTab data={data} />;
       case "ultrasound":
@@ -147,11 +147,13 @@ export default function UserDashboardPage({ data }) {
     }
   };
 
-  if (loading || !mainTab) {
+  if (loading || !mainTab)
     return (
-      <div className="p-6 text-center text-gray-500">Loading user data...</div>
+      <div className="flex justify-center items-center h-64 text-gray-600">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <span className="ml-3">Loading user data...</span>
+      </div>
     );
-  }
 
   return (
     <div className="min-h-screen text-slate-700">

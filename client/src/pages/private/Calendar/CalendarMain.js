@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Baby,
+  CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  Stethoscope,
+  Video,
+} from "lucide-react";
 import { useDispatch } from "react-redux";
 import apiService from "../../../core/services/apiService";
 import { showNotification } from "../../../core/services/slices/notificationSlice";
@@ -7,6 +14,7 @@ import { formatDate, generateDaysInMonth } from "./Utils";
 import CalendarDayModal from "../../../core/components/calendar/CalendarDayModal";
 import CalendarModal from "../../../core/components/calendar/CalendarModal";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
+import Reloader from "../../../core/components/utils/reloader";
 
 export default function CalendarMain({ id, tablename }) {
   const dispatch = useDispatch();
@@ -20,8 +28,10 @@ export default function CalendarMain({ id, tablename }) {
   const month = currentDate.getMonth() + 1;
   const year = currentDate.getFullYear();
   const monthLabel = currentDate.toLocaleString("default", { month: "long" });
+  const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
       const params = {
         month,
@@ -30,9 +40,14 @@ export default function CalendarMain({ id, tablename }) {
         ...(tablename === "patients" && { patient: id }),
       };
 
+      const pregParams = {
+        ...(tablename === "doctors" && { doctor: id }),
+        ...(tablename === "patients" && { patient: id }),
+      };
+
       const data = (await apiService.get(dispatch, "calendar", params)) ?? [];
       const eddData =
-        (await apiService.get(dispatch, "pregnancies", { patient: id })) ?? [];
+        (await apiService.get(dispatch, "pregnancies", pregParams)) ?? [];
 
       const grouped = {};
 
@@ -63,6 +78,8 @@ export default function CalendarMain({ id, tablename }) {
       dispatch(
         showNotification({ message: "Failed to load calendar", type: "error" })
       );
+    } finally {
+      setLoading(false);
     }
   }, [id, month, year, dispatch, tablename]);
 
@@ -117,6 +134,8 @@ export default function CalendarMain({ id, tablename }) {
     newDate.setMonth(newDate.getMonth() + delta);
     setCurrentDate(newDate);
   };
+
+  if (loading) return <Reloader text="Loading calendar..." />;
 
   return (
     <div className="flex gap-4">
@@ -209,24 +228,132 @@ export default function CalendarMain({ id, tablename }) {
                   </span>
                 </div>
 
+                {/* <div className="flex flex-wrap gap-2 text-xs mt-1">
+                  {Object.entries(typeCounts).map(([type, count], i) => {
+                    // let icon =
+                    //   type === "EDD"
+                    //     ? "👶"
+                    //     : type === "video"
+                    //     ? "📹"
+                    //     : type === "in-person"
+                    //     ? "😷"
+                    //     : "📅";
+
+                    const firstMatch = appts.find((a) => a.mode === type);
+                    let IconComponent = CalendarIcon;
+                    let color = "#6b7280";
+                    let tooltip = "";
+                    let isEmoji = false;
+                    let emoji = "";
+
+                    if (type === "EDD") {
+                      IconComponent = Baby;
+                      if (firstMatch?.status === "active")
+                        color = "#ec4899"; // pink
+                      else if (firstMatch?.status === "delivered")
+                        color = "#10b981"; // green
+                      else color = "#94a3b8"; // gray
+
+                      tooltip = `${
+                        firstMatch?.patient?.name || "Patient"
+                      } — EDD: ${
+                        firstMatch?.edd
+                          ? new Date(firstMatch.edd).toLocaleDateString()
+                          : "N/A"
+                      }`;
+                    } else if (type === "video") {
+                      IconComponent = Video;
+                      color = "#3b82f6";
+                      tooltip = "Video Appointment";
+                    } else if (type === "in-person") {
+                      isEmoji = true;
+                      emoji = "😷";
+                      color = "#f97316";
+                      tooltip = "In-person Appointment";
+                    } else {
+                      tooltip = "Other Event";
+                    }
+
+                    return (
+                      // <span
+                      //   key={i}
+                      //   className="inline-flex items-center gap-1 text-gray-700 text-xs"
+                      // >
+                      //   <span className="text-base">{icon}</span>
+                      //   <span className="font-medium">{count}</span>
+                      // </span>
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-1 text-xs font-medium"
+                        title={tooltip}
+                      >
+                        {isEmoji ? (
+                          <span style={{ color, fontSize: "1rem" }}>
+                            {emoji}
+                          </span>
+                        ) : (
+                          <IconComponent size={14} style={{ color }} />
+                        )}
+                        <span>{count}</span>
+                      </span>
+                    );
+                  })}
+                </div> */}
+
                 <div className="flex flex-wrap gap-2 text-xs mt-1">
                   {Object.entries(typeCounts).map(([type, count], i) => {
-                    let icon =
-                      type === "EDD"
-                        ? "👶"
-                        : type === "video"
-                        ? "📹"
-                        : type === "in-person"
-                        ? "😷"
-                        : "📅";
+                    const firstMatch = appts.find((a) => a.mode === type);
+                    let IconComponent = CalendarIcon;
+                    let color = "#6b7280";
+                    let tooltip = "";
+                    let emoji = "";
+                    let isEmoji = false;
+
+                    if (type === "EDD") {
+                      isEmoji = true;
+                      emoji = "👶";
+                      if (firstMatch?.status === "active")
+                        color = "#ec4899"; // pink
+                      else if (firstMatch?.status === "delivered")
+                        color = "#10b981"; // green
+                      else color = "#94a3b8"; // gray
+
+                      tooltip = `${
+                        firstMatch?.patient?.name || "Patient"
+                      } — EDD: ${
+                        firstMatch?.edd
+                          ? new Date(firstMatch.edd).toLocaleDateString()
+                          : "N/A"
+                      }`;
+                    } else if (type === "video") {
+                      IconComponent = Video;
+                      color = "#3b82f6";
+                      tooltip = "Video Appointment";
+                    } else if (type === "in-person") {
+                      isEmoji = true;
+                      emoji = "📅";
+                      color = "#f97316";
+                      tooltip = "In-person Appointment";
+                    } else {
+                      tooltip = "Other Event";
+                    }
 
                     return (
                       <span
                         key={i}
-                        className="inline-flex items-center gap-1 text-gray-700 text-xs"
+                        className="inline-flex items-center gap-1 text-xs font-medium"
+                        title={tooltip}
                       >
-                        <span className="text-base">{icon}</span>
-                        <span className="font-medium">{count}</span>
+                        {isEmoji ? (
+                          <span
+                            style={{ color, fontSize: "1rem", lineHeight: 1 }}
+                          >
+                            {emoji}
+                          </span>
+                        ) : (
+                          <IconComponent size={14} style={{ color }} />
+                        )}
+                        <span>{count}</span>
                       </span>
                     );
                   })}

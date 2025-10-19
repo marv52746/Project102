@@ -32,6 +32,11 @@ export default function CalendarTab({ id, tablename }) {
         ...(tablename === "patients" && { patient: id }),
       };
 
+      const pregParams = {
+        ...(tablename === "doctors" && { doctor: id }),
+        ...(tablename === "patients" && { patient: id }),
+      };
+
       // console.log(tablename);
       // console.log(params);
 
@@ -40,9 +45,7 @@ export default function CalendarTab({ id, tablename }) {
 
       // 2. Fetch EDD schedules
       const eddData =
-        (await apiService.get(dispatch, "pregnancies", { patient: id })) ?? [];
-
-      // console.log(data);
+        (await apiService.get(dispatch, "pregnancies", pregParams)) ?? [];
 
       const grouped = {};
       // Appointments

@@ -73,8 +73,20 @@ class BaseController {
         delete filters.date;
       }
 
+      const mongoose = require("mongoose");
+
       // Apply remaining filters
       Object.keys(filters).forEach((key) => {
+        let value = filters[key];
+
+        // ✅ Auto-convert string IDs to ObjectId for these fields
+        if (["doctor", "patient", "created_by", "updated_by"].includes(key)) {
+          try {
+            value = mongoose.Types.ObjectId(value);
+          } catch (err) {
+            console.warn(`Invalid ObjectId for ${key}:`, value);
+          }
+        }
         query = query.where(key).equals(filters[key]);
       });
 

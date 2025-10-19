@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
 import { Search } from "lucide-react";
+import Reloader from "../../../core/components/utils/reloader";
 
 export default function ALLAppointments({ data }) {
   // console.log(data);
@@ -15,6 +16,7 @@ export default function ALLAppointments({ data }) {
 
   const [appointments, setAppointments] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // 🔍 search + pagination state
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,6 +25,7 @@ export default function ALLAppointments({ data }) {
 
   useEffect(() => {
     const fetchDetails = async () => {
+      setLoading(true);
       try {
         const userAppointments = await apiService.get(dispatch, "appointments");
 
@@ -38,6 +41,8 @@ export default function ALLAppointments({ data }) {
         setAppointments(sortedAppointments || []);
       } catch (error) {
         console.error("Error fetching appointment details:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -48,7 +53,7 @@ export default function ALLAppointments({ data }) {
   const filteredAppointments = appointments.filter(
     (app) =>
       app.doctor?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.patient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.patient?.name?.toLowerCase().includes10(searchTerm.toLowerCase()) ||
       app.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.reason?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.notes?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -60,7 +65,9 @@ export default function ALLAppointments({ data }) {
     currentPage * rowsPerPage
   );
 
-  if (!appointments.length) {
+  if (loading) return <Reloader text="Loading appointments..." />;
+
+  if (!loading && !appointments.length) {
     return (
       <div className="text-center text-gray-500 p-6">
         No consultation history found.

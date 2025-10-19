@@ -51,7 +51,7 @@ export default function MainDashboard() {
       </div>
 
       {/* Tab content */}
-      <div className="bg-white shadow rounded-lg p-4">
+      <div className="">
         {tabs.find((tab) => tab.id === activeTab)?.component}
       </div>
     </div>

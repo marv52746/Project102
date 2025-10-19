@@ -15,6 +15,7 @@ import StatCard from "../../../core/components/dashboard/StatCard";
 import DataModal from "./DataModal";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import Reloader from "../../../core/components/utils/reloader";
 
 export default function InventoryDashboard() {
   const [stats, setStats] = useState({
@@ -42,10 +43,13 @@ export default function InventoryDashboard() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [transactionFilter, setTransactionFilter] = useState("All");
 
+  const [loading, setLoading] = useState(true);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      setLoading(true);
       try {
         const items = await apiService.get(dispatch, "inventory");
         const transactions = await apiService.get(dispatch, "inventoryLogs");
@@ -153,6 +157,8 @@ export default function InventoryDashboard() {
         setMonthlyItemTransactions(itemChart);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -284,9 +290,11 @@ export default function InventoryDashboard() {
 
   const categoryList = ["All", ...categoryData.map((c) => c.name)];
 
+  if (loading) return <Reloader text="Loading dashboard..." />;
+
   return (
     <>
-      <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+      <div className="space-y-6 min-h-screen">
         {/* Generate Report Button */}
         <div className="flex justify-end">
           <button

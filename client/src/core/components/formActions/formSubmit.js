@@ -46,7 +46,7 @@ export const handleFormSubmit = async ({
   notificationMessage,
 }) => {
   try {
-    // console.log(data);
+    console.log(data);
 
     // ✅ Fix: normalize tablename (patients/doctors should map to users)
     const tablename =

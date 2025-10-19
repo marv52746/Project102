@@ -314,12 +314,16 @@ export default function UltrasoundModalNew({
   initialData = {},
   onSave,
   patient,
+  doctor,
 }) {
   const usRef = useRef(); // ✅ new ref for ultrasound
   const dispatch = useDispatch();
 
+  // console.log(initialData);
+
   const [data, setData] = useState({
     ...initialData,
+    doctor: doctor || {},
     patient: patient || {}, // ✅ ensure patient gets injected
 
     // Fetal Survey

@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
 import { Search } from "lucide-react";
+import Reloader from "../../../core/components/utils/reloader";
 
 export default function ConsultationHistoryTab({ data }) {
   // console.log(data);
@@ -15,6 +16,7 @@ export default function ConsultationHistoryTab({ data }) {
 
   const [appointments, setAppointments] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // 🔍 search + pagination state
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,6 +25,7 @@ export default function ConsultationHistoryTab({ data }) {
 
   useEffect(() => {
     const fetchDetails = async () => {
+      setLoading(true);
       try {
         const userAppointments = await apiService.get(
           dispatch,
@@ -45,6 +48,8 @@ export default function ConsultationHistoryTab({ data }) {
         setAppointments(sortedAppointments || []);
       } catch (error) {
         console.error("Error fetching appointment details:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -66,6 +71,8 @@ export default function ConsultationHistoryTab({ data }) {
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
+
+  if (loading) return <Reloader text="Loading appointments..." />;
 
   if (!appointments.length) {
     return (
