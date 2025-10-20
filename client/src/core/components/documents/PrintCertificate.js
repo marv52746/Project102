@@ -74,8 +74,8 @@ export default function PrintActionButtons({ data }) {
 
     // ✅ Swap dimensions dynamically based on orientation
     const isLandscape = orientation === "landscape";
-    const pageWidth = isLandscape ? "8.5in" : "5.5in";
-    const pageHeight = isLandscape ? "5.5in" : "8.5in";
+    const pageWidth = isLandscape ? "7.5in" : "5.5in";
+    const pageHeight = isLandscape ? "5.5in" : "7.5in";
 
     const win = window.open("", "", "width=800,height=1000");
     win.document.write(`

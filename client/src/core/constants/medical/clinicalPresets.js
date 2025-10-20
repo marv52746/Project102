@@ -379,6 +379,7 @@ export const labRequestFormFields = [
     placeholder: "Select test",
     dynamic: true, // 👈 tells your form handler to allow switching type
   },
+
   // 👇 This extra field is hidden unless "Others" is chosen
   // {
   //   name: "name_custom",

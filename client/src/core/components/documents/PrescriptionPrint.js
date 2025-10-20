@@ -6,7 +6,7 @@ const styles = {
     background: "#fff",
     color: "#000",
     width: "calc(5.5in - 20mm)",
-    height: "calc(8.5in - 20mm)",
+    height: "calc(8.25in - 20mm)",
     margin: "10mm auto",
     padding: "8mm",
     fontFamily: "Arial, sans-serif",
@@ -39,7 +39,7 @@ const styles = {
   },
   patientGrid: {
     display: "grid",
-    gridTemplateColumns: "1fr 70px 60px", // name/addr, age, sex/date
+    gridTemplateColumns: "1fr 60px 70px", // name/addr, age, sex/date
     gridTemplateRows: "auto auto",
     gridTemplateAreas: `
       "name age sex"

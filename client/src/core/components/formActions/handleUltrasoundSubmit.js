@@ -11,7 +11,7 @@ export const handleUltrasoundSubmit = async ({
   try {
     const isUpdate = !!data._id;
 
-    console.log(data);
+    // console.log(data);
 
     // ✅ 1. Create or update ultrasound — only add patient & appointment on create
     const ultrasoundPayload = isUpdate
@@ -19,6 +19,7 @@ export const handleUltrasoundSubmit = async ({
       : {
           ...data,
           patient: data?.patient._id || null,
+          doctor: data?.doctor._id || null,
           appointment: appointmentData?._id || null,
         };
 
@@ -60,7 +61,7 @@ export const handleUltrasoundSubmit = async ({
         notes: data.ob_data?.notes || "",
       };
 
-      console.log(pregnancyPayload);
+      // console.log(pregnancyPayload);
 
       if (Array.isArray(existingPregnancy) && existingPregnancy.length > 0) {
         await apiService.put(

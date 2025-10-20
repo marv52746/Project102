@@ -4,7 +4,7 @@ const BaseController = require("../core/baseController");
 class UltrasoundController extends BaseController {
   constructor() {
     super(UltrasoundDb);
-    this.populateFields = ["patient", "appointment"];
+    this.populateFields = ["patient", "appointment", "doctor"];
   }
 
   // Add allergy-specific methods here if needed

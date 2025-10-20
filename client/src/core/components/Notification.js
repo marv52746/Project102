@@ -43,7 +43,7 @@ export default function Notification() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 flex items-start justify-center z-50 px-4 py-6 pointer-events-none">
+    <div className="fixed inset-0 flex items-start justify-center z-[9999] px-4 py-6 pointer-events-none">
       <div
         className={`w-full max-w-md rounded-lg shadow-lg border px-4 py-3 flex items-start gap-3 transition-all duration-300 ease-out
         ${bgMap[type] || bgMap.info} ${

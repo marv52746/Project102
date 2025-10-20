@@ -34,7 +34,10 @@ const BaseModal = ({ isOpen, onClose, title, children }) => {
 
 // ✅ Dynamic form renderer
 const ClinicalForm = ({ fields, formData, setFormData, type, readOnly }) => {
+  // console.log(fields);
+  // console.log(formData);
   // console.log(type);
+
   const gridClass = type === "appointment" ? "col-span-2" : "col-span-1";
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -207,10 +210,12 @@ const MultiEntryModal = ({
     setEntries(
       Array.isArray(initialData) && initialData.length > 0 ? initialData : [{}]
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(initialData), isOpen]);
-  // console.log(entries);
 
-  const handleAddMore = () => setEntries([...entries, {}]);
+  const handleAddMore = () => {
+    setEntries([...entries, {}]);
+  };
 
   const handleChange = (index, updatedData) => {
     const newEntries = [...entries];
@@ -228,8 +233,6 @@ const MultiEntryModal = ({
 
   const handleSave = async () => {
     try {
-      // console.log(entries);
-
       // Delete marked items
       for (const id of toDelete) {
         await apiService.delete(dispatch, tableName, id);
@@ -248,6 +251,9 @@ const MultiEntryModal = ({
     }
   };
 
+  // console.log(type);
+  // console.log(entries);
+
   const readOnly =
     status !== "scheduled" &&
     status !== "ready" &&
@@ -257,38 +263,41 @@ const MultiEntryModal = ({
     <BaseModal isOpen={isOpen} onClose={onClose} title={title}>
       <form onSubmit={handleSave}>
         <div className="space-y-6 max-h-[70vh] overflow-y-auto p-2">
-          {entries.map((formData, idx) => {
-            return (
-              <div
-                key={idx}
-                className="p-4 border rounded-xl bg-gray-50 relative"
-              >
-                <span className="absolute -top-2 left-3 bg-white px-2 text-xs text-gray-500">
-                  Entry {idx + 1}
-                </span>
+          {entries
+            .filter((e) => e)
+            .map((formData, idx) => {
+              return (
+                <div
+                  key={idx}
+                  className="p-4 border rounded-xl bg-gray-50 relative"
+                >
+                  <span className="absolute -top-2 left-3 bg-white px-2 text-xs text-gray-500">
+                    Entry {idx + 1}
+                  </span>
 
-                {/* Remove row button */}
-                {entries.length > 1 && !readOnly && (
-                  <button
-                    onClick={() => handleRemove(idx, formData._id)}
-                    className="absolute top-2 right-2 p-1 rounded-full hover:bg-red-100"
-                    title="Remove entry"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                  </button>
-                )}
+                  {/* Remove row button */}
+                  {entries.length > 1 && !readOnly && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemove(idx, formData._id)}
+                      className="absolute top-2 right-2 p-1 rounded-full hover:bg-red-100"
+                      title="Remove entry"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </button>
+                  )}
 
-                <ClinicalForm
-                  fields={fields}
-                  formData={formData}
-                  setFormData={(updated) => handleChange(idx, updated)}
-                  columns={columns}
-                  type={type}
-                  readOnly={readOnly}
-                />
-              </div>
-            );
-          })}
+                  <ClinicalForm
+                    fields={fields}
+                    formData={formData}
+                    setFormData={(updated) => handleChange(idx, updated)}
+                    columns={columns}
+                    type={type}
+                    readOnly={readOnly}
+                  />
+                </div>
+              );
+            })}
         </div>
 
         {/* Footer */}
@@ -296,6 +305,7 @@ const MultiEntryModal = ({
           <div className="flex justify-between items-center mt-6">
             {columns === 2 && (
               <button
+                type="button"
                 onClick={handleAddMore}
                 className="flex items-center gap-2 px-4 py-2 text-sm border rounded-lg hover:bg-gray-100"
               >
@@ -503,7 +513,7 @@ export const LabRequestModal = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Add Laboratory Request Tests"
-      fields={clinicalFormFieldMap.labrequests}
+      fields={clinicalFormFieldMap.labrequest}
       onSave={onSave}
       columns={2}
       initialData={initialData}

@@ -9,6 +9,7 @@ const BiometryField = {
 
 const ultrasoundSchema = new mongoose.Schema({
   patient: { type: ObjectId, ref: "user", required: true },
+  doctor: { type: ObjectId, ref: "user" },
   appointment: { type: ObjectId, ref: "appointment" },
 
   // General Info

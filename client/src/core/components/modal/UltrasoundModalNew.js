@@ -381,6 +381,29 @@ export default function UltrasoundModalNew({
   // console.log(data);
 
   useEffect(() => {
+    if (!initialData || Object.keys(initialData).length === 0) return;
+
+    setData((prev) => ({
+      ...prev,
+      ...initialData,
+      doctor: doctor || initialData.doctor,
+      patient: patient || initialData.patient,
+      fetal_survey: {
+        ...prev.fetal_survey,
+        ...(initialData?.fetal_survey || {}),
+      },
+      early_pregnancy: {
+        ...prev.early_pregnancy,
+        ...(initialData?.early_pregnancy || {}),
+      },
+      gyn_findings: {
+        ...prev.gyn_findings,
+        ...(initialData?.gyn_findings || {}),
+      },
+    }));
+  }, [initialData, patient, doctor]);
+
+  useEffect(() => {
     // 🩺 Auto-load existing pregnancy data if this is an OB ultrasound
     const fetchPregnancyData = async () => {
       if (!data?.patient?._id) return; // patient must be selected first

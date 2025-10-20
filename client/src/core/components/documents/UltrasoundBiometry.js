@@ -12,7 +12,7 @@ const styles = {
     margin: "0 auto",
     padding: "10mm",
     fontFamily: "Arial, sans-serif",
-    fontSize: "13px",
+    fontSize: "15px",
     lineHeight: "1.6",
     display: "flex",
     flexDirection: "column",
@@ -23,7 +23,7 @@ const styles = {
     justifyContent: "space-between",
     marginBottom: "10px",
     fontWeight: "bold",
-    fontSize: "14px",
+    fontSize: "16px",
   },
   sectionTitle: {
     fontWeight: "bold",
@@ -49,17 +49,17 @@ const styles = {
   },
   th: {
     fontWeight: "bold",
-    fontSize: "12px",
+    fontSize: "15px",
     verticalAlign: "top",
   },
   td: {
-    fontSize: "12px",
+    fontSize: "15px",
     textAlign: "left",
     verticalAlign: "top",
   },
   centeredTh: {
     fontWeight: "bold",
-    fontSize: "12px",
+    fontSize: "15px",
     verticalAlign: "top",
     textAlign: "center",
   },

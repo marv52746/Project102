@@ -60,7 +60,10 @@ export default function UltrasoundTab() {
     const fetchDetails = async () => {
       setLoading(true);
       try {
-        const records = await apiService.get(dispatch, "ultrasound");
+        const records = await apiService.get(dispatch, "ultrasound", {
+          doctor: id,
+        });
+        // console.log(records);
         const sorted = (records || []).sort(
           (a, b) =>
             new Date(b.appointment?.date || b.date) -
