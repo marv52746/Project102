@@ -119,7 +119,7 @@ const UltrasoundBiophysicalPrint = forwardRef(
             <div style={styles.th}>Address:</div>
             <div style={styles.td}>{patient?.address}</div>
             <div style={styles.th}>Age:</div>
-            <div style={styles.td}>{patient?.age} yo</div>
+            <div style={styles.td}>{patient?.age} years old</div>
           </div>
           <div style={styles.gridRow}>
             <div style={styles.th}>G/P:</div>
@@ -170,21 +170,16 @@ const UltrasoundBiophysicalPrint = forwardRef(
             </div>
           </div>
           <div style={styles.gridRowEnd}>
-            {data.type === "Biophysical Score" ? (
-              <>
-                <div style={styles.th}>Total AFI:</div>
-                <div style={styles.td}>
-                  {data.fetal_survey?.amniotic_fluid?.afi.total}
-                </div>
-              </>
-            ) : (
-              <>
-                <div style={styles.th}>SVP:</div>
-                <div style={styles.td}>
-                  {data.fetal_survey?.amniotic_fluid?.svp}
-                </div>
-              </>
-            )}
+            {/* {data.type === "Biophysical Score" ? ( */}
+            <div style={styles.th}>Total AFI:</div>
+            <div style={styles.td}>
+              {data.fetal_survey?.amniotic_fluid?.afi.total}
+            </div>
+
+            <div style={styles.th}>SVP:</div>
+            <div style={styles.td}>
+              {data.fetal_survey?.amniotic_fluid?.svp}
+            </div>
           </div>
 
           {/* FETAL BIOMETRY */}

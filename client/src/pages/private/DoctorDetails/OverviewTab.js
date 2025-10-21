@@ -10,6 +10,7 @@ import {
   UserPlus,
   CalendarPlus,
   FlaskConical,
+  Wallet,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import Card from "../FormDetails/Card";
@@ -32,6 +33,7 @@ export default function OverviewTab({ appointments }) {
     upcoming: 0,
     completed: 0,
     cancelled: 0,
+    totalFee: 0,
   });
   const [activities, setActivities] = useState([]);
   const [upcomingAppointments, setupcomingAppointments] = useState([]);
@@ -67,6 +69,7 @@ export default function OverviewTab({ appointments }) {
         let completedCount = 0;
         let cancelledCount = 0;
         let todayTotal = 0;
+        let totalConsultationFee = 0;
 
         const recentActivities = appointments
           .filter((a) => {
@@ -114,7 +117,10 @@ export default function OverviewTab({ appointments }) {
             if (a.status === "ready") {
               inLobbyArr.push(a);
             }
-            if (a.status === "completed") completedCount++;
+            if (a.status === "completed") {
+              completedCount++;
+              totalConsultationFee += Number(a.amount || 0);
+            }
             if (a.status === "cancelled") cancelledCount++;
           }
         });
@@ -124,6 +130,7 @@ export default function OverviewTab({ appointments }) {
           upcoming: upcomingCount,
           completed: completedCount,
           cancelled: cancelledCount,
+          totalFee: totalConsultationFee,
         });
 
         setActivities(recentActivities);
@@ -147,15 +154,22 @@ export default function OverviewTab({ appointments }) {
 
   // 👇 Update to only include today's completed & cancelled
   const statAppointmentsMap = {
-    "Today’s": todayAppointments,
-    Completed: appointments.filter(
+    "Today’s Appointments": todayAppointments,
+    "Total Consultation Fees (Today)": appointments.filter(
       (a) =>
         a.status === "completed" &&
         dayBounds.start &&
         new Date(a.date) >= dayBounds.start &&
         new Date(a.date) <= dayBounds.end
     ),
-    Cancelled: appointments.filter(
+    "Completed Appointments": appointments.filter(
+      (a) =>
+        a.status === "completed" &&
+        dayBounds.start &&
+        new Date(a.date) >= dayBounds.start &&
+        new Date(a.date) <= dayBounds.end
+    ),
+    "Cancelled Appointments": appointments.filter(
       (a) =>
         a.status === "cancelled" &&
         dayBounds.start &&
@@ -166,19 +180,25 @@ export default function OverviewTab({ appointments }) {
 
   const statCards = [
     {
-      label: "Today’s",
+      label: "Total Consultation Fees (Today)",
+      value: `₱${(stats.totalFee || 0).toLocaleString()}`,
+      color: "text-amber-600",
+      icon: <Wallet className="w-6 h-6 text-amber-600" />,
+    },
+    {
+      label: "Today’s Appointments",
       value: stats.today,
       color: "bg-blue-100 text-blue-800",
       icon: <CalendarClock className="w-6 h-6 text-blue-600" />,
     },
     {
-      label: "Completed",
+      label: "Completed Appointments",
       value: stats.completed,
       color: "bg-green-100 text-green-800",
       icon: <CalendarCheck2 className="w-6 h-6 text-green-600" />,
     },
     {
-      label: "Cancelled",
+      label: "Cancelled Appointments",
       value: stats.cancelled,
       color: "bg-red-100 text-red-800",
       icon: <CalendarX2 className="w-6 h-6 text-red-600" />,
@@ -227,7 +247,7 @@ export default function OverviewTab({ appointments }) {
         </div>
 
         {/* Appointment Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           {statCards.map((card, idx) => (
             <div
               key={idx}
@@ -239,7 +259,7 @@ export default function OverviewTab({ appointments }) {
             >
               <div>{card.icon}</div>
               <div>
-                <p className="text-sm">{card.label} Appointments</p>
+                <p className="text-sm">{card.label}</p>
                 <p className="text-2xl font-bold">{card.value}</p>
               </div>
             </div>
@@ -362,13 +382,19 @@ export default function OverviewTab({ appointments }) {
             >
               ✕
             </button>
-            <h2 className="text-xl font-semibold mb-4">
-              {selectedStat} Appointments
-            </h2>
+            <h2 className="text-xl font-semibold mb-4">{selectedStat}</h2>
 
             {statAppointmentsMap[selectedStat] &&
             statAppointmentsMap[selectedStat].length > 0 ? (
               <div className="overflow-x-auto">
+                {selectedStat.includes("Fees") && (
+                  <p className="text-sm text-gray-600 mb-2">
+                    Total:{" "}
+                    <span className="font-semibold text-amber-600">
+                      ₱ {stats.totalFee.toLocaleString() || "0"}
+                    </span>
+                  </p>
+                )}
                 <table className="w-full border-collapse border border-gray-200 text-sm">
                   <thead className="bg-gray-100">
                     <tr>
@@ -380,6 +406,9 @@ export default function OverviewTab({ appointments }) {
                       </th>
                       <th className="border border-gray-200 px-3 py-2 text-left">
                         Status
+                      </th>
+                      <th className="border border-gray-200 px-3 py-2 text-left">
+                        Consultation Fee
                       </th>
                       <th className="border border-gray-200 px-3 py-2 text-center">
                         Action
@@ -404,8 +433,12 @@ export default function OverviewTab({ appointments }) {
                         <td className="border border-gray-200 px-3 py-2">
                           {new Date(app.date).toLocaleDateString()}
                         </td>
+
                         <td className="border border-gray-200 px-3 py-2 capitalize">
                           {app.status}
+                        </td>
+                        <td className="border border-gray-200 px-3 py-2 capitalize">
+                          {`₱ ${(app.amount || 0).toLocaleString()}`}
                         </td>
                         <td className="border border-gray-200 px-3 py-2 text-center">
                           <button

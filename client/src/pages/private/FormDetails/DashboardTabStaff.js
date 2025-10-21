@@ -8,6 +8,7 @@ import {
   CalendarPlus,
   FlaskConical,
   CalendarX2,
+  Wallet,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
@@ -17,13 +18,14 @@ import AppointmentModal from "./AppointmentModal";
 import { formConfigMap } from "../../../core/constants/FieldConfigMap";
 import NewPatientModal from "./NewPatientModal";
 import NewBaseModal from "./NewBaseModal";
-import ActivitiesTimeline from "./ActivitiesTimeline";
 import { useParams } from "react-router-dom";
 import OngoingCheckup from "./OngoingCheckup";
+import Reloader from "../../../core/components/utils/reloader";
 
 export default function DashboardTabStaff() {
   const { id } = useParams();
   const dispatch = useDispatch();
+
   const { refreshKey } = useSelector((state) => state.utils);
   const [appointmentsToday, setAppointmentsToday] = useState([]);
   const [stats, setStats] = useState({
@@ -37,6 +39,7 @@ export default function DashboardTabStaff() {
   const [cancelledAppointments, setcancelledAppointments] = useState([]);
   const [completedAppointments, setCompletedAppointments] = useState([]);
   const [inLobbyAppointments, setInLobbyAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [openViewModal, setOpenViewModal] = useState(false);
   const [manualRefresh, setManualRefresh] = useState(0);
@@ -65,6 +68,7 @@ export default function DashboardTabStaff() {
 
   useEffect(() => {
     const fetchAppointments = async () => {
+      setLoading(true);
       try {
         const appointments = await apiService.get(dispatch, "appointments", {
           date: "today",
@@ -77,6 +81,7 @@ export default function DashboardTabStaff() {
         let completedTodayCount = 0;
         let inlobbyCount = 0;
         let cancelledCount = 0;
+        const feeByDoctor = {};
 
         const recentActivities = appointments
           .slice(-5) // last 5 appointments
@@ -119,6 +124,10 @@ export default function DashboardTabStaff() {
           if (a.status === "completed") {
             completedAppointmentsArr.push(a);
             completedTodayCount++;
+            const doctorName = a.doctor?.name || "Unknown Doctor";
+            const fee = parseFloat(a.amount || 0);
+            if (!feeByDoctor[doctorName]) feeByDoctor[doctorName] = 0;
+            feeByDoctor[doctorName] += fee;
           }
           if (a.status === "cancelled") {
             cancelledAppointmentsArr.push(a);
@@ -131,6 +140,7 @@ export default function DashboardTabStaff() {
           completed: completedTodayCount,
           inLobby: inlobbyCount,
           cancelled: cancelledCount,
+          feeByDoctor,
         });
 
         setActivities(recentActivities);
@@ -141,19 +151,24 @@ export default function DashboardTabStaff() {
         // console.log(upcomingAppointmentsArr);
       } catch (err) {
         console.error("Error fetching appointments:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchAppointments();
   }, [dispatch, manualRefresh, refreshKey]);
 
+  const feeCards = Object.entries(stats.feeByDoctor || {}).map(
+    ([doctorName, totalFee]) => ({
+      label: `${doctorName} - Today’s Fees`,
+      value: `₱${totalFee.toLocaleString()}`,
+      color: "text-amber-700 border-l-4 border-amber-400",
+      icon: <Wallet className="w-6 h-6 text-amber-500" />,
+    })
+  );
+
   const statCards = [
-    // {
-    //   label: "In Lobby",
-    //   value: stats.inLobby,
-    //   color: "bg-green-100 text-green-800",
-    //   icon: <ClipboardList className="w-6 h-6 text-green-600" />,
-    // },
     {
       label: "Upcoming Appointments",
       value: stats.upcoming,
@@ -173,7 +188,17 @@ export default function DashboardTabStaff() {
       color: "bg-red-100 text-red-800",
       icon: <CalendarX2 className="w-6 h-6 text-red-600" />,
     },
+    ...feeCards,
   ];
+
+  const doctorFeeMap = Object.fromEntries(
+    Object.keys(stats.feeByDoctor || {}).map((doctorName) => [
+      `${doctorName} - Today’s Fees`,
+      completedAppointments.filter(
+        (a) => a.doctor?.name === doctorName && a.status === "completed"
+      ),
+    ])
+  );
 
   // Map stats to appointments
   const statAppointmentsMap = {
@@ -181,6 +206,12 @@ export default function DashboardTabStaff() {
     "Completed Appointments": completedAppointments,
     "Upcoming Appointments": upcomingAppointments,
     "Cancelled Appointments": cancelledAppointments,
+  };
+
+  // Merge into the main map
+  const fullStatAppointmentsMap = {
+    ...statAppointmentsMap,
+    ...doctorFeeMap,
   };
 
   const quickActions = [
@@ -204,6 +235,8 @@ export default function DashboardTabStaff() {
     },
   ];
 
+  if (loading) return <Reloader text="Loading dashboard..." />;
+
   return (
     <>
       <div className="space-y-6">
@@ -225,7 +258,7 @@ export default function DashboardTabStaff() {
         </div>
 
         {/* Appointment Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-[90%]">
           {statCards.map((card, idx) => (
             <div
               key={idx}
@@ -363,9 +396,21 @@ export default function DashboardTabStaff() {
             </button>
             <h2 className="text-lg font-semibold mb-4">{selectedStat}</h2>
 
-            {statAppointmentsMap[selectedStat] &&
-            statAppointmentsMap[selectedStat].length > 0 ? (
+            {fullStatAppointmentsMap[selectedStat] &&
+            fullStatAppointmentsMap[selectedStat].length > 0 ? (
               <div className="overflow-x-auto">
+                {selectedStat.includes("Fees") && (
+                  <p className="text-sm text-gray-600 mb-2">
+                    Total:{" "}
+                    <span className="font-semibold text-amber-600">
+                      ₱
+                      {stats.feeByDoctor[
+                        selectedStat.replace(" - Today’s Fees", "")
+                      ]?.toLocaleString() || "0"}
+                    </span>
+                  </p>
+                )}
+
                 <table className="w-full border-collapse border border-gray-200 text-sm">
                   <thead className="bg-gray-100">
                     <tr>
@@ -378,13 +423,16 @@ export default function DashboardTabStaff() {
                       <th className="border border-gray-200 px-3 py-2 text-left">
                         Status
                       </th>
+                      <th className="border border-gray-200 px-3 py-2 text-left">
+                        Consultation Fee
+                      </th>
                       <th className="border border-gray-200 px-3 py-2 text-center">
                         Action
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {statAppointmentsMap[selectedStat].map((app, idx) => (
+                    {fullStatAppointmentsMap[selectedStat].map((app, idx) => (
                       <tr
                         key={idx}
                         className="hover:bg-gray-50 cursor-pointer"
@@ -403,6 +451,9 @@ export default function DashboardTabStaff() {
                         </td>
                         <td className="border border-gray-200 px-3 py-2 capitalize">
                           {app.status}
+                        </td>
+                        <td className="border border-gray-200 px-3 py-2 capitalize">
+                          {`₱ ${(app.amount || 0).toLocaleString()}`}
                         </td>
                         <td className="border border-gray-200 px-3 py-2 text-center">
                           <button

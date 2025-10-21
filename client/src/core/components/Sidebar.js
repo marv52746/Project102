@@ -58,6 +58,7 @@ export default function Sidebar({ children }) {
     switch (userInfo.role) {
       default:
         navigate(`/form/users/view/${userInfo.id}`);
+        window.location.reload();
         break;
     }
   };

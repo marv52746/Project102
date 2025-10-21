@@ -38,7 +38,7 @@ const styles = {
   gridRowEnd: {
     display: "grid",
     gridTemplateColumns: "20% 30% 20% 30%",
-    marginBottom: "20px",
+    marginBottom: "15px",
     alignItems: "start",
   },
 
@@ -47,7 +47,7 @@ const styles = {
     gridTemplateColumns: "20% 70%",
     alignItems: "start",
     marginBottom: "4px",
-    padding: "6px 8px",
+    // padding: "6px 8px",
   },
   gridRowGyneEnd: {
     display: "grid",
@@ -151,10 +151,6 @@ const TransvaginalUltrasoundGynePrint = forwardRef(
             <div style={styles.th}>II. Uterus</div>
             <div style={styles.td}>
               <p>{data.gyn_findings.uterus?.dimensions}</p>
-
-              <p>{data.gyn_findings.uterus?.orientation}</p>
-              <p>{data.gyn_findings.uterus?.wall_thickness.anterior}</p>
-              <p>{data.gyn_findings.uterus?.wall_thickness.posterior}</p>
               <p style={{ whiteSpace: "pre-line" }}>
                 {data.gyn_findings.uterus?.notes}
               </p>
@@ -175,7 +171,6 @@ const TransvaginalUltrasoundGynePrint = forwardRef(
             <div style={styles.th}>IV. Right Ovary</div>
             <div style={styles.td}>
               <p>{data.gyn_findings.right_ovary?.dimensions}</p>
-              <p>{data.gyn_findings.right_ovary?.volume}</p>
               <p style={{ whiteSpace: "pre-line" }}>
                 {data.gyn_findings.right_ovary?.notes}
               </p>
@@ -186,7 +181,6 @@ const TransvaginalUltrasoundGynePrint = forwardRef(
             <div style={styles.th}>V. Left Ovary</div>
             <div style={styles.td}>
               <p>{data.gyn_findings.left_ovary?.dimensions}</p>
-              <p>{data.gyn_findings.left_ovary?.volume}</p>
               <p style={{ whiteSpace: "pre-line" }}>
                 {data.gyn_findings.left_ovary?.notes}
               </p>

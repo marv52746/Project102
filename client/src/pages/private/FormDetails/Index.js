@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import apiService from "../../../core/services/apiService";
 import UserHeader from "./UserHeader";
 import DashboardTab from "./DashboardTab";
@@ -20,6 +20,7 @@ import CalendarMain from "../Calendar/CalendarMain";
 export default function UserDashboardPage({ data }) {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const location = useLocation();
   const { refreshKey } = useSelector((state) => state.utils);
 
   const [appointments, setAppointments] = useState(null);
@@ -56,7 +57,7 @@ export default function UserDashboardPage({ data }) {
     };
 
     fetchDetails();
-  }, [id, dispatch, refreshKey, data]);
+  }, [id, dispatch, refreshKey, data, location.pathname]);
 
   const getTabItemsForRole = (role) => {
     // console.log(role);

@@ -13,6 +13,7 @@ import ComboChart2 from "../../../core/components/dashboard/ComboChart2";
 import useComboData from "../../../core/hooks/useComboData";
 import apiService from "../../../core/services/apiService";
 import PregnancyChart from "./PregnancyChart";
+import ConsultationFeeChart from "./ConsultationFeeChart";
 
 function Dashboard() {
   const today = new Date();
@@ -248,6 +249,9 @@ function Dashboard() {
           <PregnancyChart pregnancies={pregnancies} />
         </div>
       </div>
+
+      {/* Consultation Fee Chart */}
+      <ConsultationFeeChart appointments={appointments} />
 
       {/* 📅 Recent Appointments */}
 
