@@ -1,3 +1,4 @@
+require("dotenv").config();
 const createTransporter = require("./jobs/mailer");
 
 (async () => {
