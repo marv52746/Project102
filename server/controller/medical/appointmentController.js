@@ -26,6 +26,7 @@ class AppointmentController extends BaseController {
   // Add appointment-specific methods here
   create = async (req, res) => {
     try {
+      console.log("create an appointment");
       // const newItem = new this.model(req.body);
       const newItem = new this.model({
         ...req.body,

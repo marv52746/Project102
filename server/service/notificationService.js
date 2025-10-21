@@ -491,7 +491,7 @@ async function createNotificationService({
       REFRESH_TOKEN: !!process.env.REFRESH_TOKEN,
       CLINIC_EMAIL: process.env.CLINIC_EMAIL,
     });
-    // console.log("createNotificationService");
+    console.log("createNotificationService");
     // ✅ Resolve template
     const template = notificationTemplates?.[category]?.[type]?.(data) || {
       subject: "Notification",
