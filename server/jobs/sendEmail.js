@@ -3,6 +3,18 @@ const createTransporter = require("./mailer");
 
 async function sendEmail(notification) {
   try {
+    console.log("ENV CHECK:", {
+      CLIENT_ID: !!process.env.CLIENT_ID,
+      CLIENT_SECRET: !!process.env.CLIENT_SECRET,
+      REFRESH_TOKEN: !!process.env.REFRESH_TOKEN,
+      CLINIC_EMAIL: process.env.CLINIC_EMAIL,
+    });
+
+    if (!notification.to) {
+      console.error("❌ No recipient email provided");
+      return;
+    }
+
     const transporter = await createTransporter();
     const mailOptions = {
       from:
@@ -30,7 +42,10 @@ async function sendEmail(notification) {
     await notification.save();
     console.log(`✅ Email sent to ${notification.to}`);
   } catch (err) {
-    console.error(`❌ Failed to send email to ${notification.to}:`, err);
+    console.error(
+      `❌ Failed to send email to ${notification.to}:`,
+      err.message
+    );
     notification.status = "failed";
     await notification.save();
   }
