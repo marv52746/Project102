@@ -1,9 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const connect = require("./database/connection");
 const cors = require("cors");
 const path = require("path");
-require("dotenv").config();
 require("./jobs/cron"); // ✅ just import to start the cron scheduler
 const PORT = process.env.PORT || 8080;
 
