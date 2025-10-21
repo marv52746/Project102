@@ -516,11 +516,11 @@ async function createNotificationService({
 
     // Save to DB
     const saved = await NotificationDb.create(notification);
-
+    const freshNotification = await NotificationDb.findById(saved._id);
     // Auto-send if immediate
     if (status === "immediate") {
       const sendEmail = require("../jobs/sendEmail");
-      await sendEmail(saved); // no need for loop
+      await sendEmail(freshNotification); // no need for loop
     }
 
     return saved;

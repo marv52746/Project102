@@ -2,6 +2,7 @@ require("dotenv").config();
 const createTransporter = require("./mailer");
 
 async function sendEmail(notification) {
+  console.log("🧾 sendEmail() called with:", notification._id);
   try {
     console.log("ENV CHECK:", {
       CLIENT_ID: !!process.env.CLIENT_ID,
