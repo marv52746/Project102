@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { NotificationDb } = require("../model/notifications/Notification");
 
 const DEFAULT_CLINIC_NAME = "Bislig Premier Birthing Home";
@@ -484,6 +485,12 @@ async function createNotificationService({
   status = "pending",
 }) {
   try {
+    console.log("ENV CHECK:", {
+      CLIENT_ID: !!process.env.CLIENT_ID,
+      CLIENT_SECRET: !!process.env.CLIENT_SECRET,
+      REFRESH_TOKEN: !!process.env.REFRESH_TOKEN,
+      CLINIC_EMAIL: process.env.CLINIC_EMAIL,
+    });
     // console.log("createNotificationService");
     // ✅ Resolve template
     const template = notificationTemplates?.[category]?.[type]?.(data) || {
