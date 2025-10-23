@@ -464,7 +464,14 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
             />
             <InfoCard label="Reason" value={report.reason || "N/A"} />
             <InfoCard label="Diagnosis" value={report.diagnosis || "-"} />
-            <InfoCard label="Notes" value={report.notes || "-"} />
+            <InfoCard
+              label="Notes"
+              value={report.notes || "-"}
+              editable={true}
+              onSave={(newValue) =>
+                handleSave("appointments", { notes: newValue })
+              }
+            />
           </div>
 
           {/* Quick Actions */}
@@ -700,8 +707,13 @@ const InfoCard = ({
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") handleSave();
-    if (e.key === "Escape") handleCancel();
+    if (label !== "Notes" && e.key === "Enter") {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === "Escape") {
+      setIsEditing(false);
+      setTempValue(value);
+    }
   };
 
   // console.log(tempValue);
@@ -758,14 +770,32 @@ const InfoCard = ({
             {displayValue}
           </span>
         ) : isEditing ? (
-          <input
-            type={label === "Consultation Fee" ? "number" : "text"}
-            autoFocus
-            value={tempValue}
-            onChange={(e) => setTempValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="border rounded-md px-2 py-1 text-sm w-full focus:outline-none focus:ring focus:ring-blue-200"
-          />
+          // <input
+          //   type={label === "Consultation Fee" ? "number" : "text"}
+          //   autoFocus
+          //   value={tempValue}
+          //   onChange={(e) => setTempValue(e.target.value)}
+          //   onKeyDown={handleKeyDown}
+          //   className="border rounded-md px-2 py-1 text-sm w-full focus:outline-none focus:ring focus:ring-blue-200"
+          // />
+          label === "Notes" ? (
+            <textarea
+              autoFocus
+              value={tempValue}
+              onChange={(e) => setTempValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="border rounded-md px-2 py-1 text-sm w-full h-20 resize-none focus:outline-none focus:ring focus:ring-blue-200"
+            />
+          ) : (
+            <input
+              type={label === "Consultation Fee" ? "number" : "text"}
+              autoFocus
+              value={tempValue}
+              onChange={(e) => setTempValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="border rounded-md px-2 py-1 text-sm w-full focus:outline-none focus:ring focus:ring-blue-200"
+            />
+          )
         ) : (
           <span
             onClick={clickable ? onClick : undefined}

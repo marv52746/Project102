@@ -73,15 +73,23 @@ export default function DashboardTabStaff() {
         const appointments = await apiService.get(dispatch, "appointments", {
           date: "today",
         });
+        const doctors = await apiService.get(dispatch, "users", {
+          role: "doctor",
+        });
+
         setAppointmentsToday(appointments);
 
-        // console.log(appointments);
+        // console.log(doctors);
 
         let upcomingCount = 0;
         let completedTodayCount = 0;
         let inlobbyCount = 0;
         let cancelledCount = 0;
         const feeByDoctor = {};
+
+        doctors.forEach((doctor) => (feeByDoctor[doctor.name] = 0));
+
+        // console.log(feeByDoctor);
 
         const recentActivities = appointments
           .slice(-5) // last 5 appointments
@@ -158,6 +166,8 @@ export default function DashboardTabStaff() {
 
     fetchAppointments();
   }, [dispatch, manualRefresh, refreshKey]);
+
+  // console.log(stats.feeByDoctor);
 
   const feeCards = Object.entries(stats.feeByDoctor || {}).map(
     ([doctorName, totalFee]) => ({

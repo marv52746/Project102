@@ -11,6 +11,7 @@ import AppointmentModal from "./AppointmentModal";
 import { formConfigMap } from "../../../core/constants/FieldConfigMap";
 import VitalItem from "../../../core/components/calendar/VitalItem";
 import UpcomingAppointments from "./UpcomingAppointments";
+import PrintablePatientRecord from "../../../core/components/documents/PrintablePatientRecord";
 
 // Main Component
 export default function DashboardTab({ patientId, data }) {
@@ -19,6 +20,7 @@ export default function DashboardTab({ patientId, data }) {
 
   const [vitals, setVitals] = useState(null);
   const [appointments, setAppointments] = useState([]);
+  const [appointmentsPrint, setAppointmentsPrint] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
   const [openViewModal, setOpenViewModal] = useState(false);
@@ -27,6 +29,9 @@ export default function DashboardTab({ patientId, data }) {
 
   const dispatch = useDispatch();
   const fields = formConfigMap["appointments"].getFields("create");
+
+  // console.log(data);
+  // console.log(appointments);
 
   useEffect(() => {
     if (!patientId) return;
@@ -61,8 +66,15 @@ export default function DashboardTab({ patientId, data }) {
               appDate >= today && ["scheduled", "ready"].includes(app.status)
             );
           })
-          .sort((a, b) => new Date(a.date) - new Date(b.date));
+          .sort((a, b) => new Date(a.created_on) - new Date(b.created_on));
 
+        const filteredAppointmentsPrint = filterByPatient(appointmentData)
+          .filter((app) => {
+            return ["completed"].includes(app.status);
+          })
+          .sort((a, b) => new Date(a.created_on) - new Date(b.created_on));
+
+        setAppointmentsPrint(filteredAppointmentsPrint);
         setAppointments(filteredAppointments);
         setVitals(sortedVitals[0] || null);
 
@@ -81,6 +93,8 @@ export default function DashboardTab({ patientId, data }) {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, patientId, refreshKey, manualRefresh]);
+
+  // console.log(appointmentsPrint);
 
   return (
     <>
@@ -136,6 +150,12 @@ export default function DashboardTab({ patientId, data }) {
 
         {/* TIMELINE + DOCUMENTS */}
         <div className="space-y-4">
+          <PrintablePatientRecord
+            data={data}
+            vitals={vitals}
+            appointments={appointmentsPrint}
+          />
+
           <ActivitiesTimeline patientId={patientId} />
         </div>
       </div>
