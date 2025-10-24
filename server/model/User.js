@@ -80,6 +80,11 @@ const userSchema = new mongoose.Schema({
     enum: ["guest", "staff", "doctor", "admin", "owner", "manager", "patient"],
     default: "patient",
   },
+  user_type: {
+    type: String,
+    enum: ["internal", "external"],
+    default: "external",
+  },
   additional_information: {
     type: String,
   },

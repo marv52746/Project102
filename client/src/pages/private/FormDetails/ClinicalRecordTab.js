@@ -93,12 +93,12 @@ export default function ClinicalRecordTab({ patientId }) {
   const tabConfig = {
     conditions: { label: "Diagnosis", icon: ShieldAlert, color: "yellow" },
     medications: { label: "Medications", icon: Pill, color: "green" },
+    pregnancies: { label: "Pregnancy", icon: Baby, color: "pink" },
     ultrasounds: { label: "Ultrasound", icon: Stethoscope, color: "blue" },
     labrequest: { label: "Lab Requests", icon: FlaskConical, color: "green" },
     allergies: { label: "Allergies", icon: AlertTriangle, color: "red" },
     vitals: { label: "Vitals Log", icon: Activity, color: "blue" },
     surgeries: { label: "Surgical History", icon: Scissors, color: "gray" },
-    pregnancies: { label: "Pregnancy", icon: Baby, color: "pink" },
   };
 
   const fieldMap = {

@@ -6,6 +6,7 @@ import { handleFormSubmit } from "../../../core/components/formActions/formSubmi
 
 import { Link } from "react-router-dom";
 import { all_routes } from "../../../routes/all_routes";
+import BookingButton from "./BookingButton";
 
 export default function BookAppointmentForm({
   doctor,
@@ -29,7 +30,7 @@ export default function BookAppointmentForm({
     phone: userInfo?.phone_number || "",
     doctor: "",
     date: currentDate,
-    time: "09:00",
+    time: "Morning",
     reason: "",
   });
 
@@ -180,7 +181,7 @@ export default function BookAppointmentForm({
                 type="number"
                 name="phone"
                 placeholder="Phone Number"
-                className="flex-1 outline-none text-sm sm:text-base"
+                className="flex-1 outline-none text-sm sm:text-base [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
                 value={formData.phone}
                 onChange={handleChange}
                 required
@@ -200,7 +201,9 @@ export default function BookAppointmentForm({
                 onChange={handleChange}
                 required
               >
-                <option value="">Select Doctor</option>
+                <option value="" disabled>
+                  Select Doctor
+                </option>
                 {doctorOptions.map((doc) => (
                   <option key={doc.id} value={doc.id}>
                     {doc.name}
@@ -229,44 +232,31 @@ export default function BookAppointmentForm({
               />
             </div>
 
-            {/* Time */}
+            {/* Session */}
             <div className="relative col-span-1">
               <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="time"
+              <select
                 name="time"
-                min="09:00"
-                max="17:00"
-                step="900" // ✅ 15 minutes = 900 seconds
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm sm:text-base text-gray-700
-      bg-white outline-none 
-      focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300
-      transition-all duration-150"
-                value={formData.time}
-                onChange={(e) => {
-                  let value = e.target.value;
-
-                  // ⛔ Clamp to working hours (9AM - 5PM)
-                  if (value < "09:00") value = "09:00";
-                  if (value > "17:00") value = "17:00";
-
-                  // ✅ Round to nearest 15-minute interval
-                  const [hour, minute] = value.split(":").map(Number);
-                  const totalMinutes = hour * 60 + minute;
-
-                  // Round to nearest multiple of 15
-                  const roundedMinutes = Math.round(totalMinutes / 15) * 15;
-                  const roundedHour = Math.floor(roundedMinutes / 60);
-                  const roundedMinute = roundedMinutes % 60;
-
-                  const finalHour = String(roundedHour).padStart(2, "0");
-                  const finalMinute = String(roundedMinute).padStart(2, "0");
-                  const adjustedTime = `${finalHour}:${finalMinute}`;
-
-                  setFormData({ ...formData, time: adjustedTime });
-                }}
+                className="w-full pl-10 pr-8 py-2 border border-gray-300 rounded-lg text-sm sm:text-base text-gray-700 
+      bg-white appearance-none outline-none shadow-sm
+      hover:border-pink-400 
+      focus-visible:border-pink-400 focus-visible:ring-4 focus-visible:ring-pink-100 
+      transition-all duration-150 ease-in-out"
+                value={formData.time || "Morning"}
+                onChange={handleChange}
                 required
-              />
+              >
+                <option value="" disabled>
+                  Select Session
+                </option>
+                <option value="Morning">Morning</option>
+                <option value="Afternoon">Afternoon</option>
+              </select>
+
+              {/* ▼ Dropdown Icon */}
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 text-xs">
+                ▼
+              </span>
             </div>
 
             {/* Reason */}
@@ -285,28 +275,7 @@ export default function BookAppointmentForm({
             </div>
 
             {/* Submit */}
-            <div className="col-span-1 sm:col-span-2">
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full py-3 rounded-lg shadow-md font-semibold transition-all duration-300 flex items-center justify-center gap-2
-              ${
-                submitted
-                  ? "bg-green-600 text-white hover:bg-green-700"
-                  : "bg-gradient-to-r from-pink-600 to-pink-500 text-white hover:from-pink-700 hover:to-pink-600 hover:shadow-lg"
-              }`}
-              >
-                {submitted ? (
-                  <>
-                    <Check size={18} /> Appointment Booked
-                  </>
-                ) : loading ? (
-                  "Booking..."
-                ) : (
-                  "Confirm Appointment"
-                )}
-              </button>
-            </div>
+            <BookingButton loading={loading} submitted={submitted} />
           </div>
         </form>
       </div>

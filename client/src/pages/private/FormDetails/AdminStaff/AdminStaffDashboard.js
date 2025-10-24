@@ -4,48 +4,42 @@ import {
   FileText,
   CalendarClock,
   CalendarCheck2,
+  CalendarX2,
   UserPlus,
   CalendarPlus,
   FlaskConical,
-  CalendarX2,
   Wallet,
 } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
-import UpcomingAppointments from "../FormDetails/UpcomingAppointments";
-import apiService from "../../../core/services/apiService";
-import AppointmentModal from "./AppointmentModal";
-import { formConfigMap } from "../../../core/constants/FieldConfigMap";
-import NewPatientModal from "./NewPatientModal";
-import NewBaseModal from "./NewBaseModal";
+import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import OngoingCheckup from "./OngoingCheckup";
-import Reloader from "../../../core/components/utils/reloader";
+import { formConfigMap } from "../../../../core/constants/FieldConfigMap";
+import UpcomingAppointments from "../UpcomingAppointments";
+import OngoingCheckup from "../OngoingCheckup";
+import CalendarModalDetails from "../../../../core/components/calendar/CalendarModalDetails";
+import AppointmentModal from "../AppointmentModal";
+import NewPatientModal from "../NewPatientModal";
+import NewBaseModal from "../NewBaseModal";
+import apiService from "../../../../core/services/apiService";
 
-export default function DashboardTabStaff() {
-  const { id } = useParams();
+export default function AdminStaffDashboard({ appointments }) {
   const dispatch = useDispatch();
-
-  const { refreshKey } = useSelector((state) => state.utils);
-  const [appointmentsToday, setAppointmentsToday] = useState([]);
   const [stats, setStats] = useState({
+    today: 0,
     upcoming: 0,
     completed: 0,
     cancelled: 0,
   });
 
-  const [activities, setActivities] = useState([]);
   const [upcomingAppointments, setupcomingAppointments] = useState([]);
-  const [cancelledAppointments, setcancelledAppointments] = useState([]);
+  const [todayAppointments, setuptodayAppointments] = useState([]);
   const [completedAppointments, setCompletedAppointments] = useState([]);
   const [inLobbyAppointments, setInLobbyAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const [openViewModal, setOpenViewModal] = useState(false);
   const [manualRefresh, setManualRefresh] = useState(0);
 
+  const [openViewModal, setOpenViewModal] = useState(false);
   const [viewData, setViewData] = useState(null);
   const [viewType, setViewType] = useState(null); // "conditions", "medications", etc.
+
   const [showAppointmentModal, setAppointmentShowModal] = useState(false);
   const [showPatientModal, setPatientShowModal] = useState(false);
   const [showMedicineModal, setMedicineShowModal] = useState(false);
@@ -54,10 +48,85 @@ export default function DashboardTabStaff() {
   const patientFields = formConfigMap["users"].getFields("create");
   const medicineFields = formConfigMap["inventoryLogs"].getFields("create");
 
-  // Add new states
   const [showStatListModal, setShowStatListModal] = useState(false);
   const [selectedStat, setSelectedStat] = useState(null);
+
   const [dayBounds, setDayBounds] = useState({ start: null, end: null });
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const now = new Date();
+        const startOfDayPH = new Date(now.setHours(0, 0, 0, 0));
+        const endOfDayPH = new Date(now.setHours(23, 59, 59, 999));
+
+        const doctors = await apiService.get(dispatch, "users", {
+          role: "doctor",
+        });
+
+        let upcomingCount = 0;
+        let completedCount = 0;
+        let cancelledCount = 0;
+        let todayTotal = 0;
+        let totalConsultationFee = 0;
+
+        const feeByDoctor = {};
+        doctors.forEach((doctor) => (feeByDoctor[doctor.name] = 0));
+
+        const upcomingAppointmentsArr = [];
+        var completedAppointmentsArr = [];
+        const todayAppointmentsArr = [];
+        const inLobbyArr = [];
+
+        appointments.forEach((a) => {
+          const appointmentDate = new Date(a.date);
+
+          if (
+            appointmentDate >= startOfDayPH &&
+            appointmentDate <= endOfDayPH
+          ) {
+            todayTotal++;
+            todayAppointmentsArr.push(a);
+            if (a.status === "scheduled") {
+              upcomingAppointmentsArr.push(a);
+              upcomingCount++;
+            }
+            if (a.status === "ready") {
+              inLobbyArr.push(a);
+            }
+            if (a.status === "completed") {
+              completedAppointmentsArr.push(a);
+              completedCount++;
+              //   totalConsultationFee += Number(a.amount || 0);
+              const doctorName = a.doctor?.name || "Unknown Doctor";
+              const fee = parseFloat(a.amount || 0);
+              if (!feeByDoctor[doctorName]) feeByDoctor[doctorName] = 0;
+              feeByDoctor[doctorName] += fee;
+            }
+            if (a.status === "cancelled") cancelledCount++;
+          }
+        });
+
+        setStats({
+          today: todayTotal,
+          upcoming: upcomingCount,
+          completed: completedCount,
+          cancelled: cancelledCount,
+          totalFee: totalConsultationFee,
+          feeByDoctor,
+        });
+
+        setCompletedAppointments(completedAppointmentsArr);
+        setupcomingAppointments(upcomingAppointmentsArr);
+        setuptodayAppointments(todayAppointmentsArr);
+        setInLobbyAppointments(inLobbyArr);
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+      }
+    };
+
+    fetchAppointments();
+  }, [dispatch, appointments, manualRefresh]);
 
   useEffect(() => {
     const now = new Date();
@@ -66,120 +135,47 @@ export default function DashboardTabStaff() {
     setDayBounds({ start, end });
   }, []);
 
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      setLoading(true);
-      try {
-        const appointments = await apiService.get(dispatch, "appointments", {
-          date: "today",
-        });
-        const doctors = await apiService.get(dispatch, "users", {
-          role: "doctor",
-        });
-
-        setAppointmentsToday(appointments);
-
-        // console.log(doctors);
-
-        let upcomingCount = 0;
-        let completedTodayCount = 0;
-        let inlobbyCount = 0;
-        let cancelledCount = 0;
-        const feeByDoctor = {};
-
-        doctors.forEach((doctor) => (feeByDoctor[doctor.name] = 0));
-
-        // console.log(feeByDoctor);
-
-        const recentActivities = appointments
-          .slice(-5) // last 5 appointments
-          .reverse()
-          .map((a) => {
-            let icon;
-            if (a.status === "completed") {
-              icon = <ClipboardList className="w-4 h-4 text-green-600" />;
-            } else if (a.status === "cancelled") {
-              icon = <FileText className="w-4 h-4 text-red-600" />;
-            } else {
-              icon = <ClipboardList className="w-4 h-4 text-blue-600" />;
-            }
-
-            return {
-              time: new Date(a.date).toLocaleString(),
-              action: `${a.status} appointment with ${
-                a.patient?.name || "Unknown"
-              }`,
-              icon,
-            };
-          });
-
-        var upcomingAppointmentsArr = [];
-        var completedAppointmentsArr = [];
-        var cancelledAppointmentsArr = [];
-        var inLobbyArr = [];
-
-        appointments.forEach((a) => {
-          if (a.status === "scheduled") {
-            upcomingAppointmentsArr.push(a);
-            upcomingCount++;
-          }
-
-          if (a.status === "ready") {
-            inLobbyArr.push(a);
-            inlobbyCount++;
-          }
-
-          if (a.status === "completed") {
-            completedAppointmentsArr.push(a);
-            completedTodayCount++;
-            const doctorName = a.doctor?.name || "Unknown Doctor";
-            const fee = parseFloat(a.amount || 0);
-            if (!feeByDoctor[doctorName]) feeByDoctor[doctorName] = 0;
-            feeByDoctor[doctorName] += fee;
-          }
-          if (a.status === "cancelled") {
-            cancelledAppointmentsArr.push(a);
-            cancelledCount++;
-          }
-        });
-
-        setStats({
-          upcoming: upcomingCount,
-          completed: completedTodayCount,
-          inLobby: inlobbyCount,
-          cancelled: cancelledCount,
-          feeByDoctor,
-        });
-
-        setActivities(recentActivities);
-        setupcomingAppointments(upcomingAppointmentsArr);
-        setCompletedAppointments(completedAppointmentsArr);
-        setcancelledAppointments(cancelledAppointmentsArr);
-        setInLobbyAppointments(inLobbyArr);
-        // console.log(upcomingAppointmentsArr);
-      } catch (err) {
-        console.error("Error fetching appointments:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAppointments();
-  }, [dispatch, manualRefresh, refreshKey]);
-
   const feeCards = Object.entries(stats.feeByDoctor || {}).map(
     ([doctorName, totalFee]) => ({
-      label: `${doctorName} - Today’s Fees`,
+      label: `${doctorName}`,
       value: `₱${totalFee.toLocaleString()}`,
       color: "text-amber-700 border-l-4 border-amber-400",
       icon: <Wallet className="w-6 h-6 text-amber-500" />,
     })
   );
 
+  //   console.log(feeCards);
+
+  // 👇 Update to only include today's completed & cancelled
+  const statAppointmentsMap = {
+    "Today’s Appointments": todayAppointments,
+
+    "Completed Appointments": appointments.filter(
+      (a) =>
+        a.status === "completed" &&
+        dayBounds.start &&
+        new Date(a.date) >= dayBounds.start &&
+        new Date(a.date) <= dayBounds.end
+    ),
+    "Cancelled Appointments": appointments.filter(
+      (a) =>
+        a.status === "cancelled" &&
+        dayBounds.start &&
+        new Date(a.date) >= dayBounds.start &&
+        new Date(a.date) <= dayBounds.end
+    ),
+  };
+
   const statCards = [
+    ...feeCards.map((f) => ({
+      label: f.label,
+      value: f.value,
+      color: "text-amber-800",
+      icon: <Wallet className="w-6 h-6 text-amber-500" />,
+    })),
     {
-      label: "Upcoming Appointments",
-      value: stats.upcoming,
+      label: "Today’s Appointments",
+      value: stats.today,
       color: "bg-blue-100 text-blue-800",
       icon: <CalendarClock className="w-6 h-6 text-blue-600" />,
     },
@@ -195,36 +191,16 @@ export default function DashboardTabStaff() {
       color: "bg-red-100 text-red-800",
       icon: <CalendarX2 className="w-6 h-6 text-red-600" />,
     },
-    ...feeCards.map((f) => ({
-      label: f.label,
-      value: f.value,
-      color: "text-amber-800",
-      icon: <Wallet className="w-6 h-6 text-amber-500" />,
-    })),
   ];
 
   const doctorFeeMap = Object.fromEntries(
     Object.keys(stats.feeByDoctor || {}).map((doctorName) => [
-      `${doctorName} - Today’s Fees`,
+      `${doctorName}`,
       completedAppointments.filter(
         (a) => a.doctor?.name === doctorName && a.status === "completed"
       ),
     ])
   );
-
-  // Map stats to appointments
-  const statAppointmentsMap = {
-    // "In Lobby": inLobbyAppointments,
-    "Completed Appointments": completedAppointments,
-    "Upcoming Appointments": upcomingAppointments,
-    "Cancelled Appointments": cancelledAppointments,
-  };
-
-  // Merge into the main map
-  const fullStatAppointmentsMap = {
-    ...statAppointmentsMap,
-    ...doctorFeeMap,
-  };
 
   const quickActions = [
     {
@@ -247,7 +223,13 @@ export default function DashboardTabStaff() {
     },
   ];
 
-  if (loading) return <Reloader text="Loading dashboard..." />;
+  // Merge into the main map
+  const fullStatAppointmentsMap = {
+    ...statAppointmentsMap,
+    ...doctorFeeMap,
+  };
+
+  //   console.log(fullStatAppointmentsMap);
 
   return (
     <>
@@ -278,8 +260,7 @@ export default function DashboardTabStaff() {
                 setSelectedStat(card.label);
                 setShowStatListModal(true);
               }}
-              className={`flex items-center gap-4 p-4 rounded-lg shadow
-                 bg-white border-l-4 ${card.color} cursor-pointer hover:bg-gray-50 transform transition-all duration-200 hover:scale-105 hover:shadow-lg`}
+              className={`flex items-center gap-4 p-4 rounded-lg shadow bg-white border-l-4 ${card.color} cursor-pointer hover:bg-gray-50`}
             >
               <div>{card.icon}</div>
               <div>
@@ -307,7 +288,6 @@ export default function DashboardTabStaff() {
             <UpcomingAppointments
               title={"Appointments Scheduled Today"}
               appointments={upcomingAppointments}
-              // scheduleAppointment={true}
               onSelect={(app) => {
                 setViewType("appointments");
                 setViewData(app);
@@ -319,7 +299,7 @@ export default function DashboardTabStaff() {
           <div className="space-y-4">
             {/* 🩺 Ongoing Checkup */}
             <OngoingCheckup
-              appointments={appointmentsToday.filter(
+              appointments={appointments.filter(
                 (a) =>
                   a.status === "in-progress" &&
                   dayBounds.start &&
@@ -339,6 +319,19 @@ export default function DashboardTabStaff() {
           </div>
         </div>
       </div>
+
+      {openViewModal && (
+        <CalendarModalDetails
+          report={viewData}
+          onClose={() => {
+            setOpenViewModal(false);
+            setViewData(null);
+            setViewType(null);
+          }}
+          isOpen={true}
+          onRefresh={() => setManualRefresh((prev) => prev + 1)}
+        />
+      )}
 
       {/* Appointment Modals */}
       {showAppointmentModal && (
@@ -385,44 +378,28 @@ export default function DashboardTabStaff() {
         </div>
       )}
 
-      {openViewModal && (
-        <CalendarModalDetails
-          report={viewData}
-          onClose={() => {
-            setOpenViewModal(false);
-            setViewData(null);
-            setViewType(null);
-          }}
-          isOpen={true}
-          onRefresh={() => {
-            console.log("refresh");
-            setManualRefresh((prev) => prev + 1);
-          }}
-        />
-      )}
-
       {showStatListModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-11/12 md:w-3/4 lg:w-1/2 max-h-[80vh] overflow-y-auto p-6 relative">
             <button
               onClick={() => setShowStatListModal(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
             >
               ✕
             </button>
-            <h2 className="text-lg font-semibold mb-4">{selectedStat}</h2>
+            <h2 className="text-xl font-semibold mb-4">{selectedStat}</h2>
 
             {fullStatAppointmentsMap[selectedStat] &&
             fullStatAppointmentsMap[selectedStat].length > 0 ? (
               <div className="overflow-x-auto">
-                {selectedStat.includes("Fees") && (
+                {Object.keys(stats.feeByDoctor || {}).includes(
+                  selectedStat
+                ) && (
                   <p className="text-sm text-gray-600 mb-2">
                     Total:{" "}
                     <span className="font-semibold text-amber-600">
                       ₱
-                      {stats.feeByDoctor[
-                        selectedStat.replace(" - Today’s Fees", "")
-                      ]?.toLocaleString() || "0"}
+                      {stats.feeByDoctor[selectedStat]?.toLocaleString() || "0"}
                     </span>
                   </p>
                 )}
@@ -463,8 +440,9 @@ export default function DashboardTabStaff() {
                           {app.patient?.name || "Unknown Patient"}
                         </td>
                         <td className="border border-gray-200 px-3 py-2">
-                          {new Date(app.date).toLocaleString()}
+                          {new Date(app.date).toLocaleDateString()}
                         </td>
+
                         <td className="border border-gray-200 px-3 py-2 capitalize">
                           {app.status}
                         </td>
@@ -474,7 +452,7 @@ export default function DashboardTabStaff() {
                         <td className="border border-gray-200 px-3 py-2 text-center">
                           <button
                             onClick={(e) => {
-                              e.stopPropagation(); // prevent triggering row click
+                              e.stopPropagation();
                               setViewData(app);
                               setViewType("appointments");
                               setShowStatListModal(false);

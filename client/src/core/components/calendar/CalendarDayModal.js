@@ -89,9 +89,7 @@ export default function CalendarDayModal({
                       {formatDate(appt.edd)}
                     </div>
                   ) : (
-                    <span className="text-xs text-gray-500">
-                      {formatTime(appt.time)}
-                    </span>
+                    <span className="text-xs text-gray-500">{appt.time}</span>
                   )}
                 </div>
 

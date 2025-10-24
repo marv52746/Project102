@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   adminOnlyRoles,
+  canEditForms,
   internalRoles,
   transactionTables,
 } from "../constants/rolePresets";
@@ -144,7 +145,7 @@ const FormFormat = ({ data, fields }) => {
           onDelete={() => setShowDeleteModal(true)}
           currentRole={currentUser?.role}
           currentTable={tablename}
-          allowedRoles={internalRoles}
+          allowedRoles={canEditForms}
           transactionTables={transactionTables}
         />
       </form>

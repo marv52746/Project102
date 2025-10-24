@@ -130,7 +130,7 @@ export default function ALLAppointments({ data }) {
                 onClick={() => setSelectedReport(app)}
               >
                 <td className="px-4 py-2">{formatDate(app.date)}</td>
-                <td className="px-4 py-2">{formatTime(app.time)}</td>
+                <td className="px-4 py-2">{app.time}</td>
                 <td className="px-4 py-2">{app.doctor?.name || "N/A"}</td>
                 <td className="px-4 py-2">{app.patient?.name || "N/A"}</td>
                 <td className="px-4 py-2 max-w-[200px] truncate">

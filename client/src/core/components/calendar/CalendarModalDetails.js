@@ -151,6 +151,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
                 data: rec,
                 id: rec._id,
                 fields,
+                // skipGlobalRefresh: true,
               });
             } else {
               // create new
@@ -159,6 +160,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
                 tablename: type,
                 data: rec,
                 fields,
+                // skipGlobalRefresh: true,
               });
             }
           })
@@ -171,7 +173,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
           patient: report.patient,
           doctor: report.doctor,
           onClose: () => setActiveModal(null),
-          onRefresh,
+          // onRefresh,
         });
 
         savedRecords = [savedUltrasound]; // ✅ wrap in array for consistency
@@ -209,7 +211,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
     );
     setReport(updatedReport);
 
-    if (onRefresh) onRefresh();
+    // if (onRefresh) onRefresh();
     setActiveModal(null);
   };
 
@@ -226,7 +228,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
     // console.log(type);
     let hasRecord = report[mapTypeToAppointmentField(type)]?.length > 0;
     if (type === "findings") {
-      hasRecord = !!report.notes || !!report.diagnosis ? true : false;
+      hasRecord = !!report.diagnosis ? true : false;
     }
     if (hasRecord)
       return {
@@ -379,10 +381,10 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
           {/* Left side: Appointment */}
           <div>
             <h2 className="text-xl font-semibold text-gray-800">
-              Appointment #{report.appointment_no}
+              Appointment Details
             </h2>
             <p className="px-6 pb-2 text-sm text-gray-500">
-              {formatDate(report.date)} at {formatTime(report.time)}
+              {formatDate(report.date)} - {report.time}
             </p>
 
             {/* Print buttons */}
@@ -462,8 +464,8 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
               value={capitalizeText(report.status) || "N/A"}
               status={report.status}
             />
-            <InfoCard label="Reason" value={report.reason || "N/A"} />
             <InfoCard label="Diagnosis" value={report.diagnosis || "-"} />
+            <InfoCard label="Reason" value={report.reason || "N/A"} fullWidth />
             <InfoCard
               label="Notes"
               value={report.notes || "-"}
@@ -471,6 +473,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
               onSave={(newValue) =>
                 handleSave("appointments", { notes: newValue })
               }
+              fullWidth
             />
           </div>
 
@@ -588,82 +591,6 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
   );
 }
 
-// const InfoCard = ({
-//   icon: Icon,
-//   label,
-//   value,
-//   onClick,
-//   clickable,
-//   editable,
-//   status,
-//   onSave,
-// }) => {
-//   const [isEditing, setIsEditing] = useState(false);
-//   const [tempValue, setTempValue] = useState(value ?? "");
-//   const statusBadgeClasses = (s) => {
-//     switch (s) {
-//       case "ready":
-//         return "bg-green-100 text-green-700";
-//       case "scheduled":
-//         return "bg-gray-100 text-gray-700";
-//       case "cancelled":
-//         return "bg-yellow-100 text-yellow-700";
-//       case "completed":
-//         return "bg-blue-100 text-blue-700";
-//       default:
-//         return "bg-gray-100 text-gray-700";
-//     }
-//   };
-//   const handleSave = () => {
-//     setIsEditing(false);
-//     if (onSave) onSave(tempValue);
-//   };
-
-//   const handleKeyDown = (e) => {
-//     if (e.key === "Enter") handleSave();
-//     if (e.key === "Escape") {
-//       setTempValue(value ?? "");
-//       setIsEditing(false);
-//     }
-//   };
-
-//   const displayValue = value ?? "N/A";
-
-//   return (
-//     <div
-//       className={`flex flex-col ${clickable ? "cursor-pointer" : ""}`}
-//       onClick={onClick}
-//     >
-//       <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
-//         {Icon && <Icon size={14} className="text-gray-500" />}
-//         {label}
-//       </span>
-
-//       <span className="mt-1">
-//         {status ? (
-//           <span
-//             className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusBadgeClasses(
-//               status
-//             )}`}
-//           >
-//             {displayValue}
-//           </span>
-//         ) : (
-//           <span
-//             className={`${
-//               clickable
-//                 ? "text-blue-600 hover:underline hover:text-blue-800"
-//                 : "text-gray-800"
-//             }`}
-//           >
-//             {displayValue}
-//           </span>
-//         )}
-//       </span>
-//     </div>
-//   );
-// };
-
 const InfoCard = ({
   icon: Icon,
   label,
@@ -673,6 +600,7 @@ const InfoCard = ({
   status,
   editable,
   onSave,
+  fullWidth,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value);
@@ -724,7 +652,11 @@ const InfoCard = ({
       : value ?? "N/A";
 
   return (
-    <div className="flex flex-col">
+    <div
+      className={`flex flex-col ${
+        fullWidth ? "col-span-full" : "" // ✅ apply full row span
+      }`}
+    >
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
           {Icon && <Icon size={14} className="text-gray-500" />}

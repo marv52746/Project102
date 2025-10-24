@@ -19,7 +19,7 @@ function Form() {
   const [loading, setLoading] = useState(view !== "create");
 
   const userInfo = useSelector((state) => state.user.userInfo);
-  const hasValidRole = userInfo && internalRoles.includes(userInfo.role);
+  const hasValidRole = userInfo && internalRoles.includes(userInfo.type);
 
   const tablename = normalizeTableName(rawTablename);
 

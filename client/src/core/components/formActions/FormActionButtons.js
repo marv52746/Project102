@@ -1,5 +1,5 @@
 import { Edit, PlusCircle, Save, Trash } from "lucide-react";
-import { internalRoles } from "../../constants/rolePresets";
+import { canEditForms } from "../../constants/rolePresets";
 
 export const FormActionButtons = ({
   isViewing,
@@ -12,7 +12,7 @@ export const FormActionButtons = ({
   onDelete,
   currentRole,
   currentTable,
-  allowedRoles = internalRoles,
+  allowedRoles = canEditForms,
   transactionTables = [],
 }) => {
   const isRoleAllowed =

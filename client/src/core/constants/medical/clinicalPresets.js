@@ -27,12 +27,12 @@ export const vitalsFormFields = [
   },
   { name: "weight", label: "Weight (kg)", placeholder: "e.g. 70" },
   { name: "height", label: "Height (cm)", placeholder: "e.g. 170" },
-  {
-    name: "notes",
-    label: "Notes",
-    type: "textarea",
-    placeholder: "Add notes here...",
-  },
+  // {
+  //   name: "notes",
+  //   label: "Notes",
+  //   type: "textarea",
+  //   placeholder: "Add notes here...",
+  // },
 ];
 
 export const surgeryFormFields = [
@@ -76,15 +76,93 @@ export const medicationFormFields = [
   {
     name: "name",
     label: "Medication Name",
-    placeholder: "e.g. Amoxicillin",
+    type: "reactselect",
     required: true,
+    placeholder: "Select medication",
+    options: [
+      // 🔹 Antibiotics
+      { label: "Amoxicillin", value: "Amoxicillin" },
+      { label: "Azithromycin", value: "Azithromycin" },
+      { label: "Cefalexin", value: "Cefalexin" },
+      { label: "Cefuroxime", value: "Cefuroxime" },
+      { label: "Ciprofloxacin", value: "Ciprofloxacin" },
+      { label: "Co-amoxiclav (Augmentin)", value: "Co-amoxiclav (Augmentin)" },
+      { label: "Erythromycin", value: "Erythromycin" },
+      { label: "Metronidazole", value: "Metronidazole" },
+      { label: "Doxycycline", value: "Doxycycline" },
+      { label: "Clindamycin", value: "Clindamycin" },
+
+      // 🔹 Pain relievers / Antipyretics
+      { label: "Paracetamol", value: "Paracetamol" },
+      { label: "Ibuprofen", value: "Ibuprofen" },
+      { label: "Mefenamic Acid", value: "Mefenamic Acid" },
+      { label: "Tramadol", value: "Tramadol" },
+      { label: "Naproxen", value: "Naproxen" },
+
+      // 🔹 Antihypertensives
+      { label: "Amlodipine", value: "Amlodipine" },
+      { label: "Losartan", value: "Losartan" },
+      { label: "Metoprolol", value: "Metoprolol" },
+      { label: "Captopril", value: "Captopril" },
+      { label: "Valsartan", value: "Valsartan" },
+
+      // 🔹 Antidiabetics
+      { label: "Metformin", value: "Metformin" },
+      { label: "Glimepiride", value: "Glimepiride" },
+      { label: "Insulin (Regular)", value: "Insulin (Regular)" },
+      { label: "Insulin (NPH)", value: "Insulin (NPH)" },
+
+      // 🔹 Gastrointestinal
+      { label: "Omeprazole", value: "Omeprazole" },
+      { label: "Ranitidine", value: "Ranitidine" },
+      { label: "Pantoprazole", value: "Pantoprazole" },
+      { label: "Domperidone", value: "Domperidone" },
+      { label: "Loperamide", value: "Loperamide" },
+      {
+        label: "Oral Rehydration Salts (ORS)",
+        value: "Oral Rehydration Salts (ORS)",
+      },
+
+      // 🔹 Vitamins / Supplements
+      { label: "Ferrous Sulfate", value: "Ferrous Sulfate" },
+      { label: "Folic Acid", value: "Folic Acid" },
+      { label: "Vitamin B-Complex", value: "Vitamin B-Complex" },
+      { label: "Vitamin C", value: "Vitamin C" },
+      { label: "Multivitamins", value: "Multivitamins" },
+      { label: "Calcium Carbonate", value: "Calcium Carbonate" },
+
+      // 🔹 Obstetric / Gynecologic
+      { label: "Prenatal Vitamins", value: "Prenatal Vitamins" },
+      { label: "Oxytocin", value: "Oxytocin" },
+      { label: "Methylergometrine", value: "Methylergometrine" },
+      { label: "Nifedipine", value: "Nifedipine" },
+      { label: "Magnesium Sulfate", value: "Magnesium Sulfate" },
+
+      // 🔹 Antihistamines
+      { label: "Cetirizine", value: "Cetirizine" },
+      { label: "Loratadine", value: "Loratadine" },
+      { label: "Diphenhydramine", value: "Diphenhydramine" },
+
+      // 🔹 Respiratory
+      { label: "Salbutamol", value: "Salbutamol" },
+      { label: "Budesonide", value: "Budesonide" },
+      { label: "Montelukast", value: "Montelukast" },
+
+      // 🔹 Others
+      { label: "Prednisone", value: "Prednisone" },
+      { label: "Hydrocortisone", value: "Hydrocortisone" },
+      { label: "Furosemide", value: "Furosemide" },
+      { label: "Aspirin (Low Dose)", value: "Aspirin (Low Dose)" },
+      { label: "Simvastatin", value: "Simvastatin" },
+    ],
   },
-  { name: "dose", label: "Dose", placeholder: "e.g. 500mg", required: true },
+
   {
     name: "frequency",
     label: "Frequency",
-    type: "select",
+    type: "reactselect",
     required: true,
+    placeholder: "Select frequency",
     options: [
       { label: "Once daily", value: "Once daily" },
       { label: "Twice daily (BID)", value: "Twice daily (BID)" },
@@ -105,8 +183,8 @@ export const medicationFormFields = [
       { label: "Evening", value: "Evening" },
       { label: "Night", value: "Night" },
     ],
-    placeholder: "Select frequency",
   },
+  { name: "dose", label: "Dose", placeholder: "e.g. 500mg", required: true },
   {
     name: "start_date",
     label: "Start Date",

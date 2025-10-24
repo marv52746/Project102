@@ -63,7 +63,7 @@ export default function AppointmentModal({
       fields,
       fileData,
     });
-    setManualRefresh((prev) => prev + 1);
+
     onClose();
   };
 

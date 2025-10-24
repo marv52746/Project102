@@ -1,19 +1,28 @@
 import { useState } from "react";
-import { CheckCircle, AlertCircle } from "lucide-react";
+import {
+  Check,
+  Clock,
+  Facebook,
+  Loader2,
+  Lock,
+  MapPin,
+  Phone,
+} from "lucide-react";
 import apiService from "../../../core/services/apiService";
 import { useDispatch, useSelector } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion";
 
-/* Contact Us */
 export function ContactUs() {
   const userInfo = useSelector((state) => state.user?.userInfo);
   const [form, setForm] = useState({
     name: userInfo?.fullname || "",
     email: userInfo?.email || "",
-    phone: "",
+    phone: userInfo?.phone_number || "",
     message: "",
   });
 
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [status, setStatus] = useState(null);
   const dispatch = useDispatch();
 
@@ -22,13 +31,25 @@ export function ContactUs() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 🚫 Stop if user not logged in
+    if (!userInfo) {
+      setStatus({
+        type: "error",
+        msg: "Please log in to send a message.",
+      });
+      return;
+    }
+
     setLoading(true);
     setStatus(null);
 
     try {
       await apiService.post(dispatch, "contact", form);
+      setSubmitted(true);
       setStatus({ type: "success", msg: "Your message has been sent!" });
       setForm({ name: "", email: "", phone: "", message: "" });
+      setTimeout(() => setSubmitted(false), 3000);
     } catch (err) {
       console.error("❌ Failed to send message:", err);
       setStatus({
@@ -53,9 +74,9 @@ export function ContactUs() {
           </p>
         </div>
 
-        {/* Grid Layout */}
+        {/* Layout */}
         <div className="grid md:grid-cols-2 gap-8 items-start">
-          {/* Google Map with Address */}
+          {/* Map */}
           <div className="rounded-xl overflow-hidden shadow h-[300px] sm:h-[400px] md:h-full">
             <iframe
               title="Bislig Premier Birthing Home Location"
@@ -63,29 +84,46 @@ export function ContactUs() {
               width="100%"
               className="w-full h-full"
               style={{ border: 0 }}
-              allowFullScreen=""
+              allowFullScreen
               loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
             ></iframe>
           </div>
 
-          {/* Contact Form & Address */}
+          {/* Form */}
           <div className="space-y-4 sm:space-y-6">
-            {/* Address Box */}
-            <div className="bg-white shadow rounded-xl p-4 sm:p-6 text-center sm:text-left">
-              <h3 className="text-lg sm:text-xl font-semibold text-pink-700 mb-1">
+            <div className="bg-white shadow-md rounded-xl p-5 sm:p-6 border border-pink-100 transition-all hover:shadow-lg hover:border-pink-200">
+              {/* Title */}
+              <h3 className="text-lg sm:text-xl font-semibold text-pink-700 mb-2 flex items-center gap-2">
                 Bislig Premier Birthing Home
               </h3>
-              <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                EGS Building, Espirito Street, Mangagoy, Bislig City
-              </p>
-              <div className="mt-2 space-y-1 text-gray-700 text-sm sm:text-base">
-                <p>Monday – Saturday, 9:00 AM – 5:00 PM</p>
-                <p>0917 113 5187</p>
+              {/* Schedule & Contact */}
+              <div className="mt-4 space-y-2 text-gray-700 text-sm sm:text-base">
+                <div className="flex items-center gap-2 pl-1">
+                  <MapPin className="w-4 h-4 text-pink-500 flex-shrink-0" />
+                  <p>EGS Building, Espirito Street, Mangagoy, Bislig City</p>
+                </div>
+                <div className="flex items-center gap-2 pl-1">
+                  <Clock className="w-4 h-4 text-pink-500 flex-shrink-0" />
+                  <p>Monday – Saturday, 9:00 AM – 5:00 PM</p>
+                </div>
+                <div className="flex items-center gap-2 pl-1">
+                  <Phone className="w-4 h-4 text-pink-500 flex-shrink-0" />
+                  <p>0917 113 5187</p>
+                </div>
+                <div className="flex items-center gap-2 pl-1">
+                  <Facebook className="w-4 h-4 text-pink-500 flex-shrink-0" />
+                  <a
+                    href="https://www.facebook.com/profile.php?id=61552266903347"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-pink-600 hover:text-pink-700 hover:underline transition-colors"
+                  >
+                    Visit our Facebook Page
+                  </a>
+                </div>
               </div>
             </div>
 
-            {/* Contact Form */}
             <form
               onSubmit={handleSubmit}
               className="bg-white shadow rounded-xl p-4 sm:p-6"
@@ -97,7 +135,8 @@ export function ContactUs() {
                 onChange={handleChange}
                 placeholder="Your Name"
                 required
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 text-sm sm:text-base text-gray-700 bg-white outline-none focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 transition-all duration-150"
+                disabled={!userInfo}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 text-sm sm:text-base text-gray-700 bg-white outline-none focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 transition-all duration-150 disabled:bg-gray-100 disabled:text-gray-400"
               />
               <input
                 type="email"
@@ -106,15 +145,17 @@ export function ContactUs() {
                 onChange={handleChange}
                 placeholder="Your Email"
                 required
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 text-sm sm:text-base text-gray-700 bg-white outline-none focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 transition-all duration-150"
+                disabled={!userInfo}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 text-sm sm:text-base text-gray-700 bg-white outline-none focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 transition-all duration-150 disabled:bg-gray-100 disabled:text-gray-400"
               />
               <input
-                type="text"
+                type="number"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
                 placeholder="Your Phone Number"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 text-sm sm:text-base text-gray-700 bg-white outline-none focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 transition-all duration-150"
+                disabled={!userInfo}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 text-sm sm:text-base text-gray-700 bg-white outline-none focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 transition-all duration-150 disabled:bg-gray-100 disabled:text-gray-400 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
               <textarea
                 name="message"
@@ -123,34 +164,67 @@ export function ContactUs() {
                 placeholder="Message"
                 rows="5"
                 required
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 text-sm sm:text-base text-gray-700 bg-white outline-none focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 transition-all duration-150"
+                disabled={!userInfo}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 text-sm sm:text-base text-gray-700 bg-white outline-none focus-visible:border-pink-400 focus-visible:ring-2 focus-visible:ring-pink-300 transition-all duration-150 disabled:bg-gray-100 disabled:text-gray-400"
               />
-              <button
-                type="submit"
-                disabled={loading}
-                className={`flex items-center justify-center gap-2 w-full bg-pink-600 text-white py-2 px-6 rounded-lg hover:bg-pink-700 transition ${
-                  loading ? "opacity-70 cursor-not-allowed" : ""
-                }`}
-              >
-                {loading ? "Sending..." : "Send Message"}
-              </button>
 
-              {status && (
-                <div
-                  className={`mt-4 flex items-center justify-center gap-2 text-sm p-2 rounded ${
-                    status.type === "success"
-                      ? "bg-green-50 text-green-700"
-                      : "bg-red-50 text-red-700"
+              {/* Animated Button */}
+              <motion.button
+                type="submit"
+                disabled={loading || submitted || !userInfo}
+                whileTap={{ scale: 0.97 }}
+                className={`relative w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 text-white overflow-hidden shadow-md transition-all duration-300
+                  ${
+                    !userInfo
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : submitted
+                      ? "bg-green-600"
+                      : "bg-gradient-to-r from-pink-600 to-pink-500 hover:from-pink-700 hover:to-pink-600"
                   }`}
-                >
-                  {status.type === "success" ? (
-                    <CheckCircle size={16} />
+              >
+                <AnimatePresence mode="wait">
+                  {!userInfo ? (
+                    <motion.span
+                      key="login"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex items-center gap-2"
+                    >
+                      <Lock size={18} /> Please Log In
+                    </motion.span>
+                  ) : submitted ? (
+                    <motion.span
+                      key="sent"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex items-center gap-2"
+                    >
+                      <Check size={18} /> Message Sent
+                    </motion.span>
+                  ) : loading ? (
+                    <motion.span
+                      key="loading"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex items-center gap-2"
+                    >
+                      <Loader2 className="w-4 h-4 animate-spin" /> Sending...
+                    </motion.span>
                   ) : (
-                    <AlertCircle size={16} />
+                    <motion.span
+                      key="default"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      Send Message
+                    </motion.span>
                   )}
-                  <span>{status.msg}</span>
-                </div>
-              )}
+                </AnimatePresence>
+              </motion.button>
             </form>
           </div>
         </div>

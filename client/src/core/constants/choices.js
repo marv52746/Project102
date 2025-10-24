@@ -9,6 +9,11 @@ export const bloodTypeOptions = [
   { label: "O-", value: "O-" },
 ];
 
+export const userTypeOptions = [
+  { label: "Internal", value: "internal" },
+  { label: "External", value: "external" },
+];
+
 export const doctorSpecializationOptions = [
   { label: "Allergist / Immunologist", value: "Allergist / Immunologist" },
   { label: "Cardiologist", value: "Cardiologist" },

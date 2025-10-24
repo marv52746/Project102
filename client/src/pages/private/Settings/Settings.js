@@ -24,7 +24,7 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("Account"); // ✅ Added state for active tab
 
   const userInfo = useSelector((state) => state.user.userInfo);
-  const hasValidRole = userInfo && internalRoles.includes(userInfo.role);
+  const hasValidRole = userInfo && internalRoles.includes(userInfo.type);
 
   const [clinics, setClinics] = useState([]);
   const [refresh, setRefresh] = useState(false);

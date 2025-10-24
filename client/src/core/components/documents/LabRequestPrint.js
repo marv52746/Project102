@@ -38,7 +38,7 @@ const styles = {
   },
   patientGrid: {
     display: "grid",
-    gridTemplateColumns: "1fr 70px 60px", // name/addr, age, sex/date
+    gridTemplateColumns: "1fr 60px 70px", // name/addr, age, sex/date
     gridTemplateRows: "auto auto",
     gridTemplateAreas: `
       "name age sex"

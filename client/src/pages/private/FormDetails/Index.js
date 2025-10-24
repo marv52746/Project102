@@ -16,6 +16,7 @@ import PatientsList from "./PatientsList";
 import UltrasoundTab from "./UltrasoundTab";
 import ALLAppointments from "./ALLAppointments";
 import CalendarMain from "../Calendar/CalendarMain";
+import AdminStaffDashboard from "./AdminStaff/AdminStaffDashboard";
 
 export default function UserDashboardPage({ data }) {
   const { id } = useParams();
@@ -24,6 +25,7 @@ export default function UserDashboardPage({ data }) {
   const { refreshKey } = useSelector((state) => state.utils);
 
   const [appointments, setAppointments] = useState(null);
+  const [appointmentsToday, setAppointmentsToday] = useState(null);
   const [mainTab, setMainTab] = useState(null); // <== will be set dynamically
   const [loading, setLoading] = useState(true);
 
@@ -36,7 +38,18 @@ export default function UserDashboardPage({ data }) {
           data._id ? { doctor: data._id } : {}
         );
 
+        const userAppointmentsToday = await apiService.get(
+          dispatch,
+          "appointments",
+          {
+            date: "today",
+          }
+        );
+
+        // console.log(userAppointmentsToday);
+
         setAppointments(userAppointments);
+        setAppointmentsToday(userAppointmentsToday);
 
         // Dynamically set default tab based on role
         const role = data.role;
@@ -44,7 +57,7 @@ export default function UserDashboardPage({ data }) {
           setMainTab("overview");
         } else if (role === "patient") {
           setMainTab("dashboard");
-        } else if (role === "staff") {
+        } else if (role === "staff" || role === "admin") {
           setMainTab("staff-dashboard");
         } else {
           setMainTab("dashboard");
@@ -63,6 +76,7 @@ export default function UserDashboardPage({ data }) {
     // console.log(role);
     switch (role) {
       case "staff":
+      case "admin":
         return [
           { key: "staff-dashboard", label: "Overview" },
           { key: "patients-all", label: "Patient List" },
@@ -133,7 +147,8 @@ export default function UserDashboardPage({ data }) {
 
       // staff
       case "staff-dashboard":
-        return <DashboardTabStaff appointments={appointments} />;
+        // return <DashboardTabStaff appointments={appointments} />;
+        return <AdminStaffDashboard appointments={appointmentsToday} />;
       case "patients-all":
         return <PatientsList />;
       case "appointment-history":

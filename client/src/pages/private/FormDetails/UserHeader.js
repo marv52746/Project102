@@ -28,7 +28,7 @@ import apiService from "../../../core/services/apiService";
 
 export default function UserHeader({ data }) {
   const userInfo = useSelector((state) => state.user.userInfo);
-  const hasValidRole = userInfo && internalRoles.includes(userInfo.role);
+  const hasValidRole = userInfo && internalRoles.includes(userInfo.type);
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);

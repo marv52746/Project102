@@ -8,7 +8,7 @@ import { listConfigMap } from "../../core/constants/FieldConfigMap";
 function List() {
   const { tablename } = useParams();
   const userInfo = useSelector((state) => state.user.userInfo);
-  const hasValidRole = userInfo && internalRoles.includes(userInfo.role);
+  const hasValidRole = userInfo && internalRoles.includes(userInfo.type);
 
   if (!hasValidRole) return <div>Access denied</div>;
 

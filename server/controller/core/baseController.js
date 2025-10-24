@@ -46,18 +46,39 @@ class BaseController {
 
       // 🕗 Special handling: date=today
       if (filters.date === "today") {
+        // const now = new Date();
+
+        // // Compute PH start and end of the day in UTC
+        // const startOfDayPH = new Date(
+        //   Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+        // );
+        // const startOfDayUTC = new Date(
+        //   startOfDayPH.getTime() - 8 * 60 * 60 * 1000
+        // ); // PH -8h
+        // const endOfDayUTC = new Date(
+        //   startOfDayUTC.getTime() + 24 * 60 * 60 * 1000
+        // );
+
+        // query = query.find({
+        //   date: { $gte: startOfDayUTC, $lt: endOfDayUTC },
+        // });
+
+        // delete filters.date;
+
         const now = new Date();
 
-        // Compute PH start and end of the day in UTC
-        const startOfDayPH = new Date(
-          Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
-        );
+        // Get PH time (UTC+8)
+        const startOfDayPH = new Date(now);
+        startOfDayPH.setHours(0, 0, 0, 0);
+
+        const endOfDayPH = new Date(now);
+        endOfDayPH.setHours(23, 59, 59, 999);
+
+        // Convert PH times to UTC for MongoDB comparison
         const startOfDayUTC = new Date(
           startOfDayPH.getTime() - 8 * 60 * 60 * 1000
-        ); // PH -8h
-        const endOfDayUTC = new Date(
-          startOfDayUTC.getTime() + 24 * 60 * 60 * 1000
         );
+        const endOfDayUTC = new Date(endOfDayPH.getTime() - 8 * 60 * 60 * 1000);
 
         query = query.find({
           date: { $gte: startOfDayUTC, $lt: endOfDayUTC },

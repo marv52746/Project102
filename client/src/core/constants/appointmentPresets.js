@@ -56,13 +56,25 @@ export const appointmentFormFields = [
     default: new Date(),
     required: true,
   },
+  // {
+  //   name: "time",
+  //   label: "Time",
+  //   type: "time",
+  //   showOn: "all",
+  //   default: "09:00",
+  //   required: true,
+  // },
   {
     name: "time",
-    label: "Time",
-    type: "time",
+    label: "Session", // changed for clarity
+    type: "select",
     showOn: "all",
-    default: "09:00",
     required: true,
+    options: [
+      { label: "Morning", value: "Morning" },
+      { label: "Afternoon", value: "Afternoon" },
+    ],
+    placeholder: "Select session",
   },
 
   {

@@ -1,4 +1,8 @@
-import { bloodTypeOptions, doctorSpecializationOptions } from "./choices";
+import {
+  bloodTypeOptions,
+  doctorSpecializationOptions,
+  userTypeOptions,
+} from "./choices";
 import { genderOptions, roleOptions } from "./formFieldPresets";
 
 // Columns used in the table list
@@ -104,13 +108,7 @@ export const userFormFields = [
     showOn: "all",
     required: true,
   },
-  {
-    name: "role",
-    label: "Role",
-    type: "select",
-    options: roleOptions,
-    showOn: "edit,view",
-  },
+
   {
     name: "gender",
     label: "Gender",
@@ -127,7 +125,23 @@ export const userFormFields = [
     showOn: "all",
     required: true,
   },
-
+  {
+    name: "role",
+    label: "Role",
+    type: "select",
+    options: roleOptions,
+    showOn: "edit,view",
+  },
+  {
+    name: "user_type",
+    label: "User Type",
+    options: userTypeOptions,
+    type: "select",
+    default: "external",
+    showOn: "edit,view",
+    required: true,
+  },
+  { type: "spacer", showOn: "all" },
   {
     name: "address",
     label: "Address",

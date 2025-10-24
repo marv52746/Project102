@@ -90,6 +90,17 @@ const ClinicalForm = ({ fields, formData, setFormData, type, readOnly }) => {
                   }}
                   options={field.options || []}
                   placeholder={field.placeholder}
+                  styles={{
+                    menu: (base) => ({
+                      ...base,
+                      zIndex: 9999, // 🔹 Ensures dropdown stays above modals or tables
+                    }),
+                    menuPortal: (base) => ({
+                      ...base,
+                      zIndex: 9999, // 🔹 Ensures portal dropdown appears on top
+                    }),
+                  }}
+                  menuPortalTarget={document.body} // 🔹 Important for proper z-index layering
                 />
               ) : field.type === "multiselect" ? (
                 <CreatableSelect
@@ -204,17 +215,39 @@ const MultiEntryModal = ({
   );
   const [toDelete, setToDelete] = useState([]); // 🆕 track deleted IDs
   const userInfo = useSelector((state) => state.user.userInfo);
+  const [expandedIndexes, setExpandedIndexes] = useState([0]); // store which entries are open
 
   // Reset entries when modal opens
   useEffect(() => {
     setEntries(
       Array.isArray(initialData) && initialData.length > 0 ? initialData : [{}]
     );
+
+    // ✅ Collapse all if more than one record, expand only first if single
+    if (initialData.length > 1) {
+      setExpandedIndexes([]); // collapse all
+    } else {
+      setExpandedIndexes([0]); // expand first
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(initialData), isOpen]);
 
+  // toggle one entry
+  const toggleEntry = (idx) => {
+    setExpandedIndexes(
+      (prev) =>
+        prev.includes(idx)
+          ? prev.filter((i) => i !== idx) // collapse if already open
+          : [...prev, idx] // expand if closed
+    );
+  };
+
   const handleAddMore = () => {
+    const newIndex = entries.length;
     setEntries([...entries, {}]);
+    // Collapse all old entries, open only the new one
+    setExpandedIndexes([newIndex]);
   };
 
   const handleChange = (index, updatedData) => {
@@ -254,6 +287,14 @@ const MultiEntryModal = ({
   // console.log(type);
   // console.log(entries);
 
+  const canAddMoreTypes = [
+    "medications",
+    "surgeries",
+    "allergies",
+    "labrequest",
+  ];
+  const canAddMore = canAddMoreTypes.includes(tableName);
+
   const readOnly =
     status !== "scheduled" &&
     status !== "ready" &&
@@ -266,35 +307,61 @@ const MultiEntryModal = ({
           {entries
             .filter((e) => e)
             .map((formData, idx) => {
+              const isExpanded = expandedIndexes.includes(idx);
+              const displayName =
+                formData?.name || formData?.label || `Entry ${idx + 1}`;
+
               return (
                 <div
                   key={idx}
-                  className="p-4 border rounded-xl bg-gray-50 relative"
+                  className="p-4 border rounded-xl bg-gray-50 relative transition-all"
                 >
-                  <span className="absolute -top-2 left-3 bg-white px-2 text-xs text-gray-500">
-                    Entry {idx + 1}
-                  </span>
+                  {/* Header bar */}
+                  <div
+                    className="flex justify-between items-center cursor-pointer select-none"
+                    onClick={() => toggleEntry(idx)}
+                  >
+                    <span className="font-medium text-gray-800">
+                      {canAddMore && displayName}
+                    </span>
 
-                  {/* Remove row button */}
-                  {entries.length > 1 && !readOnly && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemove(idx, formData._id)}
-                      className="absolute top-2 right-2 p-1 rounded-full hover:bg-red-100"
-                      title="Remove entry"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-500" />
-                    </button>
+                    <div>
+                      {!readOnly && entries.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemove(idx, formData._id)}
+                          className="p-1 rounded-full hover:bg-red-100 mr-3"
+                          title="Remove entry"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleEntry(idx);
+                        }}
+                        className="text-gray-500 hover:text-gray-800"
+                      >
+                        {isExpanded ? "−" : "+"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Expanded content */}
+                  {isExpanded && (
+                    <div className="mt-3">
+                      <ClinicalForm
+                        fields={fields}
+                        formData={formData}
+                        setFormData={(updated) => handleChange(idx, updated)}
+                        columns={columns}
+                        type={type}
+                        readOnly={readOnly}
+                      />
+                    </div>
                   )}
-
-                  <ClinicalForm
-                    fields={fields}
-                    formData={formData}
-                    setFormData={(updated) => handleChange(idx, updated)}
-                    columns={columns}
-                    type={type}
-                    readOnly={readOnly}
-                  />
                 </div>
               );
             })}
@@ -303,7 +370,7 @@ const MultiEntryModal = ({
         {/* Footer */}
         {!readOnly && (
           <div className="flex justify-between items-center mt-6">
-            {columns === 2 && (
+            {columns === 2 && canAddMore && (
               <button
                 type="button"
                 onClick={handleAddMore}
@@ -327,7 +394,7 @@ const MultiEntryModal = ({
                 type="submit"
                 className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:brightness-90"
               >
-                Save All
+                {canAddMore ? "Save All" : "Save"}
               </button>
             </div>
           </div>

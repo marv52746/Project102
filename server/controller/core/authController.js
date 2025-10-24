@@ -59,6 +59,7 @@ const login = async (req, res) => {
         name: user.fullname,
         fullname: user.fullname,
         role: user.role,
+        type: user.user_type,
         avatar: user.avatar,
         must_change_password: user.must_change_password,
       },
@@ -115,12 +116,22 @@ const googleLogin = async (req, res) => {
         id: user._id,
         email: user.email,
         role: user.role,
+        type: user.user_type,
         fullname: user.fullname,
         avatar: user.avatar,
       },
       process.env.JWT_SECRET,
       { expiresIn: "365d" }
     );
+
+    // console.log({
+    //   id: user._id,
+    //   email: user.email,
+    //   role: user.role,
+    //   type: user.user_type,
+    //   fullname: user.fullname,
+    //   avatar: user.avatar,
+    // });
 
     res.status(200).json({ token: appToken });
   } catch (err) {
@@ -162,6 +173,7 @@ const signup = async (req, res) => {
         id: savedUser._id,
         email: savedUser.email,
         role: savedUser.role,
+        type: savedUser.user_type,
         fullname: savedUser.fullname,
         avatar: savedUser.avatar,
       },

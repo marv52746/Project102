@@ -44,6 +44,7 @@ export const handleFormSubmit = async ({
   navigate,
   userInfo,
   notificationMessage,
+  skipGlobalRefresh = false,
 }) => {
   try {
     // console.log(data);
@@ -157,14 +158,17 @@ export const handleFormSubmit = async ({
     if (tablename === "users" && id && userInfo && userInfo.id === id) {
       try {
         const updatedUser = await apiService.get(dispatch, `users/${id}`);
-        const userWithId = { ...updatedUser, id: updatedUser._id };
+        const userWithId = { ...userInfo, ...updatedUser, id: updatedUser._id };
         // console.log(userWithId);
         dispatch(loggedUserData(userWithId));
       } catch (err) {
         console.error("Failed to refresh current user info:", err);
       }
     }
-    dispatch(setRefreshKey(Date.now())); // use timestamp so it's always new
+
+    if (!skipGlobalRefresh) {
+      dispatch(setRefreshKey(Date.now())); // use timestamp so it's always new
+    }
 
     if (navigate) {
       navigate(`/list/${tablename}`);

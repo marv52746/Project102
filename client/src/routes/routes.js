@@ -106,7 +106,7 @@ const AllRoutes = () => {
   const location = useLocation();
   const userInfo = useSelector((state) => state.user.userInfo);
 
-  const hasValidRole = userInfo && internalRoles.includes(userInfo.role);
+  const hasValidRole = userInfo && internalRoles.includes(userInfo.type);
 
   const isPublicPath = publicRoutes.some(
     (route) => route.path === location.pathname

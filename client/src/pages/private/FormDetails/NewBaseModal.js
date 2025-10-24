@@ -29,9 +29,9 @@ export default function NewBaseModal({
   const handleSubmit = async (e) => {
     e.preventDefault(); // ✅ stop page reload
 
-    console.log(tablename);
-    console.log(inputData);
-    console.log(fileData);
+    // console.log(tablename);
+    // console.log(inputData);
+    // console.log(fileData);
 
     handleFormSubmit({
       dispatch,

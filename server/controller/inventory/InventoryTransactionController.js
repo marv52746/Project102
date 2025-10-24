@@ -53,7 +53,7 @@ class InventoryTransactionController extends BaseController {
           category: "staff",
           type: "stockAlerts",
           data: inventoryItem,
-          recipients: [process.env.CLINIC_EMAIL],
+          recipients: [process.env.CLINIC_EMAIL, process.env.INVENTORYADMIN],
           cc: [],
           status: "immediate",
         });

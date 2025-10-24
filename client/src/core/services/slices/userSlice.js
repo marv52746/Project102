@@ -13,7 +13,7 @@ export const userSlice = createSlice({
     loggedUserData: (state, action) => {
       state.userInfo = action.payload;
       state.authState = true;
-      state.hasInternalRole = internalRoles.includes(action.payload?.role);
+      state.hasInternalRole = internalRoles.includes(action.payload?.type);
     },
     logoutUser: (state) => {
       state.userInfo = null;
