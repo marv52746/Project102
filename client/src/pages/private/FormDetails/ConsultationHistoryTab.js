@@ -21,7 +21,7 @@ export default function ConsultationHistoryTab({ data }) {
   // 🔍 search + pagination state
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 6;
+  const rowsPerPage = 10;
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -96,7 +96,7 @@ export default function ConsultationHistoryTab({ data }) {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none"
           />
         </div>
       </div>
@@ -145,12 +145,12 @@ export default function ConsultationHistoryTab({ data }) {
                 </td>
                 <td className="px-4 py-2">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    className={`px-2 py-0.5 text-xs rounded-full font-medium ${
                       app.status === "completed"
                         ? "bg-green-100 text-green-700"
                         : app.status === "cancelled"
                         ? "bg-red-100 text-red-700"
-                        : "bg-gray-100 text-gray-700"
+                        : "bg-yellow-100 text-yellow-700"
                     }`}
                   >
                     {capitalizeText(app.status)}
@@ -166,7 +166,7 @@ export default function ConsultationHistoryTab({ data }) {
       </div>
 
       {/* 📑 Pagination */}
-      {totalPages > 1 && (
+      {/* {totalPages > 1 && (
         <div className="flex justify-between items-center mt-4 text-sm">
           <span className="text-gray-600">
             Page {currentPage} of {totalPages}
@@ -196,7 +196,47 @@ export default function ConsultationHistoryTab({ data }) {
             </button>
           </div>
         </div>
-      )}
+      )} */}
+
+      {/* 📑 Total Records + Pagination */}
+      <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
+        <span>
+          Showing {paginatedAppointments.length} of{" "}
+          {filteredAppointments.length} records
+        </span>
+
+        {totalPages > 1 && (
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500">
+              Page {currentPage} of {totalPages}
+            </span>
+            <div className="flex gap-1">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+                className={`px-3 py-1 rounded-md border text-sm transition ${
+                  currentPage === 1
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-white hover:bg-gray-50"
+                }`}
+              >
+                Prev
+              </button>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => p + 1)}
+                className={`px-3 py-1 rounded-md border text-sm transition ${
+                  currentPage === totalPages
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-white hover:bg-gray-50"
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Modal */}
       {selectedReport && (

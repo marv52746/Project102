@@ -89,7 +89,7 @@ export default function ALLAppointments({ data }) {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none"
           />
         </div>
       </div>
@@ -138,12 +138,12 @@ export default function ALLAppointments({ data }) {
                 </td>
                 <td className="px-4 py-2">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    className={`px-2 py-0.5 text-xs rounded-full font-medium ${
                       app.status === "completed"
                         ? "bg-green-100 text-green-700"
                         : app.status === "cancelled"
                         ? "bg-red-100 text-red-700"
-                        : "bg-gray-100 text-gray-700"
+                        : "bg-yellow-100 text-yellow-700"
                     }`}
                   >
                     {capitalizeText(app.status)}

@@ -15,8 +15,8 @@ export const all_routes = {
   form: "/form/:tablename/:view/:id?",
   orgChart: "/organizational-structure-diagram",
   calendar: "/calendar",
+  help: "/help",
   settings: "/settings",
-  testPage: "/testPage",
 
   users: "/list/users",
   properties: "/list/properties",

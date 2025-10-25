@@ -67,6 +67,7 @@ const InternalLayout = () => {
       >
         {parms.tablename !== "calendar" &&
           parms.tablename !== "settings" &&
+          parms.tablename !== "help" &&
           parms.tablename !== "portal" &&
           !hideHeader && <Header parms={parms} />}
         <Routes>

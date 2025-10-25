@@ -29,18 +29,18 @@ export default function UltrasoundTab() {
   const [selectedReport, setSelectedReport] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [expandedMonths, setExpandedMonths] = useState({});
   const [expandedDates, setExpandedDates] = useState({});
   const [expandedGroups, setExpandedGroups] = useState({});
   const [loadingGroup, setLoadingGroup] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const rowsPerPage = 6;
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedDay, setSelectedDay] = useState("");
+  const [selectedRadiologist, setSelectedRadiologist] = useState("");
 
-  const printContainerRef = useRef(null);
-
-  // console.log(selectedReport);
-
-  // Helper function: calculate age from date of birth
+  // Helper: calculate age
   const calculateAge = (dob) => {
     if (!dob) return "";
     const birthDate = new Date(dob);
@@ -63,7 +63,6 @@ export default function UltrasoundTab() {
         const records = await apiService.get(dispatch, "ultrasound", {
           doctor: id,
         });
-        // console.log(records);
         const sorted = (records || []).sort(
           (a, b) =>
             new Date(b.appointment?.date || b.date) -
@@ -79,56 +78,74 @@ export default function UltrasoundTab() {
     fetchDetails();
   }, [id, dispatch, refreshKey]);
 
-  const filteredRecords = ultrasound.filter(
-    (rec) =>
+  // Get all dates for day filter
+  const allDates = Array.from(
+    new Set(
+      ultrasound.map((rec) => formatDate(rec.appointment?.date || rec.date))
+    )
+  );
+
+  // Filtering logic
+  const filteredRecords = ultrasound.filter((rec) => {
+    const date = new Date(rec.appointment?.date || rec.date);
+    const monthName = date.toLocaleString("default", {
+      month: "long",
+      year: "numeric",
+    });
+    const dayFormatted = formatDate(date);
+    const matchesSearch =
       rec.radiologist?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       rec.type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       rec.patient?.fullname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      rec.impression?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      rec.impression?.toLowerCase().includes(searchTerm.toLowerCase());
 
-  const groupedRecords = filteredRecords.reduce((acc, rec) => {
-    const dateKey = formatDate(rec.appointment?.date || rec.date);
-    if (!acc[dateKey]) acc[dateKey] = {};
+    const matchesMonth = !selectedMonth || monthName === selectedMonth;
+    const matchesDay = !selectedDay || dayFormatted === selectedDay;
+    const matchesRadiologist =
+      !selectedRadiologist || rec.radiologist === selectedRadiologist;
+
+    return matchesSearch && matchesMonth && matchesDay && matchesRadiologist;
+  });
+
+  // Group by month → date → radiologist
+  const groupedByMonth = filteredRecords.reduce((acc, rec) => {
+    const date = new Date(rec.appointment?.date || rec.date);
+    const monthKey = date.toLocaleString("default", {
+      month: "long",
+      year: "numeric",
+    });
+    const dateKey = formatDate(date);
     const radiologist = rec.radiologist || "Unknown Radiologist";
-    if (!acc[dateKey][radiologist]) acc[dateKey][radiologist] = [];
-    acc[dateKey][radiologist].push(rec);
+
+    if (!acc[monthKey]) acc[monthKey] = {};
+    if (!acc[monthKey][dateKey]) acc[monthKey][dateKey] = {};
+    if (!acc[monthKey][dateKey][radiologist])
+      acc[monthKey][dateKey][radiologist] = [];
+
+    acc[monthKey][dateKey][radiologist].push(rec);
     return acc;
   }, {});
 
-  const dates = Object.keys(groupedRecords).sort(
-    (a, b) => new Date(b) - new Date(a)
-  );
-  const totalPages = Math.ceil(dates.length / rowsPerPage);
-  const paginatedDates = dates.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
+  const toggleMonth = (month) => {
+    setExpandedMonths((prev) => ({ ...prev, [month]: !prev[month] }));
+  };
 
   const toggleDate = (date) => {
-    setExpandedDates((prev) => ({
-      ...prev,
-      [date]: !prev[date],
-    }));
+    setExpandedDates((prev) => ({ ...prev, [date]: !prev[date] }));
   };
 
   const toggleGroup = (date, radiologist) => {
     const key = `${date}_${radiologist}`;
-    setExpandedGroups((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
+    setExpandedGroups((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleSave = async (type, data) => {
     await handleUltrasoundSubmit({ dispatch, data });
   };
 
-  // ✅ Use your existing print components for bundle ZIP generation
   const handleDownloadBundle = async (records, radiologist, date) => {
     const groupKey = `${date}_${radiologist}`;
-    setLoadingGroup(groupKey); // start loading
-
+    setLoadingGroup(groupKey);
     try {
       const zip = new JSZip();
 
@@ -140,7 +157,7 @@ export default function UltrasoundTab() {
         container.style.zIndex = "-999";
         container.style.opacity = "1";
         container.style.pointerEvents = "none";
-        container.style.position = "fixed"; // doesn't affect page layout
+        container.style.position = "fixed";
         container.style.top = "0";
         container.style.left = "0";
         document.body.appendChild(container);
@@ -188,14 +205,10 @@ export default function UltrasoundTab() {
         const root = createRoot(container);
         root.render(renderPrint());
 
-        // ✅ Wait until React commit + DOM paint
         await new Promise((resolve) => {
-          requestAnimationFrame(() => {
-            requestAnimationFrame(resolve);
-          });
+          requestAnimationFrame(() => requestAnimationFrame(resolve));
         });
 
-        // ✅ Wait for all images (more robust)
         const images = Array.from(container.querySelectorAll("img"));
         if (images.length) {
           await Promise.all(
@@ -216,13 +229,10 @@ export default function UltrasoundTab() {
           );
         }
 
-        // ✅ Small buffer for fonts/layout (optional but helps prevent blank render)
         await new Promise((r) => setTimeout(r, 150));
 
         try {
           const doc = new jsPDF("p", "px", "a4");
-
-          // ✅ Wrap doc.html in a safe timeout to avoid silent hangs
           await Promise.race([
             new Promise((resolve, reject) => {
               doc.html(container, {
@@ -231,11 +241,8 @@ export default function UltrasoundTab() {
                     const pdfBlob = doc.output("blob");
                     const fileName = `(${index + 1}) ${
                       rec.patient?.fullname || "patient"
-                    } - ${rec.type || "Ultrasound"}.pdf`;
+                    } - ${rec.type || "Ultrasound"}`;
                     zip.file(`${fileName}.pdf`, pdfBlob);
-                    // console.log(
-                    //   `✅ [${index + 1}/${records.length}] Added ${fileName}`
-                    // );
                     resolve();
                   } catch (err) {
                     reject(err);
@@ -247,7 +254,6 @@ export default function UltrasoundTab() {
                 html2canvas: { scale: 0.5, useCORS: true },
               });
             }),
-            // Timeout fallback — if jsPDF hangs more than 10s
             new Promise((_, reject) =>
               setTimeout(
                 () => reject(new Error("Timeout on jsPDF.html()")),
@@ -256,44 +262,41 @@ export default function UltrasoundTab() {
             ),
           ]);
         } catch (err) {
-          console.error("❌ Error generating PDF for:", rec._id, err);
+          console.error("Error generating PDF for:", rec._id, err);
         }
 
         root.unmount();
         document.body.removeChild(container);
-
-        // Small gap between renders to reduce memory stress
         await new Promise((r) => setTimeout(r, 300));
       }
 
       const content = await zip.generateAsync({ type: "blob" });
       await new Promise((resolve) => {
         saveAs(content, `${date}_${radiologist}.zip`);
-        // Small delay to ensure file dialog appears before stopping loading
         setTimeout(resolve, 1000);
       });
     } catch (err) {
       console.error("Error creating ZIP bundle:", err);
     } finally {
-      setLoadingGroup(null); // ✅ Now only after everything truly finishes
+      setLoadingGroup(null);
     }
   };
 
   if (loading) return <Reloader text="Loading data..." />;
 
-  if (!ultrasound.length) {
+  if (!ultrasound.length)
     return (
       <div className="text-center text-gray-500 p-6">
         No ultrasound records found.
       </div>
     );
-  }
 
   return (
     <div className="bg-white rounded-lg shadow border p-4">
-      {/* Search */}
-      <div className="mb-4 flex items-center">
-        <div className="relative w-1/3">
+      {/* Filters */}
+      <div className="mb-4 flex items-center gap-3 flex-wrap">
+        {/* Search */}
+        <div className="relative w-1/4 min-w-[200px]">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           <input
             type="text"
@@ -306,183 +309,290 @@ export default function UltrasoundTab() {
             className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
+
+        {/* Month filter */}
+        <select
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+          className="border border-gray-300 rounded-lg px-2 py-2 text-sm"
+        >
+          <option value="">All Months</option>
+          {Array.from(
+            new Set(
+              ultrasound.map((rec) =>
+                new Date(rec.date || rec.appointment?.date).toLocaleString(
+                  "default",
+                  { month: "long", year: "numeric" }
+                )
+              )
+            )
+          )
+            .sort()
+            .map((month) => (
+              <option key={month} value={month}>
+                {month}
+              </option>
+            ))}
+        </select>
+
+        {/* Day filter */}
+        <select
+          value={selectedDay}
+          onChange={(e) => setSelectedDay(e.target.value)}
+          className="border border-gray-300 rounded-lg px-2 py-2 text-sm"
+        >
+          <option value="">All Days</option>
+          {allDates
+            .sort((a, b) => new Date(b) - new Date(a))
+            .map((day) => (
+              <option key={day} value={day}>
+                {day}
+              </option>
+            ))}
+        </select>
+
+        {/* Radiologist filter */}
+        <select
+          value={selectedRadiologist}
+          onChange={(e) => setSelectedRadiologist(e.target.value)}
+          className="border border-gray-300 rounded-lg px-2 py-2 text-sm"
+        >
+          <option value="">All Radiologists</option>
+          {Array.from(
+            new Set(
+              ultrasound.map((r) => r.radiologist || "Unknown Radiologist")
+            )
+          )
+            .sort()
+            .map((rad) => (
+              <option key={rad} value={rad}>
+                {rad}
+              </option>
+            ))}
+        </select>
       </div>
 
-      {/* Grouped Records */}
-      {paginatedDates.map((date) => {
-        const isDateExpanded = expandedDates[date] || false;
-        const radiologists = groupedRecords[date];
-        return (
-          <div key={date} className="mb-4 border rounded-lg">
-            <div
-              className="flex items-center justify-between cursor-pointer p-2 bg-blue-100 hover:bg-blue-200"
-              onClick={() => toggleDate(date)}
-            >
-              <h4 className="font-bold text-sm">{date}</h4>
-              {isDateExpanded ? (
-                <ChevronDown className="h-4 w-4" />
-              ) : (
-                <ChevronRight className="h-4 w-4" />
-              )}
-            </div>
+      {/* Render hierarchy */}
+      {Object.keys(groupedByMonth)
+        .sort(
+          (a, b) =>
+            new Date(
+              b.split(" ")[1],
+              new Date(Date.parse(b.split(" ")[0] + " 1, 2020")).getMonth()
+            ) -
+            new Date(
+              a.split(" ")[1],
+              new Date(Date.parse(a.split(" ")[0] + " 1, 2020")).getMonth()
+            )
+        )
+        .map((month) => {
+          const isMonthExpanded = expandedMonths[month] || false;
+          const datesInMonth = groupedByMonth[month];
+          return (
+            <div key={month} className="mb-4 border rounded-lg">
+              <div
+                className="flex items-center justify-between cursor-pointer p-2 bg-blue-100 hover:bg-blue-200"
+                onClick={() => toggleMonth(month)}
+              >
+                <h3 className="font-bold text-sm">{month}</h3>
 
-            {isDateExpanded &&
-              Object.keys(radiologists).map((radiologist) => {
-                const key = `${date}_${radiologist}`;
-                const isExpanded = expandedGroups[key] || false;
-                const records = radiologists[radiologist];
-                const totalFee = records.reduce((sum, rec) => {
-                  const fee = parseFloat(rec.radio_fee);
-                  return sum + (isNaN(fee) ? 0 : fee);
-                }, 0);
+                <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <span>
+                    {Object.values(datesInMonth).reduce(
+                      (monthTotal, dateGroups) =>
+                        monthTotal +
+                        Object.values(dateGroups).reduce(
+                          (sum, recs) => sum + recs.length,
+                          0
+                        ),
+                      0
+                    )}{" "}
+                    records
+                  </span>
+                  {isMonthExpanded ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </div>
+              </div>
 
-                return (
-                  <div
-                    key={radiologist}
-                    className="mb-2 border rounded-lg mx-2"
-                  >
-                    <div
-                      className="flex items-center justify-between cursor-pointer p-2 bg-gray-50 hover:bg-gray-100"
-                      onClick={() => toggleGroup(date, radiologist)}
-                    >
-                      <h5 className="font-semibold text-xs flex items-center gap-2">
-                        {radiologist}
-                        <span className="text-xs text-gray-500">
-                          (Total Fee: ₱{totalFee.toFixed(2)})
-                        </span>
-                      </h5>
-                      <div className="flex items-center gap-3 text-xs text-gray-500">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (loadingGroup !== `${date}_${radiologist}`) {
-                              handleDownloadBundle(records, radiologist, date);
-                            }
-                          }}
-                          disabled={loadingGroup === `${date}_${radiologist}`}
-                          className="flex items-center gap-1 px-2 py-1 border rounded hover:bg-blue-50 text-blue-600"
+              {isMonthExpanded &&
+                Object.keys(datesInMonth)
+                  .sort((a, b) => new Date(b) - new Date(a))
+                  .map((date) => {
+                    const isDateExpanded = expandedDates[date] || false;
+                    const radiologists = datesInMonth[date];
+                    return (
+                      <div key={date} className="ml-4 mt-2 border rounded-lg">
+                        <div
+                          className="flex items-center justify-between cursor-pointer p-2 bg-blue-50 hover:bg-blue-100"
+                          onClick={() => toggleDate(date)}
                         >
-                          <Download className="h-3 w-3" />
-                          {loadingGroup === `${date}_${radiologist}`
-                            ? "Loading..."
-                            : "ZIP"}
-                        </button>
-                        <span>
-                          {records.length} record{records.length > 1 ? "s" : ""}
-                        </span>
-                        {isExpanded ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        )}
-                      </div>
-                    </div>
+                          <h4 className="font-bold text-xs flex items-center gap-2">
+                            {date}
+                          </h4>
+                          <div className="flex items-center gap-3 text-[11px] text-gray-500">
+                            <span className="text-[11px] text-gray-500">
+                              {Object.values(radiologists).reduce(
+                                (sum, recs) => sum + recs.length,
+                                0
+                              )}{" "}
+                              records
+                            </span>
 
-                    {isExpanded && (
-                      <table className="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-2 py-1 text-left font-medium text-gray-600">
-                              Date
-                            </th>
-                            <th className="px-2 py-1 text-left font-medium text-gray-600">
-                              Radiologist
-                            </th>
-                            <th className="px-2 py-1 text-left font-medium text-gray-600">
-                              Type
-                            </th>
-                            <th className="px-2 py-1 text-left font-medium text-gray-600">
-                              Patient
-                            </th>
-                            <th className="px-2 py-1 text-left font-medium text-gray-600">
-                              Fee
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200 text-xs">
-                          {records
-                            .sort(
-                              (a, b) =>
-                                new Date(b.created_on) - new Date(a.created_on)
-                            ) // newest first
-                            .map((rec) => (
-                              <tr
-                                key={rec._id}
-                                className="hover:bg-gray-50 cursor-pointer"
-                                onClick={() => setSelectedReport(rec)}
+                            {isDateExpanded ? (
+                              <ChevronDown />
+                            ) : (
+                              <ChevronRight />
+                            )}
+                          </div>
+                        </div>
+
+                        {isDateExpanded &&
+                          Object.keys(radiologists).map((radiologist) => {
+                            const key = `${date}_${radiologist}`;
+                            const isExpanded = expandedGroups[key] || false;
+                            const records = radiologists[radiologist];
+                            const totalFee = records.reduce((sum, rec) => {
+                              const fee = parseFloat(rec.radio_fee);
+                              return sum + (isNaN(fee) ? 0 : fee);
+                            }, 0);
+
+                            return (
+                              <div
+                                key={radiologist}
+                                className="mb-2 border rounded-lg mx-2"
                               >
-                                <td className="px-2 py-1">
-                                  {formatDate(
-                                    rec.appointment?.date || rec.date
-                                  )}
-                                </td>
-                                <td className="px-2 py-1">{rec.radiologist}</td>
-                                <td className="px-2 py-1">{rec.type}</td>
-                                <td className="px-2 py-1">
-                                  {rec.patient?.fullname || "N/A"}
-                                </td>
-                                <td className="px-2 py-1">₱ {rec.radio_fee}</td>
-                              </tr>
-                            ))}
-                        </tbody>
-                      </table>
-                    )}
-                  </div>
-                );
-              })}
-          </div>
-        );
-      })}
+                                <div
+                                  className="flex items-center justify-between cursor-pointer p-2 bg-gray-50 hover:bg-gray-100"
+                                  onClick={() => toggleGroup(date, radiologist)}
+                                >
+                                  <h5 className="font-semibold text-xs flex items-center gap-2">
+                                    {radiologist}
+                                    <span className="text-xs text-gray-500">
+                                      (₱{totalFee.toFixed(2)})
+                                    </span>
+                                  </h5>
+                                  <div className="flex items-center gap-3 text-xs text-gray-500">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (
+                                          loadingGroup !==
+                                          `${date}_${radiologist}`
+                                        ) {
+                                          handleDownloadBundle(
+                                            records,
+                                            radiologist,
+                                            date
+                                          );
+                                        }
+                                      }}
+                                      disabled={
+                                        loadingGroup ===
+                                        `${date}_${radiologist}`
+                                      }
+                                      className="flex items-center gap-1 px-2 py-1 border rounded hover:bg-blue-50 text-blue-600"
+                                    >
+                                      <Download className="h-3 w-3" />
+                                      {loadingGroup === `${date}_${radiologist}`
+                                        ? "Loading..."
+                                        : "ZIP"}
+                                    </button>
+                                    <span>
+                                      {records.length} record
+                                      {records.length > 1 ? "s" : ""}
+                                    </span>
+                                    {isExpanded ? (
+                                      <ChevronDown className="h-4 w-4" />
+                                    ) : (
+                                      <ChevronRight className="h-4 w-4" />
+                                    )}
+                                  </div>
+                                </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-between items-center mt-4 text-sm">
-          <span className="text-gray-600">
-            Page {currentPage} of {totalPages}
-          </span>
-          <div className="flex gap-2">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
-              className={`px-3 py-1 rounded-lg border ${
-                currentPage === 1
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-white hover:bg-gray-50"
-              }`}
-            >
-              Prev
-            </button>
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => p + 1)}
-              className={`px-3 py-1 rounded-lg border ${
-                currentPage === totalPages
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-white hover:bg-gray-50"
-              }`}
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
+                                {isExpanded && (
+                                  <table className="min-w-full divide-y divide-gray-200 text-sm">
+                                    <thead className="bg-gray-50">
+                                      <tr>
+                                        <th className="px-2 py-1 text-left font-medium text-gray-600">
+                                          Date
+                                        </th>
+                                        <th className="px-2 py-1 text-left font-medium text-gray-600">
+                                          Radiologist
+                                        </th>
+                                        <th className="px-2 py-1 text-left font-medium text-gray-600">
+                                          Type
+                                        </th>
+                                        <th className="px-2 py-1 text-left font-medium text-gray-600">
+                                          Patient
+                                        </th>
+                                        <th className="px-2 py-1 text-left font-medium text-gray-600">
+                                          Fee
+                                        </th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200 text-xs">
+                                      {records
+                                        .sort(
+                                          (a, b) =>
+                                            new Date(b.created_on) -
+                                            new Date(a.created_on)
+                                        )
+                                        .map((rec) => (
+                                          <tr
+                                            key={rec._id}
+                                            onClick={() =>
+                                              setSelectedReport(rec)
+                                            }
+                                            className="hover:bg-gray-50 cursor-pointer"
+                                          >
+                                            <td className="px-2 py-1">
+                                              {formatDate(rec.date)}
+                                            </td>
+                                            <td className="px-2 py-1">
+                                              {rec.radiologist}
+                                            </td>
+                                            <td className="px-2 py-1">
+                                              {rec.type}
+                                            </td>
+                                            <td className="px-2 py-1">
+                                              {rec.patient?.fullname}
+                                            </td>
+                                            <td className="px-2 py-1">
+                                              ₱
+                                              {parseFloat(
+                                                rec.radio_fee
+                                              ).toFixed(2)}
+                                            </td>
+                                          </tr>
+                                        ))}
+                                    </tbody>
+                                  </table>
+                                )}
+                              </div>
+                            );
+                          })}
+                      </div>
+                    );
+                  })}
+            </div>
+          );
+        })}
 
-      {/* Modal */}
       {selectedReport && (
         <UltrasoundModalNew
           title={"Ultrasound Data"}
-          isOpen={selectedReport}
-          hasPermission={hasPermission}
+          isOpen={!!selectedReport}
           onClose={() => setSelectedReport(null)}
-          onSave={(data) => handleSave("ultrasound", data)}
           initialData={selectedReport}
+          onSave={(data) => handleSave("ultrasound", data)}
+          hasPermission={hasPermission}
           patient={selectedReport.patient}
           doctor={selectedReport.appointment.doctor}
         />
       )}
-
-      {/* Hidden render container */}
-      <div ref={printContainerRef} style={{ display: "none" }} />
     </div>
   );
 }

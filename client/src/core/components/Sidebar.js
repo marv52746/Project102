@@ -166,18 +166,26 @@ export default function Sidebar({ children }) {
           {showDropdown && (
             <div
               ref={dropdownRef}
-              className="dropdown-menu absolute right-1 bottom-[60px] w-64 bg-background shadow-md mt-2 rounded-md border"
+              className="dropdown-menu absolute right-1 bottom-[60px] w-64 bg-background shadow-md mt-2 rounded-md border z-10"
             >
               <button
-                onClick={() => {
-                  handleDropdownToggle();
+                onClick={(e) => {
+                  e.stopPropagation();
                   navigate("/settings");
+                  handleDropdownToggle();
                 }}
                 className="w-full dropdown-item flex items-center px-4 py-2 hover:bg-side-active/30"
               >
                 <Settings size={20} className="mr-2" /> Settings
               </button>
-              <button className="w-full dropdown-item flex items-center px-4 py-2 hover:bg-side-active/30">
+              <button
+                className="w-full dropdown-item flex items-center px-4 py-2 hover:bg-side-active/30"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate("/help");
+                  handleDropdownToggle();
+                }}
+              >
                 <HelpCircle size={20} className="mr-2" /> Help
               </button>
               <button

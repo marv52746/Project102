@@ -18,7 +18,6 @@ export default function PrintablePatientRecord({ data, appointments }) {
             body {
               font-family: 'Segoe UI', Arial, sans-serif;
               color: #222;
-              padding: 30px;
               line-height: 1.5;
               background: #fff;
             }
@@ -65,7 +64,7 @@ export default function PrintablePatientRecord({ data, appointments }) {
             .details-grid {
               display: grid;
               grid-template-columns: 1fr 1fr;
-              gap: 10px 30px;
+              gap: 0px 30px;
               font-size: 14px;
             }
             .details p {
@@ -146,9 +145,7 @@ export default function PrintablePatientRecord({ data, appointments }) {
 
             @media print {
               @page {
-                  padding-top: 20px;
-                margin-top: 50px; /* 👈 Add top margin for every new printed page */
-                margin-bottom: 30px;
+                padding-top: 10px;
               }
 
               body {
@@ -189,8 +186,22 @@ export default function PrintablePatientRecord({ data, appointments }) {
       </html>
     `);
     newWindow.document.close();
-    newWindow.focus();
-    newWindow.print();
+
+    // ✅ Auto-close logic
+    newWindow.onload = () => {
+      newWindow.focus();
+      newWindow.print();
+
+      // Close the window automatically after printing OR canceling
+      newWindow.onafterprint = () => {
+        newWindow.close();
+      };
+
+      // Fallback safety close in case onafterprint doesn't fire (some browsers)
+      setTimeout(() => {
+        if (!newWindow.closed) newWindow.close();
+      }, 500);
+    };
   };
 
   return (
@@ -218,7 +229,7 @@ export default function PrintablePatientRecord({ data, appointments }) {
             style={{
               textAlign: "left",
               border: "none",
-              marginBottom: "10px",
+              marginBottom: "0",
               marginTop: "0",
             }}
           >

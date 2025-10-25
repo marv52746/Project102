@@ -14,6 +14,7 @@ import InventoryDashboard from "../pages/private/Dashboard/InventoryDashboard";
 import MainDashboard from "../pages/private/Dashboard/MainDashboard";
 import ForcePasswordChange from "../pages/main/forcePasswordChange";
 import ForgotPassword from "../pages/main/forgotPassword";
+import HelpPage from "../core/components/HelpPage";
 
 const routes = all_routes;
 
@@ -79,6 +80,11 @@ const routesArray = [
     path: routes.portal,
     name: "portal",
     element: <Portal />,
+  },
+  {
+    path: routes.help,
+    name: "help",
+    element: <HelpPage />,
   },
   {
     path: routes.testPage,

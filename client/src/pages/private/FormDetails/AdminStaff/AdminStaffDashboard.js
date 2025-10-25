@@ -20,6 +20,8 @@ import AppointmentModal from "../AppointmentModal";
 import NewPatientModal from "../NewPatientModal";
 import NewBaseModal from "../NewBaseModal";
 import apiService from "../../../../core/services/apiService";
+import InventoryMovementModal from "../Modals/InventoryTransactionModal";
+import InventoryTransactionModal from "../Modals/InventoryTransactionModal";
 
 export default function AdminStaffDashboard({ appointments }) {
   const dispatch = useDispatch();
@@ -364,7 +366,7 @@ export default function AdminStaffDashboard({ appointments }) {
       )}
 
       {/* Medicine Modals */}
-      {showMedicineModal && (
+      {/* {showMedicineModal && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
           <div className="bg-white w-full max-w-lg p-6 rounded-md shadow-lg relative z-50">
             <NewBaseModal
@@ -376,6 +378,12 @@ export default function AdminStaffDashboard({ appointments }) {
             />
           </div>
         </div>
+      )} */}
+      {showMedicineModal && (
+        <InventoryTransactionModal
+          onClose={() => setMedicineShowModal(false)}
+          fields={medicineFields}
+        />
       )}
 
       {showStatListModal && (

@@ -137,7 +137,8 @@ export default function UserDashboardPage({ data }) {
       case "schedule":
         return <ScheduleTab data={data} />;
       case "patients":
-        return <PatientsTab appointments={appointments} doctorID={userId} />;
+        return <PatientsList doctorID={userId} />;
+      // return <PatientsTab appointments={appointments} doctorID={userId} />;
       case "calendar":
         return <CalendarMain id={userId} tablename={"doctors"} />;
       case "reviews":

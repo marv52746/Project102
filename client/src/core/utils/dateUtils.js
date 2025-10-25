@@ -1,9 +1,17 @@
 export const formatDate = (dateStr) => {
-  if (!dateStr) return "N/A";
+  if (!dateStr) return "—";
 
-  const [year, month, day] = dateStr.split("T")[0].split(/[-/]/);
+  // Handle Date object or string
+  const date =
+    typeof dateStr === "string" || typeof dateStr === "number"
+      ? new Date(dateStr)
+      : dateStr instanceof Date
+      ? dateStr
+      : null;
 
-  return new Date(year, month - 1, day).toLocaleDateString("en-PH", {
+  if (!date || isNaN(date)) return "—";
+
+  return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
