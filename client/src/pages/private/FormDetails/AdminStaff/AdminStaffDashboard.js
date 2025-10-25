@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import {
   ClipboardList,
   FileText,
@@ -11,16 +12,13 @@ import {
   Wallet,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
 import { formConfigMap } from "../../../../core/constants/FieldConfigMap";
 import UpcomingAppointments from "../UpcomingAppointments";
 import OngoingCheckup from "../OngoingCheckup";
 import CalendarModalDetails from "../../../../core/components/calendar/CalendarModalDetails";
 import AppointmentModal from "../AppointmentModal";
 import NewPatientModal from "../NewPatientModal";
-import NewBaseModal from "../NewBaseModal";
 import apiService from "../../../../core/services/apiService";
-import InventoryMovementModal from "../Modals/InventoryTransactionModal";
 import InventoryTransactionModal from "../Modals/InventoryTransactionModal";
 
 export default function AdminStaffDashboard({ appointments }) {
@@ -366,19 +364,6 @@ export default function AdminStaffDashboard({ appointments }) {
       )}
 
       {/* Medicine Modals */}
-      {/* {showMedicineModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-          <div className="bg-white w-full max-w-lg p-6 rounded-md shadow-lg relative z-50">
-            <NewBaseModal
-              title={"Log Inventory (Sales / Stock In / Stock Out)"}
-              tablename={"inventoryLogs"}
-              mode={"create"}
-              onClose={() => setMedicineShowModal(false)}
-              fields={medicineFields}
-            />
-          </div>
-        </div>
-      )} */}
       {showMedicineModal && (
         <InventoryTransactionModal
           onClose={() => setMedicineShowModal(false)}

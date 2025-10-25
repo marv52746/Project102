@@ -23,10 +23,29 @@ class AppointmentController extends BaseController {
     // super(AppointmentDb, ["patient", "doctor"]);
   }
 
+  // ✅ Reusable broadcast method
+  broadcastChange(event, data) {
+    console.log("broadcastChange triggered");
+    try {
+      if (global.io) {
+        // More flexible than global.emitAppointmentUpdate
+        global.io.emit(event, {
+          table: this.tableName,
+          model: this.modelName,
+          data,
+        });
+        console.log(`📢 Broadcasted [${event}] for ${this.tableName}`);
+      } else {
+        console.warn("⚠️ No socket.io instance found for broadcast");
+      }
+    } catch (err) {
+      console.error("❌ Broadcast Error:", err.message);
+    }
+  }
+
   // Add appointment-specific methods here
   create = async (req, res) => {
     try {
-      console.log("create an appointment");
       // const newItem = new this.model(req.body);
       const newItem = new this.model({
         ...req.body,
@@ -35,6 +54,9 @@ class AppointmentController extends BaseController {
       const savedItem = await newItem.save();
 
       await this.logActivity("create", savedItem, req.currentUser?._id);
+
+      // 🔥 Emit "created" event
+      this.broadcastChange(`${this.modelName}_created`, savedItem);
 
       // ✅ Notification conditions
 
@@ -63,13 +85,18 @@ class AppointmentController extends BaseController {
       });
 
       // ✅ Only create reminder if the date is not today
-      const appointmentDate = new Date(savedItem.date);
-      const today = new Date();
+      // const appointmentDate = new Date(savedItem.date);
+      // const today = new Date();
 
-      const isSameDay =
-        appointmentDate.getFullYear() === today.getFullYear() &&
-        appointmentDate.getMonth() === today.getMonth() &&
-        appointmentDate.getDate() === today.getDate();
+      // const isSameDay =
+      //   appointmentDate.getFullYear() === today.getFullYear() &&
+      //   appointmentDate.getMonth() === today.getMonth() &&
+      //   appointmentDate.getDate() === today.getDate();
+
+      const moment = require("moment-timezone");
+      const appointmentDatePH = moment(savedItem.date).tz("Asia/Manila");
+      const todayPH = moment().tz("Asia/Manila");
+      const isSameDay = appointmentDatePH.isSame(todayPH, "day");
 
       if (!isSameDay) {
         await createNotificationService({

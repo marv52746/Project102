@@ -13,6 +13,7 @@ import Select from "react-select";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch } from "react-redux";
 import apiService from "../../../../core/services/apiService";
+import useSocket from "../../../../core/hooks/useSocket";
 
 export default function InventoryTransactionModal({ onClose }) {
   const dispatch = useDispatch();
@@ -30,6 +31,23 @@ export default function InventoryTransactionModal({ onClose }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  // Socket for inventory item updates
+  useSocket({
+    inventorytransaction_created: (data) => {
+      const updatedItem = data.data;
+      setInventoryItems((prev) =>
+        prev.map((item) =>
+          item._id === updatedItem._id ? { ...item, ...updatedItem } : item
+        )
+      );
+
+      // Also update selectedItem if it's the same one
+      setSelectedItem((prev) =>
+        prev?._id === updatedItem._id ? { ...prev, ...updatedItem } : prev
+      );
+    },
+  });
 
   // Fetch inventory items
   useEffect(() => {

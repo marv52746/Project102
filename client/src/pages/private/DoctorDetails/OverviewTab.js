@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   ClipboardList,
-  Clock,
-  Stethoscope,
   FileText,
   CalendarClock,
   CalendarCheck2,
@@ -13,20 +11,18 @@ import {
   Wallet,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
-import Card from "../FormDetails/Card";
-import { capitalizeText } from "../../../core/utils/stringUtils";
+
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
 import UpcomingAppointments from "../FormDetails/UpcomingAppointments";
 import { formConfigMap } from "../../../core/constants/FieldConfigMap";
 import AppointmentModal from "../FormDetails/AppointmentModal";
 import NewPatientModal from "../FormDetails/NewPatientModal";
 import NewBaseModal from "../FormDetails/NewBaseModal";
-import ActivitiesTimeline from "../FormDetails/ActivitiesTimeline";
-import { useParams } from "react-router-dom";
+import InventoryTransactionModal from "../FormDetails/Modals/InventoryTransactionModal";
+
 import OngoingCheckup from "../FormDetails/OngoingCheckup";
 
 export default function OverviewTab({ appointments }) {
-  const { id } = useParams();
   const dispatch = useDispatch();
   const [stats, setStats] = useState({
     today: 0,
@@ -360,17 +356,10 @@ export default function OverviewTab({ appointments }) {
 
       {/* Medicine Modals */}
       {showMedicineModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-          <div className="bg-white w-full max-w-lg p-6 rounded-md shadow-lg relative z-50">
-            <NewBaseModal
-              title={"Log Inventory (Sales / Stock In / Stock Out)"}
-              tablename={"inventoryLogs"}
-              mode={"create"}
-              onClose={() => setMedicineShowModal(false)}
-              fields={medicineFields}
-            />
-          </div>
-        </div>
+        <InventoryTransactionModal
+          onClose={() => setMedicineShowModal(false)}
+          fields={medicineFields}
+        />
       )}
 
       {showStatListModal && (

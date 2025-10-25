@@ -14,6 +14,27 @@ class InventoryTransactionController extends BaseController {
     this.populateFields = ["item", "created_by", "updated_by"];
   }
 
+  // ✅ Reusable broadcast method
+  broadcastChange(event, data, transaction) {
+    console.log("broadcastChange triggered");
+    try {
+      if (global.io) {
+        // More flexible than global.emitAppointmentUpdate
+        global.io.emit(event, {
+          table: this.tableName,
+          model: this.modelName,
+          data,
+          transaction,
+        });
+        console.log(`📢 Broadcasted [${event}] for ${this.tableName}`);
+      } else {
+        console.warn("⚠️ No socket.io instance found for broadcast");
+      }
+    } catch (err) {
+      console.error("❌ Broadcast Error:", err.message);
+    }
+  }
+
   // Stock in/out/adjustment
   create = async (req, res) => {
     try {
@@ -46,6 +67,13 @@ class InventoryTransactionController extends BaseController {
 
       // ✅ Log Activity
       await this.logActivity("create", transaction, req.currentUser?._id);
+
+      // 🔥 Emit "created" event
+      this.broadcastChange(
+        `${this.modelName}_created`,
+        inventoryItem,
+        transaction
+      );
 
       // Staff stock alert
       if (inventoryItem.quantity <= inventoryItem.reorderLevel) {

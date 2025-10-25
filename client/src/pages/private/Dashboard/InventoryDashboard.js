@@ -16,6 +16,7 @@ import DataModal from "./DataModal";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Reloader from "../../../core/components/utils/reloader";
+import useSocket from "../../../core/hooks/useSocket";
 
 export default function InventoryDashboard() {
   const [stats, setStats] = useState({
@@ -46,6 +47,112 @@ export default function InventoryDashboard() {
   const [loading, setLoading] = useState(true);
 
   const dispatch = useDispatch();
+
+  useSocket({
+    inventoryitem_created: (data) => {
+      const newItem = data.data;
+      setAllItems((prev) => [newItem, ...prev]);
+
+      // Update low stock or soon-to-expire if applicable
+      const now = new Date();
+      const soonExpireLimit = new Date();
+      soonExpireLimit.setDate(now.getDate() + 30);
+
+      if (newItem.quantity <= newItem.reorderLevel) {
+        setLowStockItems((prev) => [newItem, ...prev]);
+      }
+
+      if (
+        newItem.expiryDate &&
+        new Date(newItem.expiryDate) <= soonExpireLimit
+      ) {
+        setSoonToExpireItems((prev) => [newItem, ...prev]);
+      }
+
+      // Update category chart & map
+      setCategoryItemsMap((prev) => {
+        const cat = newItem.category || "Uncategorized";
+        const updated = { ...prev };
+        if (!updated[cat]) updated[cat] = [];
+        updated[cat] = [newItem, ...updated[cat]];
+        return updated;
+      });
+      setCategoryData((prev) => {
+        const cat = newItem.category || "Uncategorized";
+        const existing = prev.find((c) => c.name === cat);
+        if (existing) {
+          return prev.map((c) =>
+            c.name === cat ? { ...c, count: c.count + 1 } : c
+          );
+        }
+        return [...prev, { name: cat, count: 1 }];
+      });
+
+      // Update KPI stats
+      setStats((prev) => ({
+        ...prev,
+        totalItems: prev.totalItems + 1,
+        lowStock:
+          prev.lowStock + (newItem.quantity <= newItem.reorderLevel ? 1 : 0),
+        soonToExpire:
+          prev.soonToExpire +
+          (newItem.expiryDate && new Date(newItem.expiryDate) <= soonExpireLimit
+            ? 1
+            : 0),
+      }));
+    },
+
+    inventorytransaction_created: (data) => {
+      const newItem = data.data;
+      const newTransaction = {
+        ...data.transaction,
+        item: newItem,
+      };
+
+      // Add to monthly transactions
+      setMonthlyTransactions((prev) => [newTransaction, ...prev]);
+
+      // Add to recent transactions (keep only last 5)
+      setRecentTransactions((prev) => [newTransaction, ...prev].slice(0, 5));
+
+      // Update monthly item aggregation
+      setMonthlyItemTransactions((prev) => {
+        const idx = prev.findIndex((i) => i.name === newTransaction.item.name);
+        const updated = [...prev];
+        if (idx > -1) {
+          const item = { ...updated[idx] };
+          if (newTransaction.type === "Stock in")
+            item.stockIn += newTransaction.quantity;
+          if (newTransaction.type === "Stock out")
+            item.stockOut += newTransaction.quantity;
+          updated[idx] = item;
+        } else {
+          updated.push({
+            name: newTransaction.item.name,
+            category: newTransaction.item.category || "Uncategorized",
+            stockIn:
+              newTransaction.type === "Stock in" ? newTransaction.quantity : 0,
+            stockOut:
+              newTransaction.type === "Stock out" ? newTransaction.quantity : 0,
+          });
+        }
+        return updated;
+      });
+
+      // Update KPI stat for this month's transactions
+      const txnDate = new Date(newTransaction.timestamp);
+      const now = new Date();
+      if (
+        txnDate.getFullYear() === now.getFullYear() &&
+        txnDate.getMonth() === now.getMonth()
+      ) {
+        setStats((prev) => ({
+          ...prev,
+          transactionsThisMonth: prev.transactionsThisMonth + 1,
+        }));
+      }
+    },
+  });
 
   useEffect(() => {
     const fetchDashboardData = async () => {

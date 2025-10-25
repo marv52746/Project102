@@ -56,7 +56,7 @@ export default function ModalFormActions({
       id: report._id,
       data: { status: "ready" },
     });
-    onRefresh();
+    // onRefresh();
     onClose();
   };
 

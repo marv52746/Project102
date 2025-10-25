@@ -42,8 +42,9 @@ import PrintActionButtons from "../documents/PrintCertificate";
 import UltrasoundModalNew from "../modal/UltrasoundModalNew";
 import { adminOnlyRoles } from "../../constants/rolePresets";
 import { handleUltrasoundSubmit } from "../formActions/handleUltrasoundSubmit";
+import useAppointmentSocket from "../../hooks/useAppointmentSocket";
 
-function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
+function CalendarModalDetails({ report: initialReport, onClose }) {
   const [report, setReport] = useState(initialReport);
   const [activeModal, setActiveModal] = useState(null);
   const userInfo = useSelector((state) => state.user.userInfo);
@@ -52,6 +53,18 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
   // console.log(report);
 
   const dispatch = useDispatch();
+
+  useAppointmentSocket((data) => {
+    const updatedData = data.data;
+    setReport((prevReport) => ({
+      ...prevReport, // keep all previous fields
+      ...updatedData, // overwrite updated fields
+      patient: prevReport.patient, // preserve patient
+      doctor: prevReport.doctor, // preserve doctor
+    }));
+  });
+
+  // console.log(report);
 
   useEffect(() => {
     setReport(initialReport);
@@ -514,7 +527,7 @@ function CalendarModalDetails({ report: initialReport, onClose, onRefresh }) {
               report={report}
               onClose={onClose}
               userRole={"doctor"}
-              onRefresh={onRefresh}
+              // onRefresh={onRefresh}
             />
           )}
         </div>

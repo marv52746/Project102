@@ -19,96 +19,105 @@ class BaseController {
       console.error("❌ Activity Log Error:", err.message);
     }
   }
-
-  // getAll = async (req, res) => {
-  //   try {
-  //     const filters = req.query;
-  //     let query = this.model.find(filters);
-
-  //     if (Array.isArray(this.populateFields) && this.populateFields.length) {
-  //       this.populateFields.forEach((field) => {
-  //         query = query.populate(field);
-  //       });
-  //     }
-
-  //     const items = await query;
-  //     res.json(items);
-  //   } catch (error) {
-  //     res.status(500).json({ error: error.message });
-  //   }
-  // };
+  // ✅ Reusable broadcast method
+  broadcastChange(event, data) {
+    try {
+      if (global.io) {
+        // More flexible than global.emitAppointmentUpdate
+        global.io.emit(event, {
+          table: this.tableName,
+          model: this.modelName,
+          data,
+        });
+        console.log(`📢 Broadcasted [${event}] for ${this.tableName}`);
+      } else if (global.emitAppointmentUpdate) {
+        // backward compatibility if you used global.emitAppointmentUpdate
+        global.emitAppointmentUpdate(data);
+      } else {
+        console.warn("⚠️ No socket.io instance found for broadcast");
+      }
+    } catch (err) {
+      console.error("❌ Broadcast Error:", err.message);
+    }
+  }
 
   // In your BaseController or appointmentsController
   getAll = async (req, res) => {
     try {
       const filters = { ...req.query };
       let query = this.model.find();
+      const moment = require("moment-timezone");
 
       // 🕗 Special handling: date=today
       if (filters.date === "today") {
-        // const now = new Date();
+        // PH timezone
+        const timezone = "Asia/Manila";
 
-        // // Compute PH start and end of the day in UTC
-        // const startOfDayPH = new Date(
-        //   Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
-        // );
-        // const startOfDayUTC = new Date(
-        //   startOfDayPH.getTime() - 8 * 60 * 60 * 1000
-        // ); // PH -8h
-        // const endOfDayUTC = new Date(
-        //   startOfDayUTC.getTime() + 24 * 60 * 60 * 1000
-        // );
+        // Start and end of today in PH time
+        const startOfDayPH = moment().tz(timezone).startOf("day"); // 00:00:00 PH
+        const endOfDayPH = moment().tz(timezone).endOf("day"); // 23:59:59 PH
 
-        // query = query.find({
-        //   date: { $gte: startOfDayUTC, $lt: endOfDayUTC },
-        // });
+        // Convert to UTC for MongoDB query
+        const startOfDayUTC = startOfDayPH.utc().toDate();
+        const endOfDayUTC = endOfDayPH.utc().toDate();
 
-        // delete filters.date;
-
-        const now = new Date();
-
-        // Get PH time (UTC+8)
-        const startOfDayPH = new Date(now);
-        startOfDayPH.setHours(0, 0, 0, 0);
-
-        const endOfDayPH = new Date(now);
-        endOfDayPH.setHours(23, 59, 59, 999);
-
-        // Convert PH times to UTC for MongoDB comparison
-        const startOfDayUTC = new Date(
-          startOfDayPH.getTime() - 8 * 60 * 60 * 1000
-        );
-        const endOfDayUTC = new Date(endOfDayPH.getTime() - 8 * 60 * 60 * 1000);
-
+        // MongoDB query
         query = query.find({
-          date: { $gte: startOfDayUTC, $lt: endOfDayUTC },
+          date: { $gte: startOfDayUTC, $lte: endOfDayUTC },
         });
-
         delete filters.date;
       } else if (filters.date) {
-        // 🕗 optional: handle ISO string or range
-        const date = new Date(filters.date);
-        const start = new Date(date.setUTCHours(0, 0, 0, 0));
-        const end = new Date(date.setUTCHours(23, 59, 59, 999));
-        query = query.find({ date: { $gte: start, $lt: end } });
+        // Handle arbitrary date string
+        const timezone = "Asia/Manila";
+        const datePH = moment.tz(filters.date, timezone);
+
+        const startOfDayPH = datePH.startOf("day");
+        const endOfDayPH = datePH.endOf("day");
+
+        query = query.find({
+          date: {
+            $gte: startOfDayPH.utc().toDate(),
+            $lte: endOfDayPH.utc().toDate(),
+          },
+        });
+
         delete filters.date;
       }
 
       const mongoose = require("mongoose");
 
       // Apply remaining filters
+      // Object.keys(filters).forEach((key) => {
+      //   let value = filters[key];
+
+      //   // ✅ Auto-convert string IDs to ObjectId for these fields
+      //   if (["doctor", "patient", "created_by", "updated_by"].includes(key)) {
+      //     try {
+      //       value = mongoose.Types.ObjectId(value);
+      //     } catch (err) {
+      //       console.warn(`Invalid ObjectId for ${key}:`, value);
+      //     }
+      //   }
+      //   query = query.where(key).equals(filters[key]);
+      // });
       Object.keys(filters).forEach((key) => {
         let value = filters[key];
 
-        // ✅ Auto-convert string IDs to ObjectId for these fields
-        if (["doctor", "patient", "created_by", "updated_by"].includes(key)) {
-          try {
-            value = mongoose.Types.ObjectId(value);
-          } catch (err) {
-            console.warn(`Invalid ObjectId for ${key}:`, value);
-          }
+        // ✅ Only treat as ObjectId if value looks valid
+        if (
+          ["doctor", "patient", "created_by", "updated_by"].includes(key) &&
+          typeof value === "string" &&
+          /^[0-9a-fA-F]{24}$/.test(value)
+        ) {
+          value = new mongoose.Types.ObjectId(value); // ✅ FIXED
+        } else if (
+          ["doctor", "patient", "created_by", "updated_by"].includes(key)
+        ) {
+          console.warn(`⚠️ Skipping invalid ObjectId for ${key}: ${value}`);
+          return; // skip invalid filter
         }
-        query = query.where(key).equals(filters[key]);
+
+        query = query.where(key).equals(value);
       });
 
       // Populate as before
@@ -157,8 +166,10 @@ class BaseController {
         updated_by: req.currentUser?._id || null, // ✅ auto-set creator
       });
       const savedItem = await newItem.save();
-
       await this.logActivity("create", savedItem, req.currentUser?._id);
+
+      // 🔥 Emit "created" event
+      this.broadcastChange(`${this.modelName}_created`, savedItem);
 
       res.status(201).json(savedItem);
     } catch (error) {
@@ -180,6 +191,10 @@ class BaseController {
         return res.status(404).json({ message: "Item not found" });
       }
       await this.logActivity("update", updatedItem, req.currentUser?._id);
+
+      // 🔥 Emit "updated" event
+      this.broadcastChange(`${this.modelName}_updated`, updatedItem);
+
       res.json(updatedItem);
     } catch (error) {
       console.error("❌ Update Error:", error);
@@ -194,6 +209,10 @@ class BaseController {
         return res.status(404).json({ message: "Item not found" });
       }
       await this.logActivity("delete", deletedItem, req.currentUser?._id);
+
+      // 🔥 Emit "deleted" event
+      this.broadcastChange(`${this.modelName}_deleted`, deletedItem);
+
       res.json({ message: "Item deleted successfully", deletedItem });
     } catch (error) {
       res.status(500).json({ error: error.message });

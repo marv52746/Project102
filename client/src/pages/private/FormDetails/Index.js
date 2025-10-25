@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useParams } from "react-router-dom";
 import apiService from "../../../core/services/apiService";
@@ -17,17 +18,31 @@ import UltrasoundTab from "./UltrasoundTab";
 import ALLAppointments from "./ALLAppointments";
 import CalendarMain from "../Calendar/CalendarMain";
 import AdminStaffDashboard from "./AdminStaff/AdminStaffDashboard";
+import useSocket from "../../../core/hooks/useSocket";
 
 export default function UserDashboardPage({ data }) {
   const { id } = useParams();
   const dispatch = useDispatch();
   const location = useLocation();
   const { refreshKey } = useSelector((state) => state.utils);
+  const [manualRefresh, setManualRefresh] = useState(0);
 
   const [appointments, setAppointments] = useState(null);
   const [appointmentsToday, setAppointmentsToday] = useState(null);
   const [mainTab, setMainTab] = useState(null); // <== will be set dynamically
   const [loading, setLoading] = useState(true);
+
+  useSocket({
+    // When a new appointment is created
+    appointment_created: (data) => {
+      setManualRefresh((prev) => prev + 1);
+    },
+
+    // When an existing appointment is updated
+    appointment_updated: (data) => {
+      setManualRefresh((prev) => prev + 1);
+    },
+  });
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -70,7 +85,7 @@ export default function UserDashboardPage({ data }) {
     };
 
     fetchDetails();
-  }, [id, dispatch, refreshKey, data, location.pathname]);
+  }, [id, dispatch, refreshKey, data, location.pathname, manualRefresh]);
 
   const getTabItemsForRole = (role) => {
     // console.log(role);

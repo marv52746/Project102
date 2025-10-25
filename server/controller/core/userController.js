@@ -41,6 +41,26 @@ class UserController extends BaseController {
     super(UserDb);
   }
 
+  // ✅ Reusable broadcast method
+  broadcastChange(event, data) {
+    console.log("broadcastChange triggered");
+    try {
+      if (global.io) {
+        // More flexible than global.emitAppointmentUpdate
+        global.io.emit(event, {
+          table: this.tableName,
+          model: this.modelName,
+          data,
+        });
+        console.log(`📢 Broadcasted [${event}] for ${this.tableName}`);
+      } else {
+        console.warn("⚠️ No socket.io instance found for broadcast");
+      }
+    } catch (err) {
+      console.error("❌ Broadcast Error:", err.message);
+    }
+  }
+
   // CREATE USER
   create = async (req, res) => {
     try {
@@ -119,6 +139,9 @@ class UserController extends BaseController {
       });
 
       const savedUser = await user.save();
+
+      // 🔥 Emit "created" event
+      this.broadcastChange(`${this.modelName}_created`, savedUser);
 
       // 3. Upload avatar to GridFS (if present)
       if (req.file && req.file.buffer) {
@@ -257,6 +280,9 @@ class UserController extends BaseController {
         { new: true }
       );
 
+      // 🔥 Emit "updated" event
+      this.broadcastChange(`${this.modelName}_updated`, updatedUser);
+
       res.status(201).json(updatedUser);
     } catch (error) {
       console.error("Update User Error:", error);
@@ -298,6 +324,9 @@ class UserController extends BaseController {
 
       // 4. Delete user
       await UserDb.findByIdAndDelete(userId);
+
+      // 🔥 Emit "deleted" event
+      this.broadcastChange(`${this.modelName}_deleted`, user);
 
       // ✅ Log Activity
       await this.logActivity("delete", user, req.currentUser?._id);

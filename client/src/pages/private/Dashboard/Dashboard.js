@@ -14,6 +14,7 @@ import useComboData from "../../../core/hooks/useComboData";
 import apiService from "../../../core/services/apiService";
 import PregnancyChart from "./PregnancyChart";
 import ConsultationFeeChart from "./ConsultationFeeChart";
+import useSocket from "../../../core/hooks/useSocket";
 
 function Dashboard() {
   const today = new Date();
@@ -30,6 +31,63 @@ function Dashboard() {
   const comboData = useComboData(appointments, selectedYear);
   const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
   const handleYearChange = (e) => setSelectedYear(Number(e.target.value));
+
+  useSocket({
+    appointment_created: (data) => {
+      const newAppointment = data.data;
+      setAppointments((prev) => [newAppointment, ...prev]); // prepend new
+    },
+    appointment_updated: (data) => {
+      const updatedAppointment = data.data;
+      setAppointments((prev) =>
+        prev.map((a) =>
+          a._id === updatedAppointment._id
+            ? {
+                ...a,
+                ...updatedAppointment,
+                doctor: a.doctor,
+                patient: a.patient,
+              }
+            : a
+        )
+      );
+    },
+
+    appointment_deleted: (data) => {
+      const deletedAppointment = data.data;
+      setAppointments((prev) =>
+        prev.filter((a) => a._id !== deletedAppointment._id)
+      );
+    },
+
+    // Pregnancy events
+    pregnancy_created: (data) => {
+      const newPregnancy = data.data;
+      setPregnancies((prev) => [newPregnancy, ...prev]);
+    },
+    pregnancy_updated: (data) => {
+      const updatedPregnancy = data.data;
+      setPregnancies((prev) =>
+        prev.map((p) =>
+          p._id === updatedPregnancy._id ? { ...p, ...updatedPregnancy } : p
+        )
+      );
+    },
+
+    // User events (patients)
+    user_created: (data) => {
+      const newUser = data.data;
+      setPatients((prev) => [newUser, ...prev]);
+    },
+    user_updated: (data) => {
+      const updatedUser = data.data;
+      setPatients((prev) =>
+        prev.map((p) =>
+          p._id === updatedUser._id ? { ...p, ...updatedUser } : p
+        )
+      );
+    },
+  });
 
   useEffect(() => {
     const fetchData = async () => {
