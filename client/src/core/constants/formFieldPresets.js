@@ -6,9 +6,8 @@ export const genderOptions = [
 
 export const roleOptions = [
   { label: "Admin", value: "admin" },
-  // { label: "Manager", value: "manager" },
-  // { label: "Owner", value: "owner" },
   { label: "Staff", value: "staff" },
+  { label: "Staff (No System Access)", value: "staff_noaccess" },
   { label: "Guest", value: "guest" },
   { label: "Doctor", value: "doctor" },
   { label: "Patient", value: "patient" },

@@ -14,6 +14,7 @@ export const userTableColumns = [
   // { name: "gender", label: "Gender" },
   // { name: "address", label: "Address" },
   { name: "role", label: "Role" },
+  { name: "user_type", label: "User Type" },
   { name: "created_on", label: "Created" },
 ];
 

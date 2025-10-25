@@ -148,7 +148,9 @@ const TableList = ({ data, columns }) => {
                       className="p-3 max-w-[200px] truncate text-ellipsis whitespace-nowrap"
                     >
                       {
-                        col.name === "status" || col.name === "role" ? (
+                        col.name === "status" ||
+                        col.name === "role" ||
+                        col.name === "user_type" ? (
                           <span
                             className={`badge px-2 py-1 rounded-md text-xs ${getStatusClass(
                               col.name === "status"
