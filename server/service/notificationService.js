@@ -228,9 +228,8 @@ const notificationTemplates = {
             appointmentScheduled:
               "Your appointment has been successfully scheduled. Here are the details:",
             lookForward: "We look forward to seeing you! 💖",
-            pleaseArrive: `Please arrive 10–15 minutes early to allow time for
-                  check-in.<br />If you need to reschedule, kindly contact us at
-                  least 24 hours in advance.`,
+            pleaseArrive: `Your appointment is scheduled for the <strong>${data.time}</strong> session.<br />
+                 If you need to reschedule, kindly contact us at least 24 hours in advance.`,
             details: `<tr>
                     <td style="font-size: 15px; padding: 5px 0">
                       📅 <strong>Date:</strong> ${new Date(
@@ -240,7 +239,7 @@ const notificationTemplates = {
                   </tr>
                   <tr>
                     <td style="font-size: 15px; padding: 5px 0">
-                      ⏰ <strong>Time:</strong> ${formatTimeToAMPM(data.time)}
+                      ⏰ <strong>Session:</strong> ${data.time}
                     </td>
                   </tr>
                   <tr>
@@ -270,9 +269,8 @@ const notificationTemplates = {
             appointmentScheduled:
               "This is a reminder that your appointment is scheduled for today. Here are the details:",
             lookForward: "We look forward to seeing you! 💖",
-            pleaseArrive: `Please arrive 10–15 minutes early to allow time for
-                  check-in.<br />If you need to reschedule, kindly contact us at
-                  least 24 hours in advance.`,
+            pleaseArrive: `Your appointment is scheduled for the <strong>${data.time}</strong> session.<br />
+                       If you need to reschedule, kindly contact us at least 24 hours in advance.`,
             details: `<tr>
                     <td style="font-size: 15px; padding: 5px 0">
                       📅 <strong>Date:</strong> ${new Date(
@@ -282,7 +280,7 @@ const notificationTemplates = {
                   </tr>
                   <tr>
                     <td style="font-size: 15px; padding: 5px 0">
-                      ⏰ <strong>Time:</strong> ${formatTimeToAMPM(data.time)}
+                      ⏰ <strong>Time:</strong> ${data.time}
                     </td>
                   </tr>
                   <tr>

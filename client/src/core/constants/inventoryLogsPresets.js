@@ -17,7 +17,7 @@ export const inventoryLogsFormFields = [
     label: "Item Name",
     type: "reference",
     ref: "inventory", // table/endpoint to call
-    showOn: "create,view",
+    showOn: "all",
     required: true,
   },
   // {
@@ -34,7 +34,7 @@ export const inventoryLogsFormFields = [
     name: "item.quantity",
     label: "Current stock",
     type: "number",
-    showOn: "create,view",
+    showOn: "all",
     required: true,
     disabled: true,
     condition: "",
@@ -44,7 +44,7 @@ export const inventoryLogsFormFields = [
     label: "Type",
     type: "select",
     options: inventoyTypeOptions,
-    showOn: "create,view",
+    showOn: "all",
     // default: "Stock out",
     required: true,
   },
@@ -52,7 +52,7 @@ export const inventoryLogsFormFields = [
     name: "quantity",
     label: "Quantity",
     type: "number",
-    showOn: "create,view",
+    showOn: "all",
     required: true,
   },
 
@@ -60,7 +60,7 @@ export const inventoryLogsFormFields = [
     name: "reason",
     label: "Reason",
     type: "textarea",
-    showOn: "create,view",
+    showOn: "all",
   },
   // {
   //   name: "timestamp",
