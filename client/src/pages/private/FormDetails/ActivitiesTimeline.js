@@ -41,6 +41,8 @@ const formatActivity = (log) => {
   const { action, table, dataSnapshot, userId } = log;
   const date = log.created_on;
 
+  // console.log(log);
+
   const actVerb =
     action === "create"
       ? "Created"
@@ -163,7 +165,7 @@ export default function ActivitiesTimeline({ patientId, userID }) {
         }
 
         const formatted = (data || []).map(formatActivity);
-        // console.log(data);
+        // console.log(formatted);
         setActivities(formatted);
       } catch (error) {
         console.error("Error fetching activities:", error);

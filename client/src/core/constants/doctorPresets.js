@@ -7,6 +7,7 @@ export const doctorTableColumns = [
   { name: "gender", label: "Gender" },
   { name: "date_of_birth", label: "Date of Birth" },
   { name: "phone_number", label: "Phone Number" },
+  { name: "email", label: "Email" },
 ];
 
 // Form fields with conditional visibility

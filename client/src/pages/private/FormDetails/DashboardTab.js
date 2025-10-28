@@ -156,7 +156,7 @@ export default function DashboardTab({ patientId, data }) {
             appointments={appointmentsPrint}
           />
 
-          <ActivitiesTimeline patientId={patientId} />
+          {/* <ActivitiesTimeline patientId={patientId} /> */}
         </div>
       </div>
       {openViewModal && (

@@ -21,6 +21,7 @@ export const inventoryFormFields = [
     label: "Name",
     type: "text",
     showOn: "all",
+    required: true,
   },
   {
     name: "category",
@@ -28,6 +29,7 @@ export const inventoryFormFields = [
     type: "select",
     options: inventoyCategoryOptions,
     showOn: "all",
+    required: true,
   },
   {
     name: "unit",
@@ -35,6 +37,7 @@ export const inventoryFormFields = [
     type: "select",
     options: inventoryUnitOptions,
     showOn: "all",
+    required: true,
   },
   // {
   //   name: "quantity",
@@ -47,6 +50,7 @@ export const inventoryFormFields = [
     label: "Reorder Level",
     type: "number",
     showOn: "all",
+    // required: true,
   },
   {
     name: "expiryDate",

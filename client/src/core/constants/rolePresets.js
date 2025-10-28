@@ -2,6 +2,8 @@
 export const internalRoles = ["internal"];
 export const adminOnlyRoles = ["admin", "owner", "manager", "doctor"];
 
+export const dashboardUserRoles = ["admin", "staff", "doctor"];
+
 export const appointmentCreators = ["doctor", "staff"];
 
 export const transactionTables = [""];

@@ -7,20 +7,22 @@ import UserHeader from "./UserHeader";
 import DashboardTab from "./DashboardTab";
 import OverviewTab from "../DoctorDetails/OverviewTab";
 import ScheduleTab from "../DoctorDetails/ScheduleTab";
-import PatientsTab from "../DoctorDetails/PatientsTab";
+
 import ReviewsTab from "../DoctorDetails/ReviewsTab";
 import CalendarTab from "../Calendar/CalendarTab";
 import ClinicalRecordTab from "./ClinicalRecordTab";
 import ConsultationHistoryTab from "./ConsultationHistoryTab";
-import DashboardTabStaff from "./DashboardTabStaff";
+
 import PatientsList from "./PatientsList";
 import UltrasoundTab from "./UltrasoundTab";
 import ALLAppointments from "./ALLAppointments";
 import CalendarMain from "../Calendar/CalendarMain";
 import AdminStaffDashboard from "./AdminStaff/AdminStaffDashboard";
 import useSocket from "../../../core/hooks/useSocket";
+import { dashboardUserRoles } from "../../../core/constants/rolePresets";
 
 export default function UserDashboardPage({ data }) {
+  const currentUser = useSelector((state) => state.user.userInfo);
   const { id } = useParams();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -125,6 +127,16 @@ export default function UserDashboardPage({ data }) {
   // console.log(tabItems);
 
   const renderTabContent = () => {
+    // Optional fallback UI if not authorized (for safety)
+    if (!dashboardUserRoles.includes(currentUser.role)) {
+      return (
+        <div className="p-10 text-center text-gray-500">
+          <h2 className="text-2xl font-semibold mb-2">Access Denied</h2>
+          <p>You do not have permission to view this dashboard.</p>
+        </div>
+      );
+    }
+
     if (!data || !mainTab) {
       return (
         <div className="text-center text-gray-500">No user data found.</div>

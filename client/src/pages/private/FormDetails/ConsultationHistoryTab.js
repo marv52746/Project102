@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { formatDate, formatTime } from "../../../core/utils/dateUtils";
+import { formatDate } from "../../../core/utils/dateUtils";
 import { capitalizeText } from "../../../core/utils/stringUtils";
 import apiService from "../../../core/services/apiService";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
-import { Search } from "lucide-react";
 import Reloader from "../../../core/components/utils/reloader";
+import TableFilters from "./TableUtils/TableFilters";
+import TablePagination from "./TableUtils/TablePagination";
 
 export default function ConsultationHistoryTab({ data }) {
-  // console.log(data);
   const { id } = useParams();
   const dispatch = useDispatch();
   const { refreshKey } = useSelector((state) => state.utils);
@@ -18,10 +18,16 @@ export default function ConsultationHistoryTab({ data }) {
   const [selectedReport, setSelectedReport] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔍 search + pagination state
+  // 🔍 search + filters + pagination
   const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({});
+  const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters, searchTerm]);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -32,18 +38,12 @@ export default function ConsultationHistoryTab({ data }) {
           "appointments",
           {
             [data.role]: data._id,
-            // status: ["completed", "cancelled"],
           }
         );
 
-        // console.log(userAppointments);
-
-        // ✅ sort by date
-        const sortedAppointments = (userAppointments || []).sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          return dateB - dateA;
-        });
+        const sortedAppointments = (userAppointments || []).sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
 
         setAppointments(sortedAppointments || []);
       } catch (error) {
@@ -56,15 +56,48 @@ export default function ConsultationHistoryTab({ data }) {
     fetchDetails();
   }, [id, dispatch, refreshKey, data]);
 
-  // 🔍 Filtered + Paginated Data
-  const filteredAppointments = appointments.filter(
-    (app) =>
+  // 🧩 Filter handler
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
+  };
+
+  // 🧮 Nested value helper
+  const getNestedValue = (obj, path) =>
+    path.split(".").reduce((acc, part) => acc && acc[part], obj);
+
+  // 🎯 Filter logic
+  const filteredAppointments = appointments.filter((app) => {
+    const matchesSearch =
       app.doctor?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.patient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.time?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.reason?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.notes?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      app.notes?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesFilters = Object.entries(filters).every(([key, val]) => {
+      if (!val) return true;
+      const recordVal = getNestedValue(app, key);
+
+      // Handle react-select values
+      const filterValue =
+        typeof val === "object" && val.value ? val.value : val;
+
+      // Date comparison (strict)
+      if (key.toLowerCase().includes("date")) {
+        return formatDate(recordVal) === formatDate(filterValue);
+      }
+
+      // Text match (case-insensitive, partial)
+      return recordVal
+        ?.toString()
+        .toLowerCase()
+        .includes(filterValue.toString().toLowerCase());
+    });
+
+    return matchesSearch && matchesFilters;
+  });
 
   const totalPages = Math.ceil(filteredAppointments.length / rowsPerPage);
   const paginatedAppointments = filteredAppointments.slice(
@@ -74,59 +107,80 @@ export default function ConsultationHistoryTab({ data }) {
 
   if (loading) return <Reloader text="Loading appointments..." />;
 
-  if (!appointments.length) {
+  if (!appointments.length)
     return (
       <div className="text-center text-gray-500 p-6">
         No consultation history found.
       </div>
     );
-  }
+
+  const clearFilters = () => setFilters({});
+
+  const doctorOptions = [
+    ...new Set(appointments.map((a) => a.doctor?.name).filter(Boolean)),
+  ].map((d) => ({ value: d, label: d }));
+  const patientOptions = [
+    ...new Set(appointments.map((a) => a.patient?.name).filter(Boolean)),
+  ].map((p) => ({ value: p, label: p }));
+  const statusOptions = [
+    ...new Set(appointments.map((a) => a.status).filter(Boolean)),
+  ].map((s) => ({ value: s, label: capitalizeText(s) }));
+
+  const filterConfig = [
+    { key: "date", label: "Date", type: "date" },
+    { key: "time", label: "Session", type: "text" },
+    {
+      key: "doctor.name",
+      label: "Doctor",
+      type: "select",
+      options: doctorOptions,
+    },
+    {
+      key: "patient.name",
+      label: "Patient",
+      type: "select",
+      options: patientOptions,
+    },
+    { key: "reason", label: "Reason", type: "text" },
+    { key: "status", label: "Status", type: "select", options: statusOptions },
+    { key: "notes", label: "Doctor Notes", type: "text" },
+  ];
 
   return (
     <div className="bg-white rounded-lg shadow border p-4">
-      {/* 🔍 Search */}
-      <div className="mb-4 flex items-center">
-        <div className="relative w-1/3">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search doctor, reason, or notes..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none"
-          />
-        </div>
-      </div>
+      {/* 🔍 Search + Filter toggle */}
+      <TableFilters
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        filters={filters}
+        setFilters={setFilters}
+        filterConfig={filterConfig}
+        showFilters={showFilters}
+        setShowFilters={setShowFilters}
+        clearFilters={clearFilters}
+      />
 
       {/* 📋 Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto mt-3">
         <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-2 text-left font-medium text-gray-600">
-                Date
-              </th>
-              <th className="px-4 py-2 text-left font-medium text-gray-600">
-                Session
-              </th>
-              <th className="px-4 py-2 text-left font-medium text-gray-600">
-                Doctor
-              </th>
-              <th className="px-4 py-2 text-left font-medium text-gray-600">
-                Patient
-              </th>
-              <th className="px-4 py-2 text-left font-medium text-gray-600">
-                Reason
-              </th>
-              <th className="px-4 py-2 text-left font-medium text-gray-600">
-                Status
-              </th>
-              <th className="px-4 py-2 text-left font-medium text-gray-600">
-                Doctor Notes
-              </th>
+              {[
+                "Date",
+                "Session",
+                "Doctor",
+                "Patient",
+                "Reason",
+                "Status",
+                "Doctor Notes",
+              ].map((head) => (
+                <th
+                  key={head}
+                  className="px-4 py-2 text-left font-medium text-gray-600"
+                >
+                  {head}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -166,40 +220,7 @@ export default function ConsultationHistoryTab({ data }) {
       </div>
 
       {/* 📑 Pagination */}
-      {/* {totalPages > 1 && (
-        <div className="flex justify-between items-center mt-4 text-sm">
-          <span className="text-gray-600">
-            Page {currentPage} of {totalPages}
-          </span>
-          <div className="flex gap-2">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
-              className={`px-3 py-1 rounded-lg border ${
-                currentPage === 1
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-white hover:bg-gray-50"
-              }`}
-            >
-              Prev
-            </button>
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => p + 1)}
-              className={`px-3 py-1 rounded-lg border ${
-                currentPage === totalPages
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-white hover:bg-gray-50"
-              }`}
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )} */}
-
-      {/* 📑 Total Records + Pagination */}
-      <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
+      {/* <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
         <span>
           Showing {paginatedAppointments.length} of{" "}
           {filteredAppointments.length} records
@@ -236,9 +257,17 @@ export default function ConsultationHistoryTab({ data }) {
             </div>
           </div>
         )}
-      </div>
+      </div> */}
 
-      {/* Modal */}
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalRecords={filteredAppointments.length}
+        rowsPerPage={rowsPerPage}
+        onPageChange={setCurrentPage}
+      />
+
+      {/* 🩺 Modal */}
       {selectedReport && (
         <CalendarModalDetails
           report={selectedReport}

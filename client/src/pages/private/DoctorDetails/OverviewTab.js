@@ -17,7 +17,6 @@ import UpcomingAppointments from "../FormDetails/UpcomingAppointments";
 import { formConfigMap } from "../../../core/constants/FieldConfigMap";
 import AppointmentModal from "../FormDetails/AppointmentModal";
 import NewPatientModal from "../FormDetails/NewPatientModal";
-import NewBaseModal from "../FormDetails/NewBaseModal";
 import InventoryTransactionModal from "../FormDetails/Modals/InventoryTransactionModal";
 
 import OngoingCheckup from "../FormDetails/OngoingCheckup";

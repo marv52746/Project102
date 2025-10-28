@@ -4,6 +4,15 @@ export const genderOptions = [
   // { label: "Other", value: "Other" },
 ];
 
+export const civilStatusOptions = [
+  { label: "Single", value: "Single" },
+  { label: "Married", value: "Married" },
+  { label: "Widowed", value: "Widowed" },
+  { label: "Separated", value: "Separated" },
+  { label: "Divorced", value: "Divorced" },
+  { label: "Annulled", value: "Annulled" },
+];
+
 export const roleOptions = [
   { label: "Admin", value: "admin" },
   { label: "Staff", value: "staff" },

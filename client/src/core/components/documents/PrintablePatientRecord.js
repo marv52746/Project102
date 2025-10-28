@@ -399,7 +399,7 @@ export default function PrintablePatientRecord({ data, appointments }) {
 
                       <td
                         className="findings"
-                        style={{ "white-space": "pre-wrap" }}
+                        style={{ whiteSpace: "pre-wrap" }}
                       >
                         {app.reason && (
                           <div>
@@ -437,7 +437,7 @@ export default function PrintablePatientRecord({ data, appointments }) {
 
                       <td
                         className="treatment"
-                        style={{ "white-space": "pre-wrap" }}
+                        style={{ whiteSpace: "pre-wrap" }}
                       >
                         Notes: {app.notes && <>{app.notes}</>}
                         {relatedSections

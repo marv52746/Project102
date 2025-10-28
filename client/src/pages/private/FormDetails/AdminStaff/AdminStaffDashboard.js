@@ -229,8 +229,6 @@ export default function AdminStaffDashboard({ appointments }) {
     ...doctorFeeMap,
   };
 
-  //   console.log(fullStatAppointmentsMap);
-
   return (
     <>
       <div className="space-y-6">

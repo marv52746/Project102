@@ -14,6 +14,7 @@ export const patientTableColumns = [
   { name: "gender", label: "Gender" },
   { name: "date_of_birth", label: "Date of Birth" },
   { name: "phone_number", label: "Phone Number" },
+  { name: "email", label: "Email" },
   { name: "blood_type", label: "Blood Type" },
 ];
 

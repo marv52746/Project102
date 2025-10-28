@@ -61,6 +61,12 @@ const userSchema = new mongoose.Schema({
   gender: {
     type: String,
   },
+  civil_status: {
+    type: String,
+  },
+  occupation: {
+    type: String,
+  },
   phone_number: {
     // required: true,
     type: String,

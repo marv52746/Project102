@@ -65,10 +65,6 @@ app.use("/api", require("./router/index"));
 // ✅ Static file serving
 app.use("/assets", express.static(path.join(__dirname, "assets")));
 
-// ✅ Start the server
-// app.listen(PORT, () => {
-//   console.log(`Server is running on http://localhost:${PORT}`);
-// });
 // ✅ Start the server (attach both Express + Socket.IO)
 server.listen(PORT, () => {
   console.log(`🚀 Server and Socket.IO running on http://localhost:${PORT}`);

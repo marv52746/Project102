@@ -1,128 +1,279 @@
 import React, { useState } from "react";
+import Select from "react-select";
 import { useNavigate, useParams } from "react-router-dom";
 import ExportLinks from "./ExportLinks";
 import { getAvatarUrl } from "../utils/avatarURL";
 import { getStatusClass } from "../utils/calendarUtils";
 import { formatFullDate, getNestedValue } from "../utils/tableUtils";
 import { capitalizeText } from "../utils/stringUtils";
+import { ChevronDown, ChevronUp, XCircle } from "lucide-react";
 
 const TableList = ({ data, columns }) => {
   const [search, setSearch] = useState("");
-  const [entries, setEntries] = useState(10); // Number of entries per page
-  const [currentPage, setCurrentPage] = useState(1); // Current page
+  const [entries, setEntries] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filters, setFilters] = useState({});
+  const [showFilters, setShowFilters] = useState(false);
 
   const { tablename } = useParams();
   const navigate = useNavigate();
 
-  // Filter data based on the search query
-  const filteredData = data.filter((item) =>
-    columns.some((col) => {
+  // Handle filter value change
+  const handleFilterChange = (colName, value) => {
+    setFilters((prev) => ({ ...prev, [colName]: value }));
+    setCurrentPage(1);
+  };
+
+  // Clear filters
+  const clearFilters = () => {
+    setFilters({});
+  };
+
+  // 🔍 Filtering logic
+  const filteredData = data.filter((item) => {
+    // text search
+    const matchesSearch = columns.some((col) => {
       const value = getNestedValue(item, col.name);
       return String(value || "")
         .toLowerCase()
         .includes(search.toLowerCase());
-    })
-  );
+    });
 
-  // Sort filtered data by timestamp fields (descending)
+    // field filters
+    const matchesFilters = Object.entries(filters).every(([key, val]) => {
+      if (!val) return true;
+      const rawValue = getNestedValue(item, key);
+
+      if (!rawValue) return false;
+
+      const isDate = key.toLowerCase().includes("date");
+      if (isDate) {
+        const recordDate = new Date(rawValue).toISOString().split("T")[0];
+        return recordDate === val;
+      }
+
+      return String(rawValue).toLowerCase().includes(String(val).toLowerCase());
+    });
+
+    return matchesSearch && matchesFilters;
+  });
+
+  // sort by time
   const sortedData = filteredData.sort((a, b) => {
     const getTime = (item) =>
       new Date(item.createdAt || item.created_on || item.timestamp).getTime() ||
       0;
-
-    return getTime(b) - getTime(a); // most recent first
+    return getTime(b) - getTime(a);
   });
 
-  // Get the start and end index of data for current page
   const startIndex = (currentPage - 1) * entries;
   const endIndex = startIndex + entries;
   const paginatedData = sortedData.slice(startIndex, endIndex);
 
-  // console.log(paginatedData);
-
-  const handleChangeSearch = (e) => {
-    setSearch(e.target.value);
-    setCurrentPage(1); // Reset to page 1 on new search
-  };
-
-  const handleEntriesChange = (e) => {
-    setEntries(parseInt(e.target.value, 10));
-    setCurrentPage(1); // Reset to page 1 when entries per page change
-  };
-
-  const handleNextPage = () => {
-    if (currentPage * entries < filteredData.length) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleRowClick = (item) => {
+  const handleCreateNew = () => navigate(`/form/${tablename}/create`);
+  const handleRowClick = (item) =>
     navigate(`/form/${tablename}/view/${item._id}`);
-  };
 
-  const handleCreateNew = () => {
-    navigate(`/form/${tablename}/create`);
+  const compactSelectStyles = {
+    control: (base, state) => ({
+      ...base,
+      minHeight: "28px",
+      height: "28px",
+      borderColor: state.isFocused ? "#94a3b8" : "#d1d5db",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: "#94a3b8",
+      },
+    }),
+    valueContainer: (base) => ({
+      ...base,
+      height: "28px",
+      padding: "0 6px",
+    }),
+    input: (base) => ({
+      ...base,
+      margin: 0,
+      padding: 0,
+    }),
+    indicatorsContainer: (base) => ({
+      ...base,
+      height: "28px",
+    }),
+    dropdownIndicator: (base) => ({
+      ...base,
+      padding: "2px",
+    }),
+    clearIndicator: (base) => ({
+      ...base,
+      padding: "2px",
+    }),
+    menu: (base) => ({
+      ...base,
+      fontSize: "12px",
+    }),
   };
 
   return (
     <div className="px-4 py-2 shadow-lg bg-white rounded-lg overflow-hidden">
-      <div className="flex justify-between mb-2">
-        {/* <h3 className="text-2xl font-semibold mb-4 text-sidetext-active">
-          {label}
-        </h3> */}
-
-        <div className="flex justify-center items-center">
-          {/* Search Input */}
+      {/* 🔍 Search + Create */}
+      <div className="flex justify-between items-center mb-2">
+        {/* 🔽 Filters below Search */}
+        <div className="flex justify-between items-center mb-2 gap-2">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="text-sm flex items-center gap-1 px-3 py-1 border rounded-md bg-gray-100 hover:bg-gray-200"
+            >
+              {showFilters ? (
+                <ChevronUp size={16} />
+              ) : (
+                <ChevronDown size={16} />
+              )}
+              Filters
+            </button>
+            {Object.keys(filters).some((k) => filters[k]) && (
+              <button
+                onClick={clearFilters}
+                className="text-sm flex items-center gap-1 px-3 py-1 border rounded-md text-red-500 hover:bg-red-50"
+              >
+                <XCircle size={14} /> Clear
+              </button>
+            )}
+          </div>
           <input
             type="search"
             value={search}
-            onChange={handleChangeSearch}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search"
-            className="form-control form-control-sm w-80 border border-gray-300 rounded-md px-4 py-2 text-sm  focus:border-text-secondary  focus:outline-none"
+            className="form-control w-64 border border-gray-300 rounded-md px-3 py-1 text-sm focus:border-text-secondary focus:outline-none"
           />
         </div>
+
         <button
           onClick={handleCreateNew}
-          className="bg-green-500 px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition"
+          className="bg-green-500 px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-green-600 transition"
         >
           Create New
         </button>
       </div>
 
+      {/* 🧩 Collapsible Filter Section (Movedbelow Search) */}
+
+      {showFilters && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3 bg-gray-50 p-3 rounded-md border border-gray-200">
+          {columns.map((col) => {
+            const key = col.name;
+            const label = col.label;
+            const lowerKey = key.toLowerCase();
+            const isDate = lowerKey.includes("date");
+            const isNumber =
+              lowerKey.includes("amount") ||
+              lowerKey.includes("price") ||
+              lowerKey.includes("reorderlevel") ||
+              lowerKey.includes("phone_number") ||
+              lowerKey.includes("quantity");
+
+            const uniqueValues = [
+              ...new Set(
+                data
+                  .map((item) => getNestedValue(item, key))
+                  .filter((v) => v && v !== "")
+              ),
+            ];
+
+            const isSelect =
+              ["status", "role", "user_type"].includes(lowerKey) ||
+              (uniqueValues.length > 0 && uniqueValues.length <= 10);
+
+            return (
+              <div key={key} className="flex flex-col text-xs">
+                <label className="text-gray-600 font-medium mb-1">
+                  {label}
+                </label>
+
+                {isDate ? (
+                  <input
+                    type="date"
+                    value={filters[key] || ""}
+                    onChange={(e) => handleFilterChange(key, e.target.value)}
+                    className="border border-gray-300 rounded-md px-2 py-[2px] text-xs h-[28px]"
+                  />
+                ) : isNumber ? (
+                  <input
+                    type="number"
+                    value={filters[key] || ""}
+                    onChange={(e) => handleFilterChange(key, e.target.value)}
+                    placeholder={`Filter ${label}`}
+                    className="border border-gray-300 rounded-md px-2 py-[2px] text-xs h-[28px] appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  />
+                ) : isSelect ? (
+                  <Select
+                    options={[
+                      { value: "", label: "All" },
+                      ...uniqueValues.map((opt) => ({
+                        value: opt,
+                        label: capitalizeText(opt, true),
+                      })),
+                    ]}
+                    value={
+                      filters[key]
+                        ? {
+                            value: filters[key],
+                            label: capitalizeText(filters[key], true),
+                          }
+                        : { value: "", label: "All" }
+                    }
+                    onChange={(selected) =>
+                      handleFilterChange(key, selected ? selected.value : "")
+                    }
+                    styles={compactSelectStyles}
+                    classNamePrefix="react-select"
+                    isClearable
+                    isSearchable
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={filters[key] || ""}
+                    onChange={(e) => handleFilterChange(key, e.target.value)}
+                    placeholder={`Filter ${label}`}
+                    className="border border-gray-300 rounded-md px-2 py-[2px] text-xs h-[28px]"
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Table + Pagination */}
       <div className="table-responsive mb-4">
-        <div className="flex justify-between mb-3 items-center">
-          {/* Entries per page */}
-          <div className="flex items-center space-x-2">
-            <label className="text-sm text-gray-600">Show</label>
+        <div className="flex justify-between mb-2 items-center">
+          <div className="flex items-center space-x-2 text-sm">
+            <label>Show</label>
             <select
               value={entries}
-              onChange={handleEntriesChange}
-              className="custom-select custom-select-sm form-control-sm border border-gray-300 rounded-md px-3 py-1 text-sm"
+              onChange={(e) => setEntries(parseInt(e.target.value, 10))}
+              className="border border-gray-300 rounded-md px-2 py-1 text-sm"
             >
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
+              {[10, 25, 50, 100].map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
             </select>
-            <label className="text-sm text-gray-600">entries</label>
+            <label>entries</label>
           </div>
           <ExportLinks data={filteredData} />
         </div>
 
-        <table className="min-w-full table-auto border-collapse">
+        <table className="min-w-full table-auto border-collapse text-sm">
           <thead>
-            <tr className=" text-left border-b">
-              {/* Dynamic Table Headers */}
+            <tr className="border-b bg-gray-50">
               {columns.map((col) => (
                 <th
                   key={col.name}
-                  className="p-3 font-semibold text-sm text-gray-600"
+                  className="p-2 font-semibold text-gray-600 text-left"
                 >
                   {col.label}
                 </th>
@@ -130,83 +281,39 @@ const TableList = ({ data, columns }) => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((item, index) => (
+            {paginatedData.map((item, i) => (
               <tr
                 key={item._id}
-                className={`border-b ${
-                  index % 2 === 0 ? "" : "bg-white"
-                } hover:bg-side-active hover:text-text-secondary hover:cursor-pointer transition-colors duration-200`}
                 onClick={() => handleRowClick(item)}
+                className={`border-b hover:bg-side-active cursor-pointer ${
+                  i % 2 === 0 ? "" : "bg-white"
+                }`}
               >
-                {/* Dynamic Table Row Data */}
                 {columns.map((col) => {
-                  const value = getNestedValue(item, col.name);
-                  // if (col.name == "avatar") console.log(value);
+                  const val = getNestedValue(item, col.name);
                   return (
-                    <td
-                      key={col.name}
-                      className="p-3 max-w-[200px] truncate text-ellipsis whitespace-nowrap"
-                    >
-                      {
-                        col.name === "status" ||
-                        col.name === "role" ||
-                        col.name === "user_type" ? (
-                          <span
-                            className={`badge px-2 py-1 rounded-md text-xs ${getStatusClass(
-                              col.name === "status"
-                                ? item.status?.toLowerCase()
-                                : item.role?.toLowerCase()
-                            )}`}
-                          >
-                            {capitalizeText(value, true)}
-                          </span>
-                        ) : col.name === "avatar" || col.name === "image" ? (
-                          // If the column name is "avatar", render a rounded avatar
-                          <img
-                            src={getAvatarUrl(value)}
-                            alt="Avatar"
-                            className="w-10 h-10 rounded-full" // Adjust size and rounded styling
-                          />
-                        ) : col.name === "doctor.name" ? (
-                          <div className="flex items-center space-x-3">
-                            <img
-                              src={getAvatarUrl(item.doctor?.avatar)}
-                              alt="Doctor Avatar"
-                              className="w-8 h-8 rounded-full"
-                            />
-                            <span className="truncate">
-                              {item.doctor?.name || "-"}
-                            </span>
-                          </div>
-                        ) : col.name === "patient.name" ? (
-                          <div className="flex items-center space-x-3">
-                            <img
-                              src={getAvatarUrl(item.patient?.avatar)}
-                              alt="Patient Avatar"
-                              className="w-8 h-8 rounded-full"
-                            />
-                            <span className="truncate">
-                              {item.patient?.name || "-"}
-                            </span>
-                          </div>
-                        ) : col.name === "name" &&
-                          (tablename === "doctors" ||
-                            tablename === "patients" ||
-                            tablename === "users") ? (
-                          <div className="flex items-center space-x-3">
-                            <img
-                              src={getAvatarUrl(item.avatar)}
-                              alt="User Avatar"
-                              className="w-8 h-8 rounded-full"
-                            />
-                            <span className="truncate">{value || "-"}</span>
-                          </div>
-                        ) : col.name.toLowerCase().includes("date") ? (
-                          formatFullDate(value)
-                        ) : (
-                          value || "-"
-                        ) // Render the data for other names
-                      }
+                    <td key={col.name} className="p-2 truncate max-w-[180px]">
+                      {col.name === "status" ||
+                      col.name === "role" ||
+                      col.name === "user_type" ? (
+                        <span
+                          className={`px-2 py-1 rounded-md text-xs ${getStatusClass(
+                            val?.toLowerCase()
+                          )}`}
+                        >
+                          {capitalizeText(val, true)}
+                        </span>
+                      ) : col.name.toLowerCase().includes("date") ? (
+                        formatFullDate(val)
+                      ) : col.name === "avatar" ? (
+                        <img
+                          src={getAvatarUrl(val)}
+                          alt="Avatar"
+                          className="w-8 h-8 rounded-full"
+                        />
+                      ) : (
+                        val || "-"
+                      )}
                     </td>
                   );
                 })}
@@ -216,24 +323,28 @@ const TableList = ({ data, columns }) => {
         </table>
 
         {/* Pagination */}
-        <div className="flex justify-between mt-4 items-center">
-          <div className="text-sm text-gray-600">
+        <div className="flex justify-between mt-4 items-center text-sm text-gray-600">
+          <div>
             Showing {startIndex + 1} to{" "}
             {Math.min(endIndex, filteredData.length)} of {filteredData.length}{" "}
             entries
           </div>
-          <div className="flex space-x-3">
+          <div className="flex gap-2">
             <button
-              onClick={handlePreviousPage}
-              className="text-sm px-4 py-2 border border-gray-300 rounded-md bg-gray-100 hover:bg-gray-200 disabled:bg-gray-200"
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
               disabled={currentPage === 1}
+              className="px-3 py-1 border rounded-md bg-gray-100 hover:bg-gray-200 disabled:bg-gray-200"
             >
               Previous
             </button>
             <button
-              onClick={handleNextPage}
-              className="text-sm px-4 py-2 border border-gray-300 rounded-md bg-gray-100 hover:bg-gray-200 disabled:bg-gray-200"
+              onClick={() =>
+                setCurrentPage((p) =>
+                  p * entries < filteredData.length ? p + 1 : p
+                )
+              }
               disabled={currentPage * entries >= filteredData.length}
+              className="px-3 py-1 border rounded-md bg-gray-100 hover:bg-gray-200 disabled:bg-gray-200"
             >
               Next
             </button>

@@ -3,7 +3,7 @@ import { formatDate } from "../../../core/utils/dateUtils";
 import apiService from "../../../core/services/apiService";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Search, ChevronDown, ChevronRight, Download } from "lucide-react";
+import { Search, ChevronDown, ChevronRight, Download, X } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
@@ -306,7 +306,7 @@ export default function UltrasoundTab() {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus-visible:border-blue-300"
           />
         </div>
 
@@ -370,6 +370,26 @@ export default function UltrasoundTab() {
               </option>
             ))}
         </select>
+
+        {/* Clear Filter Button */}
+        {(searchTerm ||
+          selectedMonth ||
+          selectedDay ||
+          selectedRadiologist) && (
+          <button
+            onClick={() => {
+              setSearchTerm("");
+              setSelectedMonth("");
+              setSelectedDay("");
+              setSelectedRadiologist("");
+              setCurrentPage(1);
+            }}
+            className="flex items-center gap-1 px-3 py-2 text-sm rounded-lg border border-red-400 text-red-600 hover:bg-red-50 transition"
+          >
+            <X className="h-4 w-4" />
+            Clear
+          </button>
+        )}
       </div>
 
       {/* Render hierarchy */}
