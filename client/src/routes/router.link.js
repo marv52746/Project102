@@ -14,7 +14,7 @@ import InventoryDashboard from "../pages/private/Dashboard/InventoryDashboard";
 import MainDashboard from "../pages/private/Dashboard/MainDashboard";
 import ForcePasswordChange from "../pages/main/forcePasswordChange";
 import ForgotPassword from "../pages/main/forgotPassword";
-import HelpPage from "../core/components/HelpPage";
+import HelpPage from "../core/components/help/HelpPage";
 
 const routes = all_routes;
 
