@@ -35,7 +35,12 @@ const ReferenceInput = ({
     fetchReferenceData();
   }, [field, dispatch]);
 
-  const loadOptions = async () => refOptions;
+  // const loadOptions = async () => refOptions;
+  const loadOptions = async (inputValue) => {
+    return refOptions.filter((option) =>
+      option.label.toLowerCase().includes(inputValue.toLowerCase())
+    );
+  };
 
   const handleChange = async (selected) => {
     const selectedValue = selected?.full || null;

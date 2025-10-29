@@ -7,9 +7,9 @@ const baseURL = process.env.REACT_APP_BASE_URL;
 
 const apiClient = axios.create({
   baseURL,
-  // headers: {
-  //   "Content-Type": "application/json",
-  // },
+  headers: {
+    "x-api-key": process.env.REACT_APP_PUBLIC_API_KEY,
+  },
   withCredentials: false, // ✅ set to true only if using cookies
 });
 

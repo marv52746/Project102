@@ -1,17 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Card from "./Card";
-import { FileText, Thermometer, HeartPulse, Gauge, Weight } from "lucide-react";
+import { Thermometer, HeartPulse, Gauge, Weight } from "lucide-react";
 import apiService from "../../../core/services/apiService";
 import { useDispatch, useSelector } from "react-redux";
 
-import ActivitiesTimeline from "./ActivitiesTimeline";
-
+import OngoingCheckup from "./OngoingCheckup";
 import CalendarModalDetails from "../../../core/components/calendar/CalendarModalDetails";
 import AppointmentModal from "./AppointmentModal";
 import { formConfigMap } from "../../../core/constants/FieldConfigMap";
 import VitalItem from "../../../core/components/calendar/VitalItem";
 import UpcomingAppointments from "./UpcomingAppointments";
 import PrintablePatientRecord from "../../../core/components/documents/PrintablePatientRecord";
+import ClinicalSnapshot from "./ClinicalSnapshot";
 
 // Main Component
 export default function DashboardTab({ patientId, data }) {
@@ -39,10 +39,12 @@ export default function DashboardTab({ patientId, data }) {
     const fetchData = async () => {
       try {
         const [vitalData, appointmentData] = await Promise.all([
-          apiService.get(dispatch, "vitals"),
-
-          apiService.get(dispatch, "appointments"),
+          apiService.get(dispatch, "vitals", { patient: patientId }),
+          apiService.get(dispatch, "appointments", { patient: patientId }),
         ]);
+
+        // console.log(vitalData);
+        // console.log(appointmentData);
 
         const filterByPatient = (arr) =>
           arr.filter(
@@ -96,10 +98,19 @@ export default function DashboardTab({ patientId, data }) {
 
   // console.log(appointmentsPrint);
 
+  const lastCompletedAppointment = useMemo(() => {
+    if (!appointmentsPrint.length) return [];
+    const sorted = [...appointmentsPrint].sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
+    return [sorted[0]]; // only the latest
+  }, [appointmentsPrint]);
+
   return (
     <>
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <div className="xl:col-span-2 space-y-4">
+        <div className="xl:col-span-2 space-y-2">
+          <ClinicalSnapshot patientId={patientId} />
           {/* VITALS */}
           <Card>
             <ul className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -109,21 +120,26 @@ export default function DashboardTab({ patientId, data }) {
                     icon={Gauge}
                     label="Blood Pressure"
                     value={vitals.blood_pressure}
+                    type="bp"
                   />
                   <VitalItem
                     icon={HeartPulse}
                     label="Heart Rate"
                     value={vitals.heart_rate}
+                    type="hr"
                   />
                   <VitalItem
                     icon={Thermometer}
                     label="Temperature"
                     value={vitals.temperature}
+                    type="temp"
                   />
                   <VitalItem
                     icon={Weight}
                     label="Weight"
                     value={vitals.weight}
+                    height={vitals.height}
+                    type="weight"
                   />
                 </>
               ) : (
@@ -150,6 +166,17 @@ export default function DashboardTab({ patientId, data }) {
 
         {/* TIMELINE + DOCUMENTS */}
         <div className="space-y-4">
+          <OngoingCheckup
+            title="Last Visit Appointment"
+            appointments={lastCompletedAppointment}
+            // appointments={upcomingAppointments}
+            onSelect={(app) => {
+              setViewType("appointments");
+              setViewData(app);
+              setOpenViewModal(true);
+            }}
+          />
+
           <PrintablePatientRecord
             data={data}
             vitals={vitals}

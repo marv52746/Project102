@@ -3,7 +3,6 @@ import {
   X,
   User,
   Stethoscope,
-  Baby,
   Scissors,
   NotebookText,
   Check,
@@ -20,7 +19,7 @@ import {
   Pencil,
 } from "lucide-react";
 
-import { formatDate, formatTime } from "../../utils/dateUtils";
+import { formatDate } from "../../utils/dateUtils";
 import { capitalizeText } from "../../utils/stringUtils";
 import ModalFormActions from "../formActions/ModalFormActions";
 import {
@@ -28,7 +27,6 @@ import {
   ConditionsModal,
   FindingsModal,
   LabRequestModal,
-  PregnanciesModal,
   PrescriptionModal,
   SurgeriesModal,
   VitalsModal,
@@ -424,21 +422,26 @@ function CalendarModalDetails({ report: initialReport, onClose }) {
                   icon={Gauge}
                   label="Blood Pressure"
                   value={report.vitals[0].blood_pressure}
+                  type="bp"
                 />
                 <VitalItem
                   icon={HeartPulse}
                   label="Heart Rate"
                   value={report.vitals[0].heart_rate}
+                  type="hr"
                 />
                 <VitalItem
                   icon={Thermometer}
                   label="Temperature"
                   value={report.vitals[0].temperature}
+                  type="temp"
                 />
                 <VitalItem
                   icon={Weight}
                   label="Weight"
                   value={report.vitals[0].weight}
+                  height={report.vitals[0].height}
+                  type="weight"
                 />
               </>
             ) : (
@@ -631,6 +634,8 @@ const InfoCard = ({
       case "cancelled":
         return "bg-yellow-100 text-yellow-700";
       case "completed":
+        return "bg-green-100 text-green-700";
+      case "in-progress":
         return "bg-blue-100 text-blue-700";
       default:
         return "bg-gray-100 text-gray-700";

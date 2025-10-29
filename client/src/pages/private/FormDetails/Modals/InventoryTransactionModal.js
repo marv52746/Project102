@@ -197,20 +197,7 @@ export default function InventoryTransactionModal({ onClose }) {
               <label className="text-sm font-medium text-gray-700">
                 Select Item
               </label>
-              {/* <select
-                className="w-full mt-2 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                value={currentTx.item}
-                onChange={(e) =>
-                  setCurrentTx((prev) => ({ ...prev, item: e.target.value }))
-                }
-              >
-                <option value="">-- Select --</option>
-                {inventoryItems.map((itm) => (
-                  <option key={itm._id} value={itm._id}>
-                    {itm.name}
-                  </option>
-                ))}
-              </select> */}
+
               <Select
                 className="mt-2"
                 placeholder="Search or select an item..."

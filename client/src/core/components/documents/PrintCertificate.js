@@ -74,8 +74,8 @@ export default function PrintActionButtons({ data }) {
 
     // ✅ Swap dimensions dynamically based on orientation
     const isLandscape = orientation === "landscape";
-    const pageWidth = isLandscape ? "7.5in" : "5.5in";
-    const pageHeight = isLandscape ? "5.5in" : "7.5in";
+    const pageWidth = isLandscape ? "7.9in" : "5.5in";
+    const pageHeight = isLandscape ? "5.5in" : "7.9in";
 
     const win = window.open("", "", "width=800,height=1000");
     win.document.write(`
@@ -85,7 +85,7 @@ export default function PrintActionButtons({ data }) {
         <link rel="stylesheet" href="/output.css" />
         <style>
           @page { 
-            size: 5.5in 8.5in portrait; /* Half Letter size */
+            size: 5.5in 8in portrait; /* Half Letter size */
             margin: 5mm; 
           }
 
@@ -104,24 +104,86 @@ export default function PrintActionButtons({ data }) {
           }
 
            #print-container {
-            width: calc(${pageWidth} - 10mm);
-            height: calc(${pageHeight} - 10mm);
+            width: ${pageWidth};
+            height: ${pageHeight};
             box-sizing: border-box;
             padding: 3mm;
             font-family: 'Arial', sans-serif;
-            font-size: 11px; /* scaled down */
+            font-size: 12px; /* scaled down */
             line-height: 1.3;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
           }
 
           #print-container * {
-            page-break-inside: avoid;
             box-sizing: border-box;
           }
 
-          table, th, td {
-            font-size: 10px !important; /* fix table text size */
+          #print-container,
+          .print-content {
+            page-break-inside: auto;
           }
+
+          /* Each page container */
+          .page {
+            page-break-after: always;
+            position: relative;
+          }
+
+          /* Repeat header/footer for each printed page */
+          .print-header,
+          .print-footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            height: 40px;
+            text-align: center;
+            font-size: 11px;
+          }
+
+          .print-header {
+            top: 0;
+            border-bottom: 1px solid #000;
+          }
+
+          .print-footer {
+            bottom: 0;
+            border-top: 1px solid #000;
+          }
+
+          /* Content should leave space for header/footer */
+          .print-content {
+            margin-top: 50px;
+            margin-bottom: 50px;
+          }
+
+         /* Fix table behavior */
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 10px;
+          border: 1px solid #000;
+          page-break-inside: auto !important;
+        }
+
+        thead {
+          display: table-header-group !important;
+        }
+
+        tfoot {
+          display: table-footer-group !important;
+        }
+
+        tr, td, th {
+          page-break-inside: avoid;
+          page-break-after: auto;
+          border: 1px solid #000;
+          padding: 2px 4px;
+          vertical-align: top;
+          word-wrap: break-word;
+        }
 
           h1, h2, h3, h4 {
             margin: 0;

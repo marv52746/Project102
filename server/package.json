@@ -16,6 +16,7 @@
     "eslint": "^8.49.0",
     "eslint-plugin-react": "^7.33.2",
     "express": "^4.21.2",
+    "express-rate-limit": "^8.1.0",
     "google-auth-library": "^9.0.0",
     "googleapis": "^126.0.1",
     "html-to-text": "^9.0.5",
