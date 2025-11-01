@@ -116,6 +116,12 @@ export default function AdminStaffDashboard({ appointments }) {
           feeByDoctor,
         });
 
+        // console.log(inLobbyArr);
+        // sort by updated_on (oldest at the top)
+        inLobbyArr.sort(
+          (a, b) => new Date(a.updated_on) - new Date(b.updated_on)
+        );
+
         setCompletedAppointments(completedAppointmentsArr);
         setupcomingAppointments(upcomingAppointmentsArr);
         setuptodayAppointments(todayAppointmentsArr);
@@ -231,7 +237,7 @@ export default function AdminStaffDashboard({ appointments }) {
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Quick Actions */}
         <div className="space-y-2">
           <div className="flex flex-wrap gap-2">

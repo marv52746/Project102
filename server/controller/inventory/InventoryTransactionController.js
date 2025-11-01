@@ -5,7 +5,7 @@ const {
 const {
   createNotificationService,
 } = require("../../service/notificationService");
-const { logActivity } = require("../../utils/activityLogger");
+// const { logActivity } = require("../../utils/activityLogger");
 const BaseController = require("../core/baseController");
 
 class InventoryTransactionController extends BaseController {
@@ -66,7 +66,7 @@ class InventoryTransactionController extends BaseController {
       await transaction.save();
 
       // ✅ Log Activity
-      await this.logActivity("create", transaction, req.currentUser?._id);
+      // await this.logActivity("create", transaction, req.currentUser?._id);
 
       // 🔥 Emit "created" event
       this.broadcastChange(
@@ -140,7 +140,7 @@ class InventoryTransactionController extends BaseController {
       await inventoryItem.save();
       await transaction.save();
 
-      await this.logActivity("update", transaction, req.currentUser?._id);
+      // await this.logActivity("update", transaction, req.currentUser?._id);
 
       this.broadcastChange(
         `${this.modelName}_updated`,

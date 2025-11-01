@@ -9,7 +9,11 @@ import {
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { internalRoles } from "../../../core/constants/rolePresets";
+import {
+  adminOnlyRoles,
+  canEditForms,
+  internalRoles,
+} from "../../../core/constants/rolePresets";
 import {
   formatFullDate,
   getAge,
@@ -25,14 +29,18 @@ import {
 import ConfirmDeleteModal from "../../../core/components/modal/ConfirmDeleteModal";
 import { logoutUser } from "../../../core/services/slices/userSlice";
 import apiService from "../../../core/services/apiService";
+import NewPatientModal from "./NewPatientModal";
+import { formConfigMap } from "../../../core/constants/FieldConfigMap";
 
 export default function UserHeader({ data }) {
   const userInfo = useSelector((state) => state.user.userInfo);
   const hasValidRole = userInfo && internalRoles.includes(userInfo.type);
+  const patientFields = formConfigMap["users"].getFields("create");
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [activePregnancy, setActivePregnancy] = useState(null);
+  const [showPatientModal, setPatientShowModal] = useState(false);
 
   const dropdownRef = useRef(null);
   const { tablename: rawTablename, id } = useParams();
@@ -84,6 +92,12 @@ export default function UserHeader({ data }) {
 
   const isCurrentUser = userInfo?.id === id;
 
+  const canEdit = userInfo && canEditForms.includes(userInfo.role);
+  const canEditStaff = userInfo && data.role === "patient";
+
+  // console.log(data.role);
+  // console.log(canEditStaff);
+
   const handleLogout = () => {
     dispatch(logoutUser()); // 🟢 clear redux state
     navigate("/login"); // 🟢 redirect to login
@@ -101,14 +115,14 @@ export default function UserHeader({ data }) {
           />
           <div>
             <h2 className="text-lg font-semibold text-gray-800">
-              Hi {user.name?.split(" ")[0] || "there"}!
+              Hi {user.fullname?.split(" ")[0] || "there"}!
             </h2>
             <p className="text-sm text-gray-500">Welcome back 👋</p>
           </div>
         </div>
 
         {/* Dropdown Actions */}
-        <div
+        {/* <div
           className="flex items-start gap-2 relative min-w-fit"
           ref={dropdownRef}
         >
@@ -139,7 +153,6 @@ export default function UserHeader({ data }) {
                 Delete
               </button>
 
-              {/* 🟢 Logout button (only for current user) */}
               <button
                 onClick={handleLogout}
                 className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
@@ -155,7 +168,7 @@ export default function UserHeader({ data }) {
           isOpen={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
           onConfirm={handleDeleteConfirm}
-        />
+        /> */}
       </section>
     );
   }
@@ -164,113 +177,147 @@ export default function UserHeader({ data }) {
   const hasSpecialties = data?.specialization?.length > 0;
 
   return (
-    <section className="bg-white border rounded-lg p-4 md:p-6 flex flex-wrap items-center justify-between gap-4 relative">
-      {/* Avatar + Info */}
-      <div
-        className={`flex items-center gap-4 flex-1 min-w-[350px] max-w-[400px] ${
-          hasSpecialties ? "items-start" : "items-center"
-        }`}
-      >
-        <img
-          src={getAvatarUrl(user.avatar)}
-          alt="Avatar"
-          className="w-16 h-16 rounded-full object-cover"
-        />
-        <div className="space-y-1">
-          <div className="text-lg font-semibold text-gray-800">
-            {user.name || "-"}
-          </div>
-          <div className="text-sm text-gray-500">
-            {age ? age : "-"} {formattedDate && `(${formattedDate})`}
-          </div>
-
-          {/* 🩷 Show pregnancy image & EDD */}
-          {activePregnancy && (
-            <div className="mt-2 flex items-center gap-2">
-              <img
-                src="/assets/images/tabs3.png"
-                alt="Pregnancy Status"
-                className="w-5 h-5 rounded-full object-cover"
-              />
-              <span className="text-sm text-pink-700 font-medium">
-                {activePregnancy.edd
-                  ? formatFullDate(activePregnancy.edd)
-                  : "N/A"}
-              </span>
-            </div>
-          )}
-
-          {/* Specialties */}
-          {hasSpecialties && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {data.specialization.map((item, idx) => (
-                <span
-                  key={idx}
-                  className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Contact Info */}
-      <div className="flex flex-col gap-1 text-sm text-gray-600 min-w-[200px]">
-        <div className="flex items-center gap-2">
-          <Phone className="h-4 w-4" />
-          {user.phone_number || "-"}
-        </div>
-        <div className="flex items-center gap-2">
-          <FileText className="h-4 w-4" />
-          {user.email || "-"}
-        </div>
-        <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4" />
-          {user.address || "-"}
-        </div>
-      </div>
-
-      {/* Dropdown Actions */}
-      <div
-        className="flex items-start gap-2 relative min-w-fit"
-        ref={dropdownRef}
-      >
-        <button
-          onClick={() => setShowDropdown((prev) => !prev)}
-          className="p-2 hover:bg-gray-100 rounded-md transition"
+    <>
+      <section className="bg-white border rounded-lg p-4 md:p-6 flex flex-wrap items-center justify-between gap-4 relative">
+        {/* Avatar + Info */}
+        <div
+          className={`flex items-center gap-4 flex-1 min-w-[350px] max-w-[400px] ${
+            hasSpecialties ? "items-start" : "items-center"
+          }`}
         >
-          <MoreVertical className="h-5 w-5 text-gray-600" />
-        </button>
+          <img
+            src={getAvatarUrl(user.avatar)}
+            alt="Avatar"
+            className="w-16 h-16 rounded-full object-cover"
+          />
+          <div className="space-y-1">
+            <div className="text-lg font-semibold text-gray-800">
+              {user.name ? user.name : user.fullname || "-"}
+            </div>
+            <div className="text-sm text-gray-500">
+              {age ? age : "-"} {formattedDate && `(${formattedDate})`}
+            </div>
 
-        {showDropdown && (
-          <div className="absolute right-0 mt-2 w-36 bg-white border rounded shadow z-10 overflow-hidden">
-            <button
-              onClick={() =>
-                handleEdit({ tablename: tablename, id: id, navigate })
-              }
-              className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-blue-600"
-            >
-              <Edit className="w-4 h-4" />
-              Edit
-            </button>
-            <button
-              onClick={() => setShowDeleteModal(true)}
-              className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-red-600"
-            >
-              <Trash2 className="w-4 h-4" />
-              Delete
-            </button>
+            {/* 🩷 Show pregnancy image & EDD */}
+            {activePregnancy && (
+              <div className="mt-2 flex items-center gap-2">
+                <img
+                  src="/assets/images/tabs3.png"
+                  alt="Pregnancy Status"
+                  className="w-5 h-5 rounded-full object-cover"
+                />
+                <span className="text-sm text-pink-700 font-medium">
+                  {activePregnancy.edd
+                    ? formatFullDate(activePregnancy.edd)
+                    : "N/A"}
+                </span>
+              </div>
+            )}
+
+            {/* Specialties */}
+            {hasSpecialties && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {data.specialization.map((item, idx) => (
+                  <span
+                    key={idx}
+                    className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
 
-      <ConfirmDeleteModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={handleDeleteConfirm}
-      />
-    </section>
+        {/* Contact Info */}
+        <div className="flex flex-col gap-1 text-sm text-gray-600 min-w-[200px]">
+          <div className="flex items-center gap-2">
+            <Phone className="h-4 w-4" />
+            {user.phone_number || "-"}
+          </div>
+          <div className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            {user.email || "-"}
+          </div>
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" />
+            {user.address || "-"}
+          </div>
+        </div>
+
+        {/* Dropdown Actions */}
+        <div
+          className="flex items-start gap-2 relative min-w-fit"
+          ref={dropdownRef}
+        >
+          {(canEditStaff || canEdit) && (
+            <button
+              onClick={() => setShowDropdown((prev) => !prev)}
+              className="p-2 hover:bg-gray-100 rounded-md transition"
+            >
+              <MoreVertical className="h-5 w-5 text-gray-600" />
+            </button>
+          )}
+
+          {showDropdown && (
+            <div className="absolute right-0 mt-2 w-36 bg-white border rounded shadow z-10 overflow-hidden">
+              {canEditStaff && !canEdit && (
+                <button
+                  onClick={() => setPatientShowModal(true)}
+                  className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-blue-600"
+                >
+                  <Edit className="w-4 h-4" />
+                  Edit
+                </button>
+              )}
+
+              {canEdit && (
+                <>
+                  <button
+                    onClick={() =>
+                      handleEdit({ tablename: tablename, id: id, navigate })
+                    }
+                    className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-blue-600"
+                  >
+                    <Edit className="w-4 h-4" />
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() => setShowDeleteModal(true)}
+                    className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-red-600"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
+        <ConfirmDeleteModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={handleDeleteConfirm}
+        />
+      </section>
+
+      {/* Patient Modals */}
+      {showPatientModal && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+          <div className="bg-white w-full max-w-lg p-6 rounded-md shadow-lg relative z-50">
+            <NewPatientModal
+              tablename={"users"}
+              mode={"create"}
+              data={data}
+              onClose={() => setPatientShowModal(false)}
+              fields={patientFields}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }

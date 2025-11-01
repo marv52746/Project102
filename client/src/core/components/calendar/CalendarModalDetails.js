@@ -456,7 +456,11 @@ function CalendarModalDetails({ report: initialReport, onClose }) {
             <InfoCard
               icon={User}
               label="Patient"
-              value={report.patient?.name || "N/A"}
+              value={
+                report.patient?.name
+                  ? report.patient?.name
+                  : report.patient?.fullname || "N/A"
+              }
               onClick={() => handleRedirect(report.patient?._id, "patients")}
               clickable
             />

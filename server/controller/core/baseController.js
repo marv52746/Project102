@@ -2,7 +2,7 @@ const { UserDb } = require("../../model/User");
 const {
   createNotificationService,
 } = require("../../service/notificationService");
-const { logActivity } = require("../../utils/activityLogger");
+// const { logActivity } = require("../../utils/activityLogger");
 
 class BaseController {
   constructor(model, tableName) {
@@ -12,13 +12,14 @@ class BaseController {
   }
 
   // ✅ Centralized logging method so we don't repeat tableName
-  async logActivity(action, record, userId) {
-    try {
-      await logActivity(action, this.tableName, record, userId);
-    } catch (err) {
-      console.error("❌ Activity Log Error:", err.message);
-    }
-  }
+  // async logActivity(action, record, userId) {
+  //   try {
+  //     await logActivity(action, this.tableName, record, userId);
+  //   } catch (err) {
+  //     console.error("❌ Activity Log Error:", err.message);
+  //   }
+  // }
+
   // ✅ Reusable broadcast method
   broadcastChange(event, data) {
     try {
@@ -166,7 +167,7 @@ class BaseController {
         updated_by: req.currentUser?._id || null, // ✅ auto-set creator
       });
       const savedItem = await newItem.save();
-      await this.logActivity("create", savedItem, req.currentUser?._id);
+      // await this.logActivity("create", savedItem, req.currentUser?._id);
 
       // 🔥 Emit "created" event
       this.broadcastChange(`${this.modelName}_created`, savedItem);
@@ -190,7 +191,7 @@ class BaseController {
       if (!updatedItem) {
         return res.status(404).json({ message: "Item not found" });
       }
-      await this.logActivity("update", updatedItem, req.currentUser?._id);
+      // await this.logActivity("update", updatedItem, req.currentUser?._id);
 
       // 🔥 Emit "updated" event
       this.broadcastChange(`${this.modelName}_updated`, updatedItem);
@@ -208,7 +209,7 @@ class BaseController {
       if (!deletedItem) {
         return res.status(404).json({ message: "Item not found" });
       }
-      await this.logActivity("delete", deletedItem, req.currentUser?._id);
+      // await this.logActivity("delete", deletedItem, req.currentUser?._id);
 
       // 🔥 Emit "deleted" event
       this.broadcastChange(`${this.modelName}_deleted`, deletedItem);

@@ -7,4 +7,5 @@ export const dashboardUserRoles = ["admin", "staff", "doctor"];
 export const appointmentCreators = ["doctor", "staff"];
 
 export const transactionTables = [""];
+
 export const canEditForms = ["admin", "doctor"];

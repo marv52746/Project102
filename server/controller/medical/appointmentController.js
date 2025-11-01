@@ -53,7 +53,7 @@ class AppointmentController extends BaseController {
       });
       const savedItem = await newItem.save();
 
-      await this.logActivity("create", savedItem, req.currentUser?._id);
+      // await this.logActivity("create", savedItem, req.currentUser?._id);
 
       // 🔥 Emit "created" event
       this.broadcastChange(`${this.modelName}_created`, savedItem);

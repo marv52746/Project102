@@ -39,7 +39,7 @@ export const handleFormSubmit = async ({
   tablename: rawTablename,
   id,
   data,
-  fields,
+  fields = [],
   fileData,
   navigate,
   userInfo,

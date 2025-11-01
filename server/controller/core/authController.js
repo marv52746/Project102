@@ -142,7 +142,7 @@ const googleLogin = async (req, res) => {
 
 const signup = async (req, res) => {
   try {
-    const { email, password, ...userObject } = req.body;
+    const { email, password, first_name, last_name, phone_number } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
@@ -157,12 +157,20 @@ const signup = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user (default role = "guest", update this as needed)
+    const fullNameOnly = [first_name, last_name].filter(Boolean).join(" ");
+
+    // Create user
     const newUser = new UserDb({
-      ...userObject,
       email,
-      password: hashedPassword,
       username: email,
+      password: hashedPassword,
+      first_name,
+      last_name,
+      phone_number,
+      name: fullNameOnly,
+      fullname: fullNameOnly,
+      role: "patient", // or whatever your default role is
+      user_type: "external", // optional
     });
 
     const savedUser = await newUser.save();

@@ -27,16 +27,31 @@ export default function NewPatientModal({
   const handleSubmit = async (e) => {
     e.preventDefault(); // ✅ stop page reload
 
-    handleFormSubmit({
-      dispatch,
-      tablename: tablename,
-      data: {
-        ...inputData,
-        role: "patient", // 👈 always include role
-      },
-      fields,
-      fileData,
-    });
+    if (data) {
+      handleFormSubmit({
+        dispatch,
+        tablename: tablename,
+        id: data.id,
+        data: {
+          ...inputData,
+          role: "patient", // 👈 always include role
+        },
+        fields,
+        fileData,
+      });
+    } else {
+      handleFormSubmit({
+        dispatch,
+        tablename: tablename,
+        data: {
+          ...inputData,
+          role: "patient", // 👈 always include role
+        },
+        fields,
+        fileData,
+      });
+    }
+
     onClose();
   };
 
@@ -44,7 +59,9 @@ export default function NewPatientModal({
     <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 pt-0 relative">
         <div className="flex justify-between items-center pb-4 pt-6 sticky top-0 bg-white z-10">
-          <h2 className="text-lg font-semibold">Add Patient</h2>
+          <h2 className="text-lg font-semibold">
+            {data ? "Update" : "Add"} Patient
+          </h2>
           <button onClick={onClose}>
             <X className="w-5 h-5 text-gray-600 hover:text-black" />
           </button>

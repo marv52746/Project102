@@ -10,6 +10,16 @@ const { PatientDb } = require("../../model/Patient");
 const { DoctorDb } = require("../../model/Doctor");
 const BaseController = require("./baseController");
 
+const { AllergyDb } = require("../../model/medical/Allergies");
+const { ConditionDb } = require("../../model/medical/Condition");
+const { LabRequestDb } = require("../../model/medical/LaboratoryRequest");
+const { MedicationDb } = require("../../model/medical/Medications");
+const { PregnancyDb } = require("../../model/medical/Pregnancy");
+const { SurgicalDb } = require("../../model/medical/Surgical");
+const { UltrasoundDb } = require("../../model/medical/Ultrasound");
+const { VitalsDb } = require("../../model/medical/Vitals");
+const { AppointmentDb } = require("../../model/Appointment");
+
 const sendEmail = require("../../jobs/sendEmail");
 const {
   createNotificationService,
@@ -189,7 +199,7 @@ class UserController extends BaseController {
       }
 
       // ✅ Log Activity
-      await this.logActivity("create", savedUser, req.currentUser?._id);
+      // await this.logActivity("create", savedUser, req.currentUser?._id);
 
       res.status(201).json(savedUser);
     } catch (error) {
@@ -306,6 +316,19 @@ class UserController extends BaseController {
       // 1. Delete linked patient if user is a patient
       if (user.role === "patient") {
         await PatientDb.deleteOne({ user: userId });
+
+        // 🩺 Delete related medical records
+        await Promise.all([
+          AllergyDb.deleteMany({ patient: userId }),
+          ConditionDb.deleteMany({ patient: userId }),
+          LabRequestDb.deleteMany({ patient: userId }),
+          MedicationDb.deleteMany({ patient: userId }),
+          PregnancyDb.deleteMany({ patient: userId }),
+          SurgicalDb.deleteMany({ patient: userId }),
+          UltrasoundDb.deleteMany({ patient: userId }),
+          VitalsDb.deleteMany({ patient: userId }),
+          AppointmentDb.deleteMany({ patient: userId }),
+        ]);
       }
 
       // 2. Delete linked doctor if user is a doctor
@@ -329,7 +352,7 @@ class UserController extends BaseController {
       this.broadcastChange(`${this.modelName}_deleted`, user);
 
       // ✅ Log Activity
-      await this.logActivity("delete", user, req.currentUser?._id);
+      // await this.logActivity("delete", user, req.currentUser?._id);
 
       res.status(200).json({ message: "User and related records deleted." });
     } catch (error) {

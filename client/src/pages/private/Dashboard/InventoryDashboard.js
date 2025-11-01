@@ -26,6 +26,10 @@ export default function InventoryDashboard() {
     transactionsThisMonth: 0,
   });
 
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [categoryData, setCategoryData] = useState([]); // [{ name, count }]
   const [monthlyItemTransactions, setMonthlyItemTransactions] = useState([]); // [{ name, category, stockIn, stockOut }]
@@ -34,6 +38,7 @@ export default function InventoryDashboard() {
   const [lowStockItems, setLowStockItems] = useState([]);
   const [soonToExpireItems, setSoonToExpireItems] = useState([]);
   const [monthlyTransactions, setMonthlyTransactions] = useState([]);
+  const [allTransactions, setAllTransactions] = useState([]);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
@@ -161,6 +166,8 @@ export default function InventoryDashboard() {
         const items = await apiService.get(dispatch, "inventory");
         const transactions = await apiService.get(dispatch, "inventoryLogs");
 
+        setAllTransactions(transactions);
+
         const now = new Date();
         const soonExpireLimit = new Date();
         soonExpireLimit.setDate(now.getDate() + 30);
@@ -287,21 +294,127 @@ export default function InventoryDashboard() {
     setModalType(type);
   };
 
-  const handleGenerateReport = () => {
+  // const handleGenerateReport = () => {
+  //   const doc = new jsPDF("p", "mm", "a4");
+
+  //   // Title
+  //   const now = new Date();
+  //   const monthName = now.toLocaleString("default", { month: "long" }); // e.g., "September"
+  //   const year = now.getFullYear();
+  //   doc.setFontSize(16);
+  //   doc.text(`${monthName} ${year} - Inventory Report`, 105, 15, {
+  //     align: "center",
+  //   });
+
+  //   // Date
+  //   doc.setFontSize(11);
+  //   doc.text(`Generated on: ${now.toLocaleDateString()}`, 14, 25);
+
+  //   // --- KPI Summary ---
+  //   doc.setFontSize(13);
+  //   doc.text("Key Metrics", 14, 35);
+
+  //   autoTable(doc, {
+  //     startY: 40,
+  //     head: [["Metric", "Value"]],
+  //     body: [
+  //       ["Total Items", stats.totalItems],
+  //       ["Low Stock Items", stats.lowStock],
+  //       ["Soon to Expire", stats.soonToExpire],
+  //       ["Transactions This Month", stats.transactionsThisMonth],
+  //     ],
+  //     theme: "grid",
+  //   });
+
+  //   // --- Stock by Category with Items ---
+  //   doc.setFontSize(13);
+  //   doc.text(
+  //     "Stock by Category (with Items)",
+  //     14,
+  //     doc.lastAutoTable.finalY + 15
+  //   );
+
+  //   categoryData.forEach((cat, index) => {
+  //     const itemsInCat = categoryItemsMap[cat.name] || [];
+
+  //     // Add category header below the last table
+  //     const yPos =
+  //       index === 0
+  //         ? doc.lastAutoTable.finalY + 25
+  //         : doc.lastAutoTable
+  //         ? doc.lastAutoTable.finalY + 10
+  //         : 45;
+  //     doc.setFontSize(12);
+  //     doc.text(`${cat.name} (${cat.count} items)`, 14, yPos);
+
+  //     // Table right below header
+  //     autoTable(doc, {
+  //       startY: yPos + 5,
+  //       head: [["Item", "Quantity", "Unit", "Reorder Level", "Expiry Date"]],
+  //       body: itemsInCat.map((item) => [
+  //         item.name,
+  //         item.quantity,
+  //         item.unit,
+  //         item.reorderLevel,
+  //         item.expiryDate
+  //           ? new Date(item.expiryDate).toLocaleDateString()
+  //           : "-",
+  //       ]),
+  //       theme: "grid",
+  //       margin: { left: 14, right: 14 },
+  //     });
+  //   });
+
+  //   // --- Current Month Item Transactions ---
+  //   doc.setFontSize(13);
+  //   doc.text(
+  //     "Current Month Item Transactions",
+  //     14,
+  //     doc.lastAutoTable.finalY + 15
+  //   );
+
+  //   autoTable(doc, {
+  //     startY: doc.lastAutoTable.finalY + 20,
+  //     head: [
+  //       ["Item", "Category", "Type", "Quantity", "Units", "Updated By", "Date"],
+  //     ],
+  //     body: monthlyTransactions.map((t) => [
+  //       t.item?.name || "Unknown",
+  //       t.item?.category || "Uncategorized",
+  //       t.type,
+  //       t.quantity,
+  //       t.item?.unit || "-",
+  //       t.updated_by?.fullname || "N/A",
+  //       new Date(t.timestamp).toLocaleDateString(),
+  //     ]),
+  //     theme: "grid",
+  //   });
+
+  //   // Save
+  //   doc.save(`Inventory_Report_${now.getFullYear()}-${now.getMonth() + 1}.pdf`);
+  // };
+
+  const handleGenerateReport = (month, year) => {
     const doc = new jsPDF("p", "mm", "a4");
 
     // Title
-    const now = new Date();
-    const monthName = now.toLocaleString("default", { month: "long" }); // e.g., "September"
-    const year = now.getFullYear();
+    const monthName = new Date(year, month - 1).toLocaleString("default", {
+      month: "long",
+    });
     doc.setFontSize(16);
     doc.text(`${monthName} ${year} - Inventory Report`, 105, 15, {
       align: "center",
     });
 
+    // Use the selected month/year for transactions
+    const filteredTransactions = allTransactions.filter((t) => {
+      const d = new Date(t.created_on);
+      return d.getMonth() + 1 === month && d.getFullYear() === year;
+    });
+
     // Date
     doc.setFontSize(11);
-    doc.text(`Generated on: ${now.toLocaleDateString()}`, 14, 25);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 25);
 
     // --- KPI Summary ---
     doc.setFontSize(13);
@@ -314,7 +427,7 @@ export default function InventoryDashboard() {
         ["Total Items", stats.totalItems],
         ["Low Stock Items", stats.lowStock],
         ["Soon to Expire", stats.soonToExpire],
-        ["Transactions This Month", stats.transactionsThisMonth],
+        ["Transactions in Selected Month", filteredTransactions.length],
       ],
       theme: "grid",
     });
@@ -361,7 +474,7 @@ export default function InventoryDashboard() {
     // --- Current Month Item Transactions ---
     doc.setFontSize(13);
     doc.text(
-      "Current Month Item Transactions",
+      `${monthName} ${year} Item Transactions`,
       14,
       doc.lastAutoTable.finalY + 15
     );
@@ -371,7 +484,7 @@ export default function InventoryDashboard() {
       head: [
         ["Item", "Category", "Type", "Quantity", "Units", "Updated By", "Date"],
       ],
-      body: monthlyTransactions.map((t) => [
+      body: filteredTransactions.map((t) => [
         t.item?.name || "Unknown",
         t.item?.category || "Uncategorized",
         t.type,
@@ -384,7 +497,7 @@ export default function InventoryDashboard() {
     });
 
     // Save
-    doc.save(`Inventory_Report_${now.getFullYear()}-${now.getMonth() + 1}.pdf`);
+    doc.save(`Inventory_Report_${year}-${month}.pdf`);
   };
 
   const itemsForSelectedCategory =
@@ -405,7 +518,7 @@ export default function InventoryDashboard() {
         {/* Generate Report Button */}
         <div className="flex justify-end">
           <button
-            onClick={handleGenerateReport}
+            onClick={() => setReportModalOpen(true)}
             className="group flex items-center gap-2
               bg-blue-50 text-blue-800 
               hover:bg-blue-100 
@@ -661,6 +774,75 @@ export default function InventoryDashboard() {
         data={modalData}
         type={modalType}
       />
+
+      {reportModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">
+              Select Month & Year
+            </h2>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700">
+                  Month
+                </label>
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400"
+                >
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {new Date(0, i).toLocaleString("default", {
+                        month: "long",
+                      })}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700">
+                  Year
+                </label>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(Number(e.target.value))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400"
+                >
+                  {Array.from({ length: 5 }, (_, i) => {
+                    const year = new Date().getFullYear() - i;
+                    return (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setReportModalOpen(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  handleGenerateReport(selectedMonth, selectedYear);
+                  setReportModalOpen(false);
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition"
+              >
+                Generate
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -133,7 +133,9 @@ export default function UpcomingAppointments({
                     </div>
 
                     <div className="mt-2 text-gray-700 font-medium">
-                      {app.patient?.name || "Patient"}
+                      {app.patient?.name
+                        ? app.patient?.name
+                        : app.patient?.fullname || "Patient"}
                     </div>
 
                     {app.reason && (
@@ -154,7 +156,9 @@ export default function UpcomingAppointments({
                   >
                     <div>
                       <div className="font-medium text-gray-800">
-                        {app.patient?.name || "Patient"}
+                        {app.patient?.name
+                          ? app.patient?.name
+                          : app.patient?.fullname || "Patient"}
                       </div>
                       <div className="text-xs text-gray-500">
                         {new Date(app.date).toLocaleDateString(undefined, {

@@ -10,6 +10,7 @@ import FormFormat from "../../core/components/FormFormat";
 import apiService from "../../core/services/apiService";
 import UserDashboardPage from "./FormDetails/Index";
 import { normalizeTableName } from "../../core/utils/tableUtils";
+import useSocket from "../../core/hooks/useSocket";
 
 function Form() {
   const { tablename: rawTablename, view, id } = useParams();
@@ -22,6 +23,14 @@ function Form() {
   const hasValidRole = userInfo && internalRoles.includes(userInfo.type);
 
   const tablename = normalizeTableName(rawTablename);
+  const [manualRefresh, setManualRefresh] = useState(0);
+
+  useSocket({
+    // When an existing user is updated
+    user_updated: (data) => {
+      setManualRefresh((prev) => prev + 1);
+    },
+  });
 
   useEffect(() => {
     if (view !== "create") {
@@ -39,7 +48,7 @@ function Form() {
 
       fetchDetails();
     }
-  }, [view, id, tablename, dispatch]);
+  }, [view, id, tablename, dispatch, manualRefresh]);
 
   if (!hasValidRole) return <div>Access denied</div>;
   if (loading) return <div className="p-4">Loading...</div>;

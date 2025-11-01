@@ -7,6 +7,8 @@ import { getStatusClass } from "../utils/calendarUtils";
 import { formatFullDate, getNestedValue } from "../utils/tableUtils";
 import { capitalizeText } from "../utils/stringUtils";
 import { ChevronDown, ChevronUp, XCircle } from "lucide-react";
+import { useSelector } from "react-redux";
+import { canEditForms } from "../constants/rolePresets";
 
 const TableList = ({ data, columns }) => {
   const [search, setSearch] = useState("");
@@ -17,6 +19,8 @@ const TableList = ({ data, columns }) => {
 
   const { tablename } = useParams();
   const navigate = useNavigate();
+
+  const userInfo = useSelector((state) => state.user.userInfo);
 
   // Handle filter value change
   const handleFilterChange = (colName, value) => {
@@ -113,6 +117,8 @@ const TableList = ({ data, columns }) => {
     }),
   };
 
+  const canEdit = userInfo && canEditForms.includes(userInfo.role);
+
   return (
     <div className="px-4 py-2 shadow-lg bg-white rounded-lg overflow-hidden">
       {/* 🔍 Search + Create */}
@@ -148,13 +154,14 @@ const TableList = ({ data, columns }) => {
             className="form-control w-64 border border-gray-300 rounded-md px-3 py-1 text-sm focus:border-text-secondary focus:outline-none"
           />
         </div>
-
-        <button
-          onClick={handleCreateNew}
-          className="bg-green-500 px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-green-600 transition"
-        >
-          Create New
-        </button>
+        {canEdit && (
+          <button
+            onClick={handleCreateNew}
+            className="bg-green-500 px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-green-600 transition"
+          >
+            Create New
+          </button>
+        )}
       </div>
 
       {/* 🧩 Collapsible Filter Section (Movedbelow Search) */}
